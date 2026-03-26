@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>الرحلة الصيفية الثانية ١٤٤٧هـ</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--br:#2C1810;--gold:#C9A84C;--gl:#FAEEDA;--cr:#F9F3E8;--tx:#1a1208;--t2:#6b5c3e;--t3:#a08860;--bd:#e8dcc8;--wh:#fff;--rd:#c0392b;--gn:#27643a;--bl:#185FA5}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--cr);font-family:'Tajawal',sans-serif;color:var(--tx)}
+body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;height:100svh;overflow:hidden;box-shadow:0 0 30px #0002}
+.hdr{background:var(--br);padding:16px 16px 11px;flex-shrink:0;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;inset:0;opacity:.06;background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 12px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 12px)}
+.hi{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between}
+.ht{font-family:'Amiri',serif;font-size:19px;color:#F5E6C8}
+.sd{width:8px;height:8px;border-radius:50%;background:#666;margin-top:5px;flex-shrink:0;transition:background .3s}
+.sd.ok{background:#4caf50;animation:pu 2s infinite}
+.sd.sy{background:var(--gold);animation:pu .6s infinite}
+.sd.er{background:var(--rd)}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.pills{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;position:relative;z-index:1}
+.pill{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:20px;padding:2px 9px;font-size:11px;color:#F5E6C8}
+.tabs{display:flex;background:var(--wh);border-bottom:1px solid var(--bd);flex-shrink:0}
+.tab{flex:1;padding:12px 4px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;color:var(--t3);background:none;border:none;border-bottom:2.5px solid transparent;cursor:pointer}
+.tab.on{color:var(--br);border-bottom-color:var(--gold)}
+.pg{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:13px 13px 28px;display:none}
+.pg.on{display:block}
+.card{background:var(--wh);border:1px solid var(--bd);border-radius:15px;padding:13px;margin-bottom:11px}
+.st{font-family:'Amiri',serif;font-size:15px;color:var(--br);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #C9A84C22}
+.lbl{display:block;font-size:11px;color:var(--t3);font-weight:700;margin-bottom:3px}
+.fi{width:100%;padding:10px 11px;border:1px solid var(--bd);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:15px;color:var(--tx);background:var(--wh);outline:none;direction:rtl;-webkit-appearance:none}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px #C9A84C12}
+textarea.fi{resize:none;min-height:66px;line-height:1.6}
+.mb{margin-bottom:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:9px}
+.btn{width:100%;padding:13px;background:var(--br);color:#F5E6C8;border:none;border-radius:11px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s;margin-top:3px}
+.btn:active{opacity:.8}
+.seg{display:flex;background:#f5efe6;border-radius:9px;padding:3px;margin-bottom:9px}
+.sg{flex:1;padding:8px 3px;border:none;background:none;border-radius:7px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer}
+.sg.on{background:var(--wh);color:var(--br);box-shadow:0 1px 3px #0001;border:.5px solid var(--bd)}
+.mets{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.met{background:#f9f3e8;border-radius:11px;padding:9px 5px;text-align:center}
+.ml{font-size:10px;color:var(--t3);margin-bottom:1px}
+.mv{font-size:15px;font-weight:700;color:var(--br)}
+.mg{color:var(--gn)}.mr{color:var(--rd)}.mo{color:#854F0B}
+.bw{margin-bottom:11px}
+.br2{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:3px}
+.bb{height:7px;background:#ede6d8;border-radius:7px;overflow:hidden}
+.bf{height:100%;background:var(--gold);border-radius:7px;transition:width .5s}
+.bf.ov{background:var(--rd)}
+.pers{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.pc{border-radius:13px;padding:12px;border:1px solid var(--bd);background:var(--wh)}
+.po{border-top:3px solid #378ADD}.pm{border-top:3px solid var(--gold)}
+.av{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:14px;font-weight:700;margin-bottom:5px}
+.ao{background:#E6F1FB;color:#0C447C}.am{background:var(--gl);color:#633806}
+.pn{font-size:13px;font-weight:700;color:var(--br);margin-bottom:1px}
+.pl{font-size:10px;color:var(--t3)}
+.pv{font-size:17px;font-weight:700;margin-top:1px}
+.pvo{color:var(--bl)}.pvm{color:#854F0B}
+.ps{font-size:10px;color:var(--t3);margin-top:4px;padding-top:4px;border-top:1px solid var(--bd)}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;margin-top:4px}
+.cr{background:#fdecea;color:#7f1d1d}.cg{background:#e6f4ea;color:#1a4731}.cn{background:#f5efe6;color:#6b5c3e}
+.sett{background:var(--gl);border:1px solid #C9A84C44;border-radius:11px;padding:10px 13px;margin-bottom:11px;text-align:center}
+.set{font-size:12px;color:#633806;margin-bottom:2px;font-weight:700}
+.seb{font-family:'Amiri',serif;font-size:16px;color:var(--br)}
+.sev{background:#e8f5ee;border-color:#a7d7b0}
+.frow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.fb{padding:4px 10px;border-radius:20px;border:1px solid var(--bd);background:var(--wh);font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;color:var(--t3)}
+.fb.on{background:var(--br);border-color:var(--br);color:#F5E6C8}
+.er{display:flex;align-items:center;gap:4px;padding:9px 0;border-bottom:1px solid #f0e8d8}
+.er:last-child{border-bottom:none}
+.bx{font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;flex-shrink:0}
+.btr{background:#E6F1FB;color:#0C447C}.bac{background:#EAF3DE;color:#27500A}
+.bfo{background:var(--gl);color:#633806}.bre{background:#EEEDFE;color:#3C3489}.bot{background:#f0ebe3;color:#5a4a30}
+.cb{font-size:10px;padding:2px 5px;border-radius:20px;background:#f0ebe3;color:#5a4a30;flex-shrink:0}
+.pt{font-size:10px;padding:2px 6px;border-radius:20px;flex-shrink:0}
+.pto{background:#E6F1FB;color:#0C447C}.ptm{background:var(--gl);color:#633806}.pts{background:#F3E5F5;color:#4A148C}
+.en{font-size:13px;color:var(--tx);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ea{font-size:13px;font-weight:700;color:#854F0B;flex-shrink:0}
+.dl{background:none;border:none;color:#ccc;font-size:15px;cursor:pointer;padding:1px 4px;flex-shrink:0;line-height:1}
+.dl:active{color:var(--rd)}
+.tc{background:var(--wh);border:1px solid var(--bd);border-radius:13px;margin-bottom:9px;overflow:hidden}
+.th{display:flex;align-items:center;gap:7px;padding:11px 12px;cursor:pointer}
+.td2{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.tt{font-family:'Amiri',serif;font-size:14px;color:var(--br);flex:1}
+.tm{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.tda{font-size:10px;color:var(--gold);font-weight:700}
+.cv{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.cv.op{transform:rotate(180deg)}
+.tb{display:none;padding:0 12px 12px;border-top:1px solid #f0e8d8}
+.tb.op{display:block}
+.tf{margin-top:9px}
+.tfl{font-size:10px;font-weight:700;color:var(--gold);margin-bottom:2px}
+.tfv{font-size:13px;color:var(--tx);line-height:1.65}
+.tfv.mu{color:var(--t3);font-style:italic}
+.ta{margin-top:9px;padding-top:7px;border-top:1px solid #f0e8d8;display:flex;justify-content:flex-end}
+.db{font-size:12px;padding:4px 11px;border:1px solid var(--bd);border-radius:20px;background:none;color:var(--t3);cursor:pointer;font-family:'Tajawal',sans-serif}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1208;color:#F5E6C8;font-size:13px;font-weight:700;padding:9px 18px;border-radius:22px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;font-family:'Tajawal',sans-serif}
+.toast.on{opacity:1}
+.emp{text-align:center;padding:26px 12px;color:var(--t3);font-size:13px}
+.ei{font-size:28px;margin-bottom:7px}
+.gl{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--bd);border-radius:11px;text-decoration:none;color:var(--tx);background:var(--wh);margin-bottom:8px}
+.gl:active{background:var(--cr)}
+.gi{font-size:18px;flex-shrink:0}
+.gt{font-size:12px;font-weight:700;color:var(--br)}
+.gs{font-size:11px;color:var(--t3)}
+.ga{color:var(--t3);font-size:13px;margin-right:auto}
+
+/* API CONFIG BANNER */
+.cfg{background:var(--gl);border:1px solid #C9A84C55;border-radius:11px;padding:11px 13px;margin-bottom:11px;display:flex;align-items:center;gap:10px}
+.cfg-txt{flex:1;font-size:12px;color:#633806;line-height:1.5}
+.cfg-btn{background:var(--br);color:#F5E6C8;border:none;border-radius:8px;padding:7px 12px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+
+/* API MODAL */
+.modal-bg{position:fixed;inset:0;background:#0007;z-index:500;display:flex;align-items:flex-end;justify-content:center;max-width:480px;margin:0 auto}
+.modal-bg.hidden{display:none}
+.modal{background:var(--wh);border-radius:20px 20px 0 0;padding:22px 18px 32px;width:100%}
+.modal-t{font-family:'Amiri',serif;font-size:18px;color:var(--br);margin-bottom:6px}
+.modal-s{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.6}
+.modal-s code{background:#f0ebe3;padding:1px 5px;border-radius:5px;font-size:11px;direction:ltr;display:inline-block}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hi">
+    <div class="ht">الرحلة الصيفية الثانية ١٤٤٧هـ</div>
+    <div class="sd" id="sd"></div>
+  </div>
+  <div class="pills">
+    <span class="pill">🇸🇦 السعودية</span>
+    <span class="pill">🇲🇦 المغرب</span>
+    <span class="pill">🇩🇿 الجزائر</span>
+    <span class="pill">🇪🇬 مصر</span>
+    <span class="pill">🇿🇦 جنوب أفريقيا</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="showPg('b',this)">💰 الميزانية</button>
+  <button class="tab" onclick="showPg('t',this)">📅 البرنامج</button>
+</div>
+
+<!-- BUDGET PAGE -->
+<div id="pg-b" class="pg on">
+
+  <div class="cfg" id="cfg-banner">
+    <div class="cfg-txt">اربط التطبيق بـ Google Sheets للمشاركة مع ماجد</div>
+    <button class="cfg-btn" onclick="showModal()">ربط ←</button>
+  </div>
+
+  <div class="pers">
+    <div class="pc po">
+      <div class="av ao">ع</div>
+      <div class="pn">عمر</div>
+      <div class="pl">إجمالي ما دفع</div>
+      <div class="pv pvo" id="op">٠ ر.س</div>
+      <div class="ps">من المشترك: <span id="os">٠ ر.س</span></div>
+      <div id="ob"></div>
+    </div>
+    <div class="pc pm">
+      <div class="av am">م</div>
+      <div class="pn">ماجد</div>
+      <div class="pl">إجمالي ما دفع</div>
+      <div class="pv pvm" id="mp">٠ ر.س</div>
+      <div class="ps">من المشترك: <span id="ms2">٠ ر.س</span></div>
+      <div id="mb2"></div>
+    </div>
+  </div>
+
+  <div class="mets">
+    <div class="met"><div class="ml">الميزانية</div><div class="mv mo" id="mt">٠</div></div>
+    <div class="met"><div class="ml">المُنفق</div><div class="mv mr" id="msp">٠</div></div>
+    <div class="met"><div class="ml">المتبقي</div><div class="mv mg" id="mr">٠</div></div>
+  </div>
+  <div class="bw">
+    <div class="br2"><span>نسبة الإنفاق</span><span id="bp">٠٪</span></div>
+    <div class="bb"><div class="bf" id="bf" style="width:0%"></div></div>
+  </div>
+  <div id="sa"></div>
+
+  <div class="card">
+    <div class="st">⚙️ الميزانية الإجمالية</div>
+    <label class="lbl">الميزانية الكاملة (ر.س)</label>
+    <input class="fi" type="number" inputmode="numeric" id="tb" placeholder="مثال: 15000" oninput="calc();sched()"/>
+  </div>
+
+  <div class="card">
+    <div class="st">➕ تسجيل مصروف</div>
+    <div class="mb">
+      <label class="lbl">البيان</label>
+      <input class="fi" type="text" id="en" placeholder="مثال: تذاكر الطيران"/>
+    </div>
+    <div class="g3">
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="ea2" placeholder="٠"/></div>
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="eco">
+          <option value="sa">🇸🇦 السعودية</option>
+          <option value="ma">🇲🇦 المغرب</option>
+          <option value="dz">🇩🇿 الجزائر</option>
+          <option value="eg">🇪🇬 مصر</option>
+          <option value="za">🇿🇦 جنوب أفريقيا</option>
+        </select>
+      </div>
+      <div><label class="lbl">الفئة</label>
+        <select class="fi" id="ect">
+          <option value="transport">✈️ مواصلات</option>
+          <option value="accommodation">🏨 سكن</option>
+          <option value="food">🍽️ طعام</option>
+          <option value="research">📜 بحث علمي</option>
+          <option value="other">📦 أخرى</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb">
+      <label class="lbl">مَن دفع؟</label>
+      <div class="seg">
+        <button class="sg" id="sgo" onclick="setPay('omar')">عمر فقط</button>
+        <button class="sg on" id="sgs" onclick="setPay('split')">بالتساوي</button>
+        <button class="sg" id="sgm" onclick="setPay('majed')">ماجد فقط</button>
+      </div>
+    </div>
+    <button class="btn" onclick="addE()">تسجيل المصروف</button>
+  </div>
+
+  <div class="card">
+    <div class="st">📋 سجل المصاريف</div>
+    <div class="frow">
+      <button class="fb on" onclick="setF('all',this)">الكل</button>
+      <button class="fb" onclick="setF('sa',this)">🇸🇦</button>
+      <button class="fb" onclick="setF('ma',this)">🇲🇦</button>
+      <button class="fb" onclick="setF('dz',this)">🇩🇿</button>
+      <button class="fb" onclick="setF('eg',this)">🇪🇬</button>
+      <button class="fb" onclick="setF('za',this)">🇿🇦</button>
+    </div>
+    <div id="el"><div class="emp"><div class="ei">📜</div>لا توجد مصاريف بعد</div></div>
+  </div>
+
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="gl">
+    <span class="gi">📊</span>
+    <span style="flex:1"><div class="gt">فتح Google Sheets</div><div class="gs">عرض البيانات التفصيلية</div></span>
+    <span class="ga">←</span>
+  </a>
+</div>
+
+<!-- TIMELINE PAGE -->
+<div id="pg-t" class="pg">
+  <div class="card">
+    <div class="st">➕ إضافة زيارة</div>
+    <div class="g3">
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="tc">
+          <option value="sa">🇸🇦 السعودية</option>
+          <option value="ma">🇲🇦 المغرب</option>
+          <option value="dz">🇩🇿 الجزائر</option>
+          <option value="eg">🇪🇬 مصر</option>
+          <option value="za">🇿🇦 جنوب أفريقيا</option>
+        </select>
+      </div>
+      <div><label class="lbl">المدينة</label><input class="fi" type="text" id="tcy" placeholder="الرباط"/></div>
+      <div><label class="lbl">التاريخ</label><input class="fi" type="date" id="tdt"/></div>
+    </div>
+    <div class="mb"><label class="lbl">الزيارة</label><input class="fi" type="text" id="thd" placeholder="مثال: الخزانة الحسنية"/></div>
+    <div class="mb"><label class="lbl">نبذة</label><textarea class="fi" id="tnb" placeholder="وصف مختصر..."></textarea></div>
+    <div class="mb"><label class="lbl">المطلوب</label><textarea class="fi" id="tml" placeholder="ما الذي تريد تحقيقه..."></textarea></div>
+    <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="tnt" placeholder="تحضيرات، أرقام تواصل..."></textarea></div>
+    <button class="btn" onclick="addT()">إضافة الزيارة</button>
+  </div>
+  <div class="st" style="padding:0 2px 9px">🧭 مسار الرحلة</div>
+  <div id="tl2"><div class="emp"><div class="ei">🗺️</div>أضف زيارات رحلتك للبدء</div></div>
+  <div style="margin-top:12px">
+    <a href="https://calendar.google.com" target="_blank" class="gl">
+      <span class="gi">📆</span>
+      <span style="flex:1"><div class="gt">Google Calendar</div><div class="gs">مزامنة المواعيد مع ماجد</div></span>
+      <span class="ga">←</span>
+    </a>
+  </div>
+</div>
+
+<!-- API MODAL -->
+<div class="modal-bg hidden" id="modal-bg" onclick="hideModal(event)">
+  <div class="modal">
+    <div class="modal-t">ربط Google Sheets</div>
+    <div class="modal-s">
+      الصق رابط الـ Web App الذي حصلت عليه من Google Apps Script<br/>
+      يبدأ بـ <code>https://script.google.com/macros/s/...</code>
+    </div>
+    <div class="mb">
+      <label class="lbl">رابط الـ Web App</label>
+      <input class="fi" type="url" id="api-in" placeholder="https://script.google.com/macros/s/..." style="direction:ltr;font-size:12px"/>
+    </div>
+    <button class="btn" onclick="saveApi()">ربط وحفظ</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AR=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const FM=n=>AR(Math.round(n).toLocaleString('en'));
+const CF={sa:'🇸🇦',ma:'🇲🇦',dz:'🇩🇿',eg:'🇪🇬',za:'🇿🇦'};
+const CN={sa:'السعودية',ma:'المغرب',dz:'الجزائر',eg:'مصر',za:'جنوب أفريقيا'};
+const CL={transport:'مواصلات',accommodation:'سكن',food:'طعام',research:'بحث علمي',other:'أخرى'};
+const CB={transport:'btr',accommodation:'bac',food:'bfo',research:'bre',other:'bot'};
+
+let pay='split',fil='all',exps=[],tls=[],api='',sv=null,busy=false;
+
+function init(){
+  const a=localStorage.getItem('t_api');
+  if(a){api=a;document.getElementById('cfg-banner').style.display='none';if(a!=='x')pull();}
+  loadLoc();
+}
+
+function showPg(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function setPay(p){pay=p;['o','s','m'].forEach(x=>document.getElementById('sg'+x).classList.remove('on'));document.getElementById('sg'+(p==='omar'?'o':p==='split'?'s':'m')).classList.add('on');}
+function setF(c,b){fil=c;document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renE();}
+
+function showModal(){document.getElementById('modal-bg').classList.remove('hidden');}
+function hideModal(e){if(e.target===document.getElementById('modal-bg'))document.getElementById('modal-bg').classList.add('hidden');}
+
+function saveApi(){
+  const u=document.getElementById('api-in').value.trim();
+  if(!u.startsWith('https://script.google.com')){toast('⚠️ الرابط غير صحيح');return;}
+  api=u;localStorage.setItem('t_api',u);
+  document.getElementById('modal-bg').classList.add('hidden');
+  document.getElementById('cfg-banner').style.display='none';
+  toast('✓ تم الربط!');pull();
+}
+
+function dot(s){const d=document.getElementById('sd');d.className='sd'+({ok:' ok',sy:' sy',er:' er'}[s]||'');}
+
+async function pull(){
+  if(!api||api==='x')return;
+  dot('sy');
+  try{
+    const r=await fetch(api+'?t='+Date.now());
+    const j=await r.json();
+    if(j.status==='ok'){parse(j.data);dot('ok');}else{dot('er');loadLoc();}
+  }catch(e){dot('er');loadLoc();}
+}
+
+function parse(rows){
+  exps=[];tls=[];let b='';
+  rows.forEach(r=>{
+    if(!r[0])return;
+    if(r[0]==='B')b=r[1];
+    else if(r[0]==='E')exps.push({nm:r[1],am:+r[2],ct:r[3],co:r[4],pay:r[5]});
+    else if(r[0]==='T')tls.push({co:r[1],cy:r[2],dt:r[3],hd:r[4],nb:r[5],ml:r[6],nt:r[7]});
+  });
+  if(b)document.getElementById('tb').value=b;
+  tls.sort((a,b)=>a.dt>b.dt?1:-1);
+  calc();renE();renT();saveLoc();
+}
+
+function rows(){
+  const r=[];
+  const b=document.getElementById('tb').value;
+  if(b)r.push(['B',b]);
+  exps.forEach(e=>r.push(['E',e.nm,e.am,e.ct,e.co,e.pay]));
+  tls.forEach(t=>r.push(['T',t.co,t.cy,t.dt,t.hd,t.nb,t.ml,t.nt]));
+  return r;
+}
+
+function sched(){clearTimeout(sv);sv=setTimeout(push,1200);}
+
+async function push(){
+  saveLoc();
+  if(!api||api==='x'||busy)return;
+  busy=true;dot('sy');
+  try{
+    await fetch(api,{method:'POST',body:JSON.stringify({action:'save',rows:rows()})});
+    dot('ok');toast('✓ تم الحفظ والمزامنة');
+  }catch(e){dot('er');toast('⚠️ محفوظ محلياً');}
+  busy=false;
+}
+
+function saveLoc(){
+  try{
+    localStorage.setItem('t_e',JSON.stringify(exps));
+    localStorage.setItem('t_t',JSON.stringify(tls));
+    const b=document.getElementById('tb').value;
+    if(b)localStorage.setItem('t_b',b);
+  }catch(e){}
+}
+
+function loadLoc(){
+  try{
+    const e=localStorage.getItem('t_e'),t=localStorage.getItem('t_t'),b=localStorage.getItem('t_b');
+    if(e)exps=JSON.parse(e);
+    if(t){tls=JSON.parse(t);tls.sort((a,b)=>a.dt>b.dt?1:-1);}
+    if(b)document.getElementById('tb').value=b;
+  }catch(e){}
+  calc();renE();renT();
+}
+
+function addE(){
+  const nm=document.getElementById('en').value.trim();
+  const am=parseFloat(document.getElementById('ea2').value);
+  const ct=document.getElementById('ect').value,co=document.getElementById('eco').value;
+  if(!nm||!am||am<=0){toast('⚠️ أدخل البيان والمبلغ');return;}
+  exps.push({nm,am,ct,co,pay});
+  document.getElementById('en').value='';document.getElementById('ea2').value='';
+  calc();renE();sched();
+}
+function delE(i){exps.splice(i,1);calc();renE();sched();}
+
+function calc(){
+  const tot=parseFloat(document.getElementById('tb').value)||0;
+  let oP=0,mP=0,sh=0;
+  exps.forEach(e=>{
+    if(e.pay==='omar')oP+=e.am;
+    else if(e.pay==='majed')mP+=e.am;
+    else{oP+=e.am/2;mP+=e.am/2;sh+=e.am;}
+  });
+  const sp=exps.reduce((s,e)=>s+e.am,0),rm=tot-sp,pc=tot>0?Math.min(100,Math.round(sp/tot*100)):0;
+  document.getElementById('mt').textContent=FM(tot)+' ر.س';
+  document.getElementById('msp').textContent=FM(sp)+' ر.س';
+  document.getElementById('mr').textContent=FM(rm)+' ر.س';
+  document.getElementById('mr').className='mv '+(rm<0?'mr':'mg');
+  document.getElementById('bp').textContent=AR(pc)+'٪';
+  const bf=document.getElementById('bf');bf.style.width=pc+'%';bf.className='bf'+(pc>85?' ov':'');
+  document.getElementById('op').textContent=FM(oP)+' ر.س';
+  document.getElementById('mp').textContent=FM(mP)+' ر.س';
+  document.getElementById('os').textContent=FM(sh/2)+' ر.س';
+  document.getElementById('ms2').textContent=FM(sh/2)+' ر.س';
+  let net=0;exps.forEach(e=>{if(e.pay==='omar')net+=e.am/2;else if(e.pay==='majed')net-=e.am/2;});
+  const ob=document.getElementById('ob'),mb=document.getElementById('mb2');
+  if(Math.abs(net)<1){ob.innerHTML='<span class="chip cn">متساويان</span>';mb.innerHTML='<span class="chip cn">متساويان</span>';}
+  else if(net>0){ob.innerHTML=`<span class="chip cg">يستحق ${FM(net)} ر.س</span>`;mb.innerHTML=`<span class="chip cr">مدين بـ ${FM(net)} ر.س</span>`;}
+  else{mb.innerHTML=`<span class="chip cg">يستحق ${FM(-net)} ر.س</span>`;ob.innerHTML=`<span class="chip cr">مدين بـ ${FM(-net)} ر.س</span>`;}
+  const sa=document.getElementById('sa');
+  if(!exps.length){sa.innerHTML='';return;}
+  if(Math.abs(net)<1)sa.innerHTML=`<div class="sett sev"><div class="set" style="color:#1a4731">✓ الحساب متساوٍ</div><div class="seb" style="color:#1a4731">عمر وماجد متساويان</div></div>`;
+  else if(net>0)sa.innerHTML=`<div class="sett"><div class="set">⚖️ التسوية</div><div class="seb">ماجد يدفع لعمر ${FM(net)} ر.س</div></div>`;
+  else sa.innerHTML=`<div class="sett"><div class="set">⚖️ التسوية</div><div class="seb">عمر يدفع لماجد ${FM(-net)} ر.س</div></div>`;
+}
+
+function renE(){
+  const el=document.getElementById('el');
+  const list=fil==='all'?exps:exps.filter(e=>e.co===fil);
+  if(!list.length){el.innerHTML='<div class="emp"><div class="ei">📜</div>'+(fil==='all'?'لا توجد مصاريف بعد':'لا توجد مصاريف هنا')+'</div>';return;}
+  el.innerHTML=[...list].reverse().map(e=>{
+    const i=exps.indexOf(e);
+    return `<div class="er"><button class="dl" onclick="delE(${i})">✕</button><span class="bx ${CB[e.ct]}">${CL[e.ct]}</span><span class="cb">${CF[e.co]}</span><span class="en">${e.nm}</span><span class="pt pt${e.pay==='split'?'s':e.pay==='omar'?'o':'m'}">${e.pay==='split'?'مشترك':e.pay==='omar'?'عمر':'ماجد'}</span><span class="ea">${FM(e.am)}</span></div>`;
+  }).join('');
+}
+
+function addT(){
+  const co=document.getElementById('tc').value,cy=document.getElementById('tcy').value.trim();
+  const dt=document.getElementById('tdt').value,hd=document.getElementById('thd').value.trim();
+  const nb=document.getElementById('tnb').value.trim(),ml=document.getElementById('tml').value.trim(),nt=document.getElementById('tnt').value.trim();
+  if(!hd){toast('⚠️ أدخل اسم الزيارة');return;}
+  tls.push({co,cy,dt,hd,nb,ml,nt});
+  tls.sort((a,b)=>a.dt>b.dt?1:-1);
+  ['tcy','tdt','thd','tnb','tml','tnt'].forEach(id=>document.getElementById(id).value='');
+  renT();sched();
+}
+function delT(i){tls.splice(i,1);renT();sched();}
+function togT(i){const b=document.getElementById('tb'+i),c=document.getElementById('tc'+i);const o=b.classList.toggle('op');c.classList.toggle('op',o);}
+
+function renT(){
+  const el=document.getElementById('tl2');
+  if(!tls.length){el.innerHTML='<div class="emp"><div class="ei">🗺️</div>أضف زيارات رحلتك للبدء</div>';return;}
+  el.innerHTML=tls.map((t,i)=>{
+    const ds=t.dt?new Date(t.dt+'T12:00').toLocaleDateString('ar-SA',{month:'long',day:'numeric'}):'';
+    const loc=t.cy?`${CF[t.co]} ${t.cy}`:CN[t.co];
+    return `<div class="tc"><div class="th" onclick="togT(${i})"><div class="td2"></div><div class="tt">${t.hd}</div><div class="tm">${ds?`<span class="tda">${ds}</span>`:''}<span class="bx bot" style="font-size:10px">${loc}</span></div><span class="cv" id="tc${i}">▼</span></div><div class="tb" id="tb${i}">${t.nb?`<div class="tf"><div class="tfl">نبذة</div><div class="tfv">${t.nb}</div></div>`:''} ${t.ml?`<div class="tf"><div class="tfl">المطلوب</div><div class="tfv">${t.ml}</div></div>`:''} ${t.nt?`<div class="tf"><div class="tfl">ملاحظات</div><div class="tfv">${t.nt}</div></div>`:''} ${!t.nb&&!t.ml&&!t.nt?`<div class="tf"><div class="tfv mu">لا توجد تفاصيل</div></div>`:''}<div class="ta"><button class="db" onclick="delT(${i})">حذف</button></div></div></div>`;
+  }).join('');
+}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('on'),2200);}
+
+setInterval(()=>{if(api&&api!=='x'&&!busy)pull();},30000);
+init();
+</script>
+</body>
+</html>
