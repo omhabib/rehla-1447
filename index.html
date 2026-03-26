@@ -306,11 +306,11 @@ const CN={sa:'السعودية',ma:'المغرب',dz:'الجزائر',eg:'مصر
 const CL={transport:'مواصلات',accommodation:'سكن',food:'طعام',research:'بحث علمي',other:'أخرى'};
 const CB={transport:'btr',accommodation:'bac',food:'bfo',research:'bre',other:'bot'};
 
-let pay='split',fil='all',exps=[],tls=[],api='',sv=null,busy=false;
+let pay="split",fil="all",exps=[],tls=[],api="https://script.google.com/macros/s/AKfycbygB2r1SytdCoN7HOlKjoZg97H_cwnXKW2rVdMJfhMEDZ2qsOGSJLIEJECpVmRvph9b/exec",sv=null,busy=false;
 
 function init(){
-  const a=localStorage.getItem('t_api');
-  if(a){api=a;document.getElementById('cfg-banner').style.display='none';if(a!=='x')pull();}
+  const a="https://script.google.com/macros/s/AKfycbygB2r1SytdCoN7HOlKjoZg97H_cwnXKW2rVdMJfhMEDZ2qsOGSJLIEJECpVmRvph9b/exec";localStorage.setItem('t_api',a);
+  api=a;document.getElementById('cfg-banner').style.display='none';pull();
   loadLoc();
 }
 
