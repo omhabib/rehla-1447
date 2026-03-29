@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>الرحلة الصيفية الثانية ١٤٤٧هـ</title>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 :root{
   --br:#2C1810;--gold:#C9A84C;--gl:#FAEEDA;--cr:#F7F2EA;
@@ -51,8 +52,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .btn{width:100%;padding:13px;background:var(--br);color:#F5E6C8;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;margin-top:4px}
 .btn:active{opacity:.82;transform:scale(.98)}
 
-.seg{display:flex;background:#f0e9dc;border-radius:10px;padding:3px;margin-bottom:10px}
-.sg{flex:1;padding:9px 3px;border:none;background:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .2s}
+.seg{display:flex;background:#f0e9dc;border-radius:10px;padding:3px;margin-bottom:10px;flex-wrap:wrap;gap:2px}
+.sg{flex:1;padding:9px 3px;border:none;background:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .2s;min-width:0;white-space:nowrap}
 .sg.on{background:var(--wh);color:var(--br);box-shadow:0 1px 5px #0001;border:.5px solid var(--bd)}
 
 .mets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
@@ -67,24 +68,26 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .bf{height:100%;background:linear-gradient(90deg,#C9A84C,#e8a020);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 .bf.ov{background:linear-gradient(90deg,#e05050,var(--rd))}
 
-.pers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.pc{border-radius:14px;padding:13px;border:1px solid var(--bd);background:var(--wh);box-shadow:0 1px 4px #0000060a}
+.pers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.pc{border-radius:14px;padding:11px 8px;border:1px solid var(--bd);background:var(--wh);box-shadow:0 1px 4px #0000060a}
 .po{border-top:3px solid #378ADD}
 .pm{border-top:3px solid var(--gold)}
+.pw{border-top:3px solid #27643a}
 .av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:15px;font-weight:700;margin-bottom:6px}
 .ao{background:#deedfb;color:#0C447C}
 .am{background:var(--gl);color:#633806}
-.pn{font-size:14px;font-weight:700;color:var(--br);margin-bottom:1px}
-.pl{font-size:10px;color:var(--t3)}
-.pv{font-size:18px;font-weight:700;margin-top:2px}
-.pvo{color:var(--bl)}.pvm{color:#854F0B}
-.ps{font-size:10px;color:var(--t3);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd)}
-.chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:5px}
+.aw{background:#dff0e6;color:#1a4731}
+.pn{font-size:13px;font-weight:700;color:var(--br);margin-bottom:1px}
+.pl{font-size:9px;color:var(--t3)}
+.pv{font-size:16px;font-weight:700;margin-top:2px}
+.pvo{color:var(--bl)}.pvm{color:#854F0B}.pvw{color:var(--gn)}
+.ps{font-size:9px;color:var(--t3);margin-top:5px;padding-top:5px;border-top:1px solid var(--bd)}
+.chip{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;margin-top:4px}
 .cr2{background:#fdecea;color:#7f1d1d}.cg{background:#dff0e6;color:#1a4731}.cn{background:#f0e9dc;color:#6b5c3e}
 
 .sett{background:var(--gl);border:1px solid #C9A84C44;border-radius:13px;padding:12px 14px;margin-bottom:12px;text-align:center}
 .set-t{font-size:12px;color:#633806;margin-bottom:3px;font-weight:700}
-.set-b{font-family:'Amiri',serif;font-size:17px;color:var(--br)}
+.set-b{font-family:'Amiri',serif;font-size:15px;color:var(--br);line-height:1.7}
 .sev{background:#dff0e6;border-color:#a7d7b0}
 
 .frow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
@@ -98,7 +101,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .bfo{background:var(--gl);color:#633806}.bre{background:#eeedfe;color:#3C3489}.bot{background:#ede6d8;color:#5a4a30}
 .cb{font-size:10px;padding:2px 6px;border-radius:20px;background:#ede6d8;color:#5a4a30;flex-shrink:0}
 .pt{font-size:10px;padding:2px 7px;border-radius:20px;flex-shrink:0}
-.pto{background:#deedfb;color:#0C447C}.ptm{background:var(--gl);color:#633806}.pts{background:#f0ebff;color:#4A148C}
+.pto{background:#deedfb;color:#0C447C}.ptm{background:var(--gl);color:#633806}.pts{background:#f0ebff;color:#4A148C}.ptw{background:#dff0e6;color:#1a4731}
 .en2{font-size:13px;color:var(--tx);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ea{font-size:13px;font-weight:700;color:#854F0B;flex-shrink:0}
 .dl{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:1px 4px;flex-shrink:0;line-height:1}
@@ -154,7 +157,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 
 .modal-bg{position:fixed;inset:0;background:#0008;z-index:500;display:flex;align-items:flex-end;justify-content:center;max-width:480px;margin:0 auto}
 .modal-bg.hidden{display:none}
-.modal{background:var(--wh);border-radius:22px 22px 0 0;padding:24px 18px 36px;width:100%;box-shadow:0 -8px 32px #0003}
+.modal{background:var(--wh);border-radius:22px 22px 0 0;padding:24px 18px 36px;width:100%;box-shadow:0 -8px 32px #0003;max-height:90vh;overflow-y:auto}
 .modal-t{font-family:'Amiri',serif;font-size:19px;color:var(--br);margin-bottom:6px}
 .modal-s{font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.7}
 .modal-s code{background:#f0e9dc;padding:1px 6px;border-radius:5px;font-size:11px;direction:ltr;display:inline-block;color:var(--br)}
@@ -171,6 +174,12 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 
 .emp{text-align:center;padding:28px 12px;color:var(--t3);font-size:13px}
 .ei{font-size:32px;margin-bottom:8px}
+
+.map-wrap{border-radius:12px;overflow:hidden;margin:8px 0;border:1px solid var(--bd);height:220px}
+.map-wrap .leaflet-container{height:100%;width:100%;background:#f4ede0}
+.map-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--gold);border-radius:10px;background:none;color:var(--gold);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;margin:6px 0;width:100%;justify-content:center;transition:all .15s}
+.map-btn:active{background:var(--gold);color:var(--wh)}
+.map-btn.on{background:var(--br);border-color:var(--br);color:#F5E6C8}
 </style>
 </head>
 <body>
@@ -196,13 +205,14 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 <div class="tabs">
   <button class="tab on" id="tab-b">&#x1F4B0; الميزانية</button>
   <button class="tab" id="tab-t">&#x1F4C5; البرنامج</button>
+  <button class="tab" id="tab-m">&#x1F5FA;&#xFE0F; الخريطة</button>
 </div>
 
 <!-- BUDGET PAGE -->
 <div id="pg-b" class="pg on">
 
   <div class="cfg" id="cfg-banner">
-    <div class="cfg-txt">&#x1F517; اربط التطبيق بـ Google Sheets للمشاركة مع ماجد</div>
+    <div class="cfg-txt">&#x1F517; اربط التطبيق بـ Google Sheets للمشاركة</div>
     <button class="cfg-btn" id="cfg-btn-link">ربط &larr;</button>
   </div>
 
@@ -219,9 +229,17 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
       <div class="av am">م</div>
       <div class="pn">ماجد</div>
       <div class="pl">إجمالي ما دفع</div>
-      <div class="pv pvm" id="mp">&#x0660; ر.س</div>
+      <div class="pv pvm" id="mp2">&#x0660; ر.س</div>
       <div class="ps">من المشترك: <span id="ms2">&#x0660; ر.س</span></div>
       <div id="mb2"></div>
+    </div>
+    <div class="pc pw">
+      <div class="av aw">و</div>
+      <div class="pn">وسيم</div>
+      <div class="pl">إجمالي ما دفع</div>
+      <div class="pv pvw" id="wp">&#x0660; ر.س</div>
+      <div class="ps">من المشترك: <span id="ws2">&#x0660; ر.س</span></div>
+      <div id="wb2"></div>
     </div>
   </div>
 
@@ -273,10 +291,11 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     </div>
     <div class="mb">
       <label class="lbl">مَن دفع؟</label>
-      <div class="seg">
-        <button class="sg" id="sgo">عمر فقط</button>
-        <button class="sg on" id="sgs">بالتساوي</button>
-        <button class="sg" id="sgm">ماجد فقط</button>
+      <div class="seg" id="pay-seg">
+        <button class="sg" data-pay="omar">عمر</button>
+        <button class="sg" data-pay="majed">ماجد</button>
+        <button class="sg" data-pay="waseem">وسيم</button>
+        <button class="sg on" data-pay="split">بالتساوي</button>
       </div>
     </div>
     <button class="btn" id="btn-add-exp">تسجيل المصروف</button>
@@ -316,7 +335,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
           <option value="za">&#x1F1FF;&#x1F1E6; جنوب أفريقيا</option>
         </select>
       </div>
-      <div><label class="lbl">المدينة</label><input class="fi" type="text" id="tcy" placeholder="الرباط"></div>
+      <div><label class="lbl">المدينة (اختياري)</label><input class="fi" type="text" id="tcy" placeholder="الرباط"></div>
       <div><label class="lbl">التاريخ</label><input class="fi" type="date" id="tdt"></div>
     </div>
     <div class="mb"><label class="lbl">الزيارة</label><input class="fi" type="text" id="thd" placeholder="مثال: الخزانة الحسنية"></div>
@@ -340,10 +359,16 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   <div style="margin-top:14px">
     <a href="https://calendar.google.com" target="_blank" class="gl">
       <span class="gi">&#x1F4C6;</span>
-      <span style="flex:1"><div class="gt">Google Calendar</div><div class="gs">مزامنة المواعيد مع ماجد</div></span>
+      <span style="flex:1"><div class="gt">Google Calendar</div><div class="gs">مزامنة المواعيد</div></span>
       <span class="ga">&larr;</span>
     </a>
   </div>
+</div>
+
+<!-- MAP PAGE -->
+<div id="pg-m" class="pg">
+  <div class="stitle" style="padding:0 2px 10px;font-family:'Amiri',serif;font-size:16px;color:var(--br)">&#x1F5FA;&#xFE0F; خرائط الدول</div>
+  <div id="map-countries"></div>
 </div>
 
 <!-- MODAL -->
@@ -397,6 +422,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 
 <div class="toast" id="toast"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
 "use strict";
@@ -408,9 +434,49 @@ var CL = {transport:"\u0645\u0648\u0627\u0635\u0644\u0627\u062A",accommodation:"
 var CB = {transport:"btr",accommodation:"bac",food:"bfo",research:"bre",other:"bot"};
 var CO = ["sa","ma","dz","eg","za"];
 
+// Map center coordinates for each country
+var MAP_CENTER = {
+  sa: [24.7, 45.1],
+  ma: [31.8, -7.1],
+  dz: [36.4, 2.9],
+  eg: [30.0, 31.2],
+  za: [-30.6, 25.0]
+};
+var MAP_ZOOM = {sa:5, ma:5, dz:5, eg:5, za:5};
+
+// Known city coordinates for geocoding
+var CITY_COORDS = {
+  // Saudi Arabia
+  "\u0627\u0644\u0631\u064A\u0627\u0636": [24.69, 46.72], "\u062C\u062F\u0629": [21.49, 39.19], "\u0645\u0643\u0629": [21.39, 39.86],
+  "\u0627\u0644\u0645\u062F\u064A\u0646\u0629": [24.47, 39.61], "\u0627\u0644\u0645\u062F\u064A\u0646\u0629 \u0627\u0644\u0645\u0646\u0648\u0631\u0629": [24.47, 39.61],
+  "\u0627\u0644\u062F\u0645\u0627\u0645": [26.43, 50.10], "\u0627\u0644\u0637\u0627\u0626\u0641": [21.27, 40.42],
+  "\u0627\u0644\u062E\u0628\u0631": [26.28, 50.21], "\u062A\u0628\u0648\u0643": [28.38, 36.57],
+  // Morocco
+  "\u0627\u0644\u0631\u0628\u0627\u0637": [34.02, -6.83], "\u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621": [33.57, -7.59],
+  "\u0641\u0627\u0633": [34.03, -5.00], "\u0645\u0631\u0627\u0643\u0634": [31.63, -8.01],
+  "\u0637\u0646\u062C\u0629": [35.77, -5.80], "\u0645\u0643\u0646\u0627\u0633": [33.89, -5.55],
+  "\u0623\u063A\u0627\u062F\u064A\u0631": [30.43, -9.60], "\u0648\u062C\u062F\u0629": [34.68, -1.91],
+  "\u0634\u0641\u0634\u0627\u0648\u0646": [35.17, -5.27],
+  // Algeria
+  "\u0627\u0644\u062C\u0632\u0627\u0626\u0631 \u0627\u0644\u0639\u0627\u0635\u0645\u0629": [36.75, 3.06], "\u0648\u0647\u0631\u0627\u0646": [35.70, -0.63],
+  "\u0642\u0633\u0646\u0637\u064A\u0646\u0629": [36.37, 6.61], "\u0639\u0646\u0627\u0628\u0629": [36.90, 7.77],
+  "\u0628\u062C\u0627\u064A\u0629": [36.75, 5.08], "\u062A\u0644\u0645\u0633\u0627\u0646": [34.88, -1.31],
+  "\u063A\u0631\u062F\u0627\u064A\u0629": [32.49, 3.67],
+  // Egypt
+  "\u0627\u0644\u0642\u0627\u0647\u0631\u0629": [30.04, 31.24], "\u0627\u0644\u0625\u0633\u0643\u0646\u062F\u0631\u064A\u0629": [31.20, 29.92],
+  "\u0627\u0644\u0623\u0642\u0635\u0631": [25.69, 32.64], "\u0623\u0633\u0648\u0627\u0646": [24.09, 32.90],
+  "\u0634\u0631\u0645 \u0627\u0644\u0634\u064A\u062E": [27.92, 34.33], "\u0627\u0644\u063A\u0631\u062F\u0642\u0629": [27.26, 33.81],
+  // South Africa
+  "\u0643\u064A\u0628 \u062A\u0627\u0648\u0646": [-33.93, 18.42], "\u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A": [-26.20, 28.05],
+  "\u062F\u064A\u0631\u0628\u0627\u0646": [-29.86, 31.02], "\u0628\u0631\u064A\u062A\u0648\u0631\u064A\u0627": [-25.75, 28.19],
+  "cape town": [-33.93, 18.42], "johannesburg": [-26.20, 28.05], "durban": [-29.86, 31.02]
+};
+
 var pay = "split", fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
 var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\u0637\u0629", low:"\u0639\u0646\u062F \u0632\u064A\u0627\u062F\u0629 \u0627\u0644\u0648\u0642\u062A"};
 var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
+var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
+var maps = {};
 
 function AR(n){ return String(n).replace(/\d/g, function(d){ return "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669"[d]; }); }
 function FM(n){ return AR(Math.round(n).toLocaleString("en")); }
@@ -424,6 +490,7 @@ function dot(s, lbl){
 // Tab switching
 document.getElementById("tab-b").addEventListener("click", function(){ showPg("b", this); });
 document.getElementById("tab-t").addEventListener("click", function(){ showPg("t", this); });
+document.getElementById("tab-m").addEventListener("click", function(){ showPg("m", this); renderMaps(); });
 
 function showPg(id, btn){
   document.querySelectorAll(".pg").forEach(function(p){ p.classList.remove("on"); });
@@ -433,15 +500,13 @@ function showPg(id, btn){
 }
 
 // Pay buttons
-document.getElementById("sgo").addEventListener("click", function(){ setPay("omar"); });
-document.getElementById("sgs").addEventListener("click", function(){ setPay("split"); });
-document.getElementById("sgm").addEventListener("click", function(){ setPay("majed"); });
-
-function setPay(p){
-  pay = p;
-  ["o","s","m"].forEach(function(x){ document.getElementById("sg" + x).classList.remove("on"); });
-  document.getElementById("sg" + (p === "omar" ? "o" : p === "split" ? "s" : "m")).classList.add("on");
-}
+document.getElementById("pay-seg").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  pay = btn.getAttribute("data-pay");
+  document.querySelectorAll("#pay-seg .sg").forEach(function(x){ x.classList.remove("on"); });
+  btn.classList.add("on");
+});
 
 // Filter buttons
 document.getElementById("filter-row").addEventListener("click", function(e){
@@ -567,11 +632,12 @@ window.delE = delE;
 
 function calc(){
   var tot = parseFloat(document.getElementById("tb").value) || 0;
-  var oP = 0, mP = 0, sh = 0;
+  var oP = 0, mP = 0, wP = 0, sh = 0;
   exps.forEach(function(e){
     if (e.pay === "omar") oP += e.am;
     else if (e.pay === "majed") mP += e.am;
-    else { oP += e.am / 2; mP += e.am / 2; sh += e.am; }
+    else if (e.pay === "waseem") wP += e.am;
+    else { oP += e.am / 3; mP += e.am / 3; wP += e.am / 3; sh += e.am; }
   });
   var sp = exps.reduce(function(s, e){ return s + e.am; }, 0);
   var rm = tot - sp;
@@ -584,34 +650,70 @@ function calc(){
   var bf = document.getElementById("bf");
   bf.style.width = pc + "%";
   bf.className = "bf" + (pc > 85 ? " ov" : "");
+
   document.getElementById("op").textContent = FM(oP) + " \u0631.\u0633";
-  document.getElementById("mp").textContent = FM(mP) + " \u0631.\u0633";
-  document.getElementById("os").textContent = FM(sh / 2) + " \u0631.\u0633";
-  document.getElementById("ms2").textContent = FM(sh / 2) + " \u0631.\u0633";
-  var net = 0;
-  exps.forEach(function(e){
-    if (e.pay === "omar") net += e.am / 2;
-    else if (e.pay === "majed") net -= e.am / 2;
-  });
-  var ob = document.getElementById("ob"), mb = document.getElementById("mb2");
-  if (Math.abs(net) < 1){
-    ob.innerHTML = '<span class="chip cn">\u0645\u062A\u0633\u0627\u0648\u064A\u0627\u0646</span>';
-    mb.innerHTML = '<span class="chip cn">\u0645\u062A\u0633\u0627\u0648\u064A\u0627\u0646</span>';
-  } else if (net > 0){
-    ob.innerHTML = '<span class="chip cg">\u064A\u0633\u062A\u062D\u0642 ' + FM(net) + ' \u0631.\u0633</span>';
-    mb.innerHTML = '<span class="chip cr2">\u0645\u062F\u064A\u0646 \u0628\u0640 ' + FM(net) + ' \u0631.\u0633</span>';
-  } else {
-    mb.innerHTML = '<span class="chip cg">\u064A\u0633\u062A\u062D\u0642 ' + FM(-net) + ' \u0631.\u0633</span>';
-    ob.innerHTML = '<span class="chip cr2">\u0645\u062F\u064A\u0646 \u0628\u0640 ' + FM(-net) + ' \u0631.\u0633</span>';
+  document.getElementById("mp2").textContent = FM(mP) + " \u0631.\u0633";
+  document.getElementById("wp").textContent = FM(wP) + " \u0631.\u0633";
+  document.getElementById("os").textContent = FM(sh / 3) + " \u0631.\u0633";
+  document.getElementById("ms2").textContent = FM(sh / 3) + " \u0631.\u0633";
+  document.getElementById("ws2").textContent = FM(sh / 3) + " \u0631.\u0633";
+
+  // Calculate net settlement between three people
+  // Each person's fair share = total_spent / 3
+  // What each person should have paid = sp / 3
+  // If person paid MORE than their share, they are owed money
+  // If person paid LESS, they owe money
+  var fairShare = sp / 3;
+  var oNet = oP - fairShare; // positive = overpaid (is owed), negative = underpaid (owes)
+  var mNet = mP - fairShare;
+  var wNet = wP - fairShare;
+
+  var ob = document.getElementById("ob"), mb = document.getElementById("mb2"), wb = document.getElementById("wb2");
+
+  function setChip(el, net, name) {
+    if (Math.abs(net) < 1) {
+      el.innerHTML = '<span class="chip cn">\u0645\u062A\u0633\u0627\u0648\u064D</span>';
+    } else if (net > 0) {
+      el.innerHTML = '<span class="chip cg">\u064A\u0633\u062A\u062D\u0642 ' + FM(net) + ' \u0631.\u0633</span>';
+    } else {
+      el.innerHTML = '<span class="chip cr2">\u0645\u062F\u064A\u0646 \u0628\u0640 ' + FM(-net) + ' \u0631.\u0633</span>';
+    }
   }
+  setChip(ob, oNet);
+  setChip(mb, mNet);
+  setChip(wb, wNet);
+
+  // Settlement area
   var sa = document.getElementById("sa");
   if (!exps.length){ sa.innerHTML = ""; return; }
-  if (Math.abs(net) < 1)
-    sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div><div class="set-b" style="color:#1a4731">\u0639\u0645\u0631 \u0648\u0645\u0627\u062C\u062F \u0645\u062A\u0633\u0627\u0648\u064A\u0627\u0646 \u062A\u0645\u0627\u0645\u0627\u064B</div></div>';
-  else if (net > 0)
-    sa.innerHTML = '<div class="sett"><div class="set-t">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629</div><div class="set-b">\u0645\u0627\u062C\u062F \u064A\u062F\u0641\u0639 \u0644\u0639\u0645\u0631 ' + FM(net) + ' \u0631.\u0633</div></div>';
-  else
-    sa.innerHTML = '<div class="sett"><div class="set-t">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629</div><div class="set-b">\u0639\u0645\u0631 \u064A\u062F\u0641\u0639 \u0644\u0645\u0627\u062C\u062F ' + FM(-net) + ' \u0631.\u0633</div></div>';
+
+  // Build settlement instructions
+  var debts = [];
+  var people = [{name:"\u0639\u0645\u0631", net:oNet}, {name:"\u0645\u0627\u062C\u062F", net:mNet}, {name:"\u0648\u0633\u064A\u0645", net:wNet}];
+  // Sort: debtors first (negative net), then creditors (positive net)
+  var debtors = people.filter(function(p){ return p.net < -0.5; }).map(function(p){ return {name:p.name, amt:-p.net}; });
+  var creditors = people.filter(function(p){ return p.net > 0.5; }).map(function(p){ return {name:p.name, amt:p.net}; });
+
+  if (debtors.length === 0) {
+    sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div><div class="set-b" style="color:#1a4731">\u0627\u0644\u062C\u0645\u064A\u0639 \u0645\u062A\u0633\u0627\u0648\u0648\u0646 \u062A\u0645\u0627\u0645\u0627\u064B</div></div>';
+  } else {
+    // Simple settlement: each debtor pays each creditor
+    var settHtml = '<div class="sett"><div class="set-t">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629</div><div class="set-b">';
+    var di = 0, ci = 0;
+    var dList = debtors.slice(), cList = creditors.slice();
+    while (di < dList.length && ci < cList.length) {
+      var transfer = Math.min(dList[di].amt, cList[ci].amt);
+      if (transfer > 0.5) {
+        settHtml += dList[di].name + ' \u064A\u062F\u0641\u0639 \u0644\u0640' + cList[ci].name + ' ' + FM(transfer) + ' \u0631.\u0633<br>';
+      }
+      dList[di].amt -= transfer;
+      cList[ci].amt -= transfer;
+      if (dList[di].amt < 0.5) di++;
+      if (cList[ci].amt < 0.5) ci++;
+    }
+    settHtml += '</div></div>';
+    sa.innerHTML = settHtml;
+  }
 }
 
 function renE(){
@@ -625,8 +727,8 @@ function renE(){
   var rev = [].concat(list).reverse();
   rev.forEach(function(e){
     var i = exps.indexOf(e);
-    var ptc = e.pay === "split" ? "pts" : e.pay === "omar" ? "pto" : "ptm";
-    var ptx = e.pay === "split" ? "\u0645\u0634\u062A\u0631\u0643" : e.pay === "omar" ? "\u0639\u0645\u0631" : "\u0645\u0627\u062C\u062F";
+    var ptc = e.pay === "split" ? "pts" : e.pay === "omar" ? "pto" : e.pay === "majed" ? "ptm" : "ptw";
+    var ptx = PN[e.pay] || "\u0645\u0634\u062A\u0631\u0643";
     html += '<div class="er">'
       + '<button class="dl" onclick="delE(' + i + ')">\u2715</button>'
       + '<span class="bx ' + CB[e.ct] + '">' + CL[e.ct] + '</span>'
@@ -680,7 +782,7 @@ function renT(){
   var tree = {};
   tls.forEach(function(t, i){
     var co = t.co || "sa";
-    var cy = t.cy || CN[co];
+    var cy = t.cy && t.cy.trim() !== "" ? t.cy : "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
     if (!tree[co]) tree[co] = {};
     if (!tree[co][cy]) tree[co][cy] = [];
     tree[co][cy].push({t:t, i:i});
@@ -688,7 +790,12 @@ function renT(){
 
   var html = "";
   CO.filter(function(co){ return tree[co]; }).forEach(function(co){
-    var cities = Object.keys(tree[co]).sort(function(a, b){ return a.localeCompare(b, "ar"); });
+    var cities = Object.keys(tree[co]).sort(function(a, b){
+      // Put "غير معروف" at the end
+      if (a === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641") return 1;
+      if (b === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641") return -1;
+      return a.localeCompare(b, "ar");
+    });
     var total = cities.reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
     var coId = "grpco-" + co;
     html += '<div class="grp-co">'
@@ -705,7 +812,7 @@ function renT(){
       var cyId = "grpcy-" + co + "-" + cy.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_");
       html += '<div class="grp-cy">'
         + '<div class="grp-cy-hdr" onclick="togEl(\'' + cyId + '\')">'
-        + '<span class="grp-cy-dot"></span>'
+        + '<span class="grp-cy-dot"' + (cy === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" ? ' style="background:#aaa"' : '') + '></span>'
         + '<span class="grp-cyname">' + cy + '</span>'
         + '<span class="grp-cnt">' + AR(visits.length) + ' \u0632\u064A\u0627\u0631\u0629</span>'
         + '<span class="grp-chev op" id="ch-' + cyId + '">\u25BC</span>'
@@ -798,6 +905,92 @@ document.getElementById("btn-save-edit").addEventListener("click", function(){
 document.getElementById("btn-cancel-edit").addEventListener("click", function(){
   document.getElementById("edit-modal-bg").classList.add("hidden");
 });
+
+// Maps
+function renderMaps(){
+  var container = document.getElementById("map-countries");
+  // Group visits by country
+  var tree = {};
+  tls.forEach(function(t){
+    var co = t.co || "sa";
+    if (!tree[co]) tree[co] = [];
+    tree[co].push(t);
+  });
+
+  var html = "";
+  CO.forEach(function(co){
+    var visits = tree[co] || [];
+    var mapId = "map-" + co;
+    html += '<div class="card">'
+      + '<div class="stitle">' + CF[co] + ' ' + CN[co] + (visits.length ? ' <span style="font-size:12px;color:var(--t3)">(' + AR(visits.length) + ' \u0632\u064A\u0627\u0631\u0629)</span>' : '') + '</div>'
+      + '<div class="map-wrap"><div id="' + mapId + '" style="height:100%"></div></div>';
+    if (visits.length) {
+      html += '<div style="margin-top:6px">';
+      visits.forEach(function(t){
+        var pr = t.pri || "high";
+        html += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px">'
+          + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
+          + '<span style="flex:1;font-weight:700;color:var(--br)">' + t.hd + '</span>'
+          + '<span style="color:var(--t3);font-size:11px">' + (t.cy || "\u063A\u064A\u0631 \u0645\u062D\u062F\u062F") + '</span>'
+          + '</div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div style="text-align:center;padding:8px;font-size:12px;color:var(--t3)">\u0644\u0627 \u062A\u0648\u062C\u062F \u0632\u064A\u0627\u0631\u0627\u062A \u0628\u0639\u062F</div>';
+    }
+    html += '</div>';
+  });
+  container.innerHTML = html;
+
+  // Initialize maps after DOM update
+  setTimeout(function(){
+    CO.forEach(function(co){
+      var mapId = "map-" + co;
+      var el = document.getElementById(mapId);
+      if (!el) return;
+      // Destroy previous map instance
+      if (maps[co]) { maps[co].remove(); }
+      var m = L.map(mapId, {zoomControl: false, attributionControl: false}).setView(MAP_CENTER[co], MAP_ZOOM[co]);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(m);
+      L.control.zoom({position: 'topright'}).addTo(m);
+      maps[co] = m;
+
+      // Add markers for visits
+      var visits = (tree[co] || []);
+      var bounds = [];
+      visits.forEach(function(t){
+        var city = t.cy ? t.cy.trim() : "";
+        var coords = CITY_COORDS[city] || CITY_COORDS[city.toLowerCase()];
+        if (!coords) {
+          // Try partial match
+          var keys = Object.keys(CITY_COORDS);
+          for (var k = 0; k < keys.length; k++) {
+            if (city && (keys[k].indexOf(city) !== -1 || city.indexOf(keys[k]) !== -1)) {
+              coords = CITY_COORDS[keys[k]];
+              break;
+            }
+          }
+        }
+        if (coords) {
+          var pr = t.pri || "high";
+          var color = pr === "high" ? "#c0392b" : pr === "med" ? "#e67e22" : "#27ae60";
+          var marker = L.circleMarker(coords, {
+            radius: 8, fillColor: color, color: "#fff", weight: 2, fillOpacity: 0.9
+          }).addTo(m);
+          marker.bindPopup('<div style="font-family:Tajawal,sans-serif;text-align:right;direction:rtl"><b>' + t.hd + '</b><br><span style="font-size:11px;color:#666">' + (city || "\u063A\u064A\u0631 \u0645\u062D\u062F\u062F") + '</span></div>');
+          bounds.push(coords);
+        }
+      });
+      if (bounds.length > 1) {
+        m.fitBounds(bounds, {padding: [30, 30]});
+      } else if (bounds.length === 1) {
+        m.setView(bounds[0], 8);
+      }
+      // Fix map rendering
+      setTimeout(function(){ m.invalidateSize(); }, 200);
+    });
+  }, 100);
+}
 
 function toast(m){
   var t = document.getElementById("toast");
