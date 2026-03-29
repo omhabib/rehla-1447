@@ -138,9 +138,15 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .tfl{font-size:10px;font-weight:700;color:var(--gold);margin-bottom:2px;letter-spacing:.3px}
 .tfv{font-size:13px;color:var(--tx);line-height:1.65}
 .tfv.mu{color:var(--t3);font-style:italic}
-.ta{margin-top:9px;padding-top:7px;border-top:1px solid #f0e8d8;display:flex;justify-content:flex-end}
+.ta{margin-top:9px;padding-top:7px;border-top:1px solid #f0e8d8;display:flex;justify-content:flex-end;gap:6px}
 .db{font-size:12px;padding:5px 12px;border:1px solid var(--bd);border-radius:20px;background:none;color:var(--t3);cursor:pointer;font-family:'Tajawal',sans-serif}
 .db:active{color:var(--rd);border-color:var(--rd)}
+.eb{font-size:12px;padding:5px 12px;border:1px solid var(--gold);border-radius:20px;background:none;color:var(--gold);cursor:pointer;font-family:'Tajawal',sans-serif}
+.eb:active{background:var(--gold);color:var(--wh)}
+.pri-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.pri-high{background:#fdecea;color:#7f1d1d}
+.pri-med{background:#fef3cd;color:#856404}
+.pri-low{background:#e8f4f0;color:#3d6b5e}
 
 .cfg{background:linear-gradient(135deg,#fff8e8,#fdedc6);border:1.5px solid #C9A84C55;border-radius:13px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .cfg-txt{flex:1;font-size:12px;color:#633806;line-height:1.5;font-weight:500}
@@ -317,6 +323,14 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="mb"><label class="lbl">نبذة</label><textarea class="fi" id="tnb" placeholder="وصف مختصر عن المكان..."></textarea></div>
     <div class="mb"><label class="lbl">المطلوب</label><textarea class="fi" id="tml" placeholder="ما الذي تريد تحقيقه..."></textarea></div>
     <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="tnt" placeholder="تحضيرات، أرقام تواصل..."></textarea></div>
+    <div class="mb">
+      <label class="lbl">الأولوية</label>
+      <div class="seg">
+        <button class="sg on" id="pri-high" data-pri="high">عالية</button>
+        <button class="sg" id="pri-med" data-pri="med">متوسطة</button>
+        <button class="sg" id="pri-low" data-pri="low">عند زيادة الوقت</button>
+      </div>
+    </div>
     <button class="btn" id="btn-add-visit">إضافة الزيارة</button>
   </div>
 
@@ -346,6 +360,41 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   </div>
 </div>
 
+<!-- EDIT VISIT MODAL -->
+<div class="modal-bg hidden" id="edit-modal-bg">
+  <div class="modal">
+    <div class="modal-t">تعديل الزيارة</div>
+    <input type="hidden" id="edit-idx">
+    <div class="g3">
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="edit-co">
+          <option value="sa">&#x1F1F8;&#x1F1E6; السعودية</option>
+          <option value="ma">&#x1F1F2;&#x1F1E6; المغرب</option>
+          <option value="dz">&#x1F1E9;&#x1F1FF; الجزائر</option>
+          <option value="eg">&#x1F1EA;&#x1F1EC; مصر</option>
+          <option value="za">&#x1F1FF;&#x1F1E6; جنوب أفريقيا</option>
+        </select>
+      </div>
+      <div><label class="lbl">المدينة</label><input class="fi" type="text" id="edit-cy"></div>
+      <div><label class="lbl">التاريخ</label><input class="fi" type="date" id="edit-dt"></div>
+    </div>
+    <div class="mb"><label class="lbl">الزيارة</label><input class="fi" type="text" id="edit-hd"></div>
+    <div class="mb"><label class="lbl">نبذة</label><textarea class="fi" id="edit-nb"></textarea></div>
+    <div class="mb"><label class="lbl">المطلوب</label><textarea class="fi" id="edit-ml"></textarea></div>
+    <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-nt"></textarea></div>
+    <div class="mb">
+      <label class="lbl">الأولوية</label>
+      <div class="seg" id="edit-pri-seg">
+        <button class="sg on" data-pri="high">عالية</button>
+        <button class="sg" data-pri="med">متوسطة</button>
+        <button class="sg" data-pri="low">عند زيادة الوقت</button>
+      </div>
+    </div>
+    <button class="btn" id="btn-save-edit" style="margin-bottom:10px">حفظ التعديل</button>
+    <button id="btn-cancel-edit" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -359,7 +408,9 @@ var CL = {transport:"\u0645\u0648\u0627\u0635\u0644\u0627\u062A",accommodation:"
 var CB = {transport:"btr",accommodation:"bac",food:"bfo",research:"bre",other:"bot"};
 var CO = ["sa","ma","dz","eg","za"];
 
-var pay = "split", fil = "all", exps = [], tls = [], sv = null, busy = false;
+var pay = "split", fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
+var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\u0637\u0629", low:"\u0639\u0646\u062F \u0632\u064A\u0627\u062F\u0629 \u0627\u0644\u0648\u0642\u062A"};
+var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 
 function AR(n){ return String(n).replace(/\d/g, function(d){ return "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669"[d]; }); }
 function FM(n){ return AR(Math.round(n).toLocaleString("en")); }
@@ -402,6 +453,15 @@ document.getElementById("filter-row").addEventListener("click", function(e){
   renE();
 });
 
+// Priority buttons
+["pri-high","pri-med","pri-low"].forEach(function(id){
+  document.getElementById(id).addEventListener("click", function(){
+    curPri = this.getAttribute("data-pri");
+    ["pri-high","pri-med","pri-low"].forEach(function(x){ document.getElementById(x).classList.remove("on"); });
+    this.classList.add("on");
+  });
+});
+
 // Budget input
 document.getElementById("tb").addEventListener("input", function(){ calc(); sched(); });
 
@@ -441,7 +501,7 @@ function parse(rows){
     if (!r[0]) return;
     if (r[0] === "B") b = r[1];
     else if (r[0] === "E") exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:r[5]});
-    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7]});
+    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high"});
   });
   if (b) document.getElementById("tb").value = b;
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
@@ -453,7 +513,7 @@ function buildRows(){
   var b = document.getElementById("tb").value;
   if (b) rows.push(["B", b]);
   exps.forEach(function(e){ rows.push(["E", e.nm, e.am, e.ct, e.co, e.pay]); });
-  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt]); });
+  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high"]); });
   return rows;
 }
 
@@ -590,9 +650,12 @@ function addT(){
   var ml = document.getElementById("tml").value.trim();
   var nt = document.getElementById("tnt").value.trim();
   if (!hd){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0632\u064A\u0627\u0631\u0629"); return; }
-  tls.push({co:co, cy:cy, dt:dt, hd:hd, nb:nb, ml:ml, nt:nt});
+  tls.push({co:co, cy:cy, dt:dt, hd:hd, nb:nb, ml:ml, nt:nt, pri:curPri});
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
   ["tcy","tdt","thd","tnb","tml","tnt"].forEach(function(id){ document.getElementById(id).value = ""; });
+  curPri = "high";
+  ["pri-high","pri-med","pri-low"].forEach(function(x){ document.getElementById(x).classList.remove("on"); });
+  document.getElementById("pri-high").classList.add("on");
   renT(); sched();
 }
 
@@ -653,10 +716,12 @@ function renT(){
         var t = v.t, i = v.i;
         var vcId = "vc-" + i;
         var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"long", day:"numeric"}) : "";
+        var pr = t.pri || "high";
         html += '<div class="vc">'
           + '<div class="vc-hdr" onclick="togEl(\'' + vcId + '\')">'
           + '<div class="vc-dot"></div>'
           + '<div class="vc-title">' + t.hd + '</div>'
+          + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
           + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
           + '<span class="vc-chev" id="ch-' + vcId + '">\u25BC</span>'
           + '</div>'
@@ -665,7 +730,7 @@ function renT(){
           + (t.ml ? '<div class="tf"><div class="tfl">\u0627\u0644\u0645\u0637\u0644\u0648\u0628</div><div class="tfv">' + t.ml + '</div></div>' : "")
           + (t.nt ? '<div class="tf"><div class="tfl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</div><div class="tfv">' + t.nt + '</div></div>' : "")
           + (!t.nb && !t.ml && !t.nt ? '<div class="tf"><div class="tfv mu">\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u0641\u0627\u0635\u064A\u0644</div></div>' : "")
-          + '<div class="ta"><button class="db" onclick="delT(' + i + ')">\u062D\u0630\u0641 \u0627\u0644\u0632\u064A\u0627\u0631\u0629</button></div>'
+          + '<div class="ta"><button class="db" onclick="delT(' + i + ')">\u062D\u0630\u0641</button><button class="eb" onclick="editT(' + i + ')">\u062A\u0639\u062F\u064A\u0644</button></div>'
           + '</div>'
           + '</div>';
       });
@@ -678,6 +743,61 @@ function renT(){
 
   el.innerHTML = html;
 }
+
+// Edit visit
+function editT(i){
+  var t = tls[i];
+  if (!t) return;
+  document.getElementById("edit-idx").value = i;
+  document.getElementById("edit-co").value = t.co;
+  document.getElementById("edit-cy").value = t.cy || "";
+  document.getElementById("edit-dt").value = t.dt || "";
+  document.getElementById("edit-hd").value = t.hd;
+  document.getElementById("edit-nb").value = t.nb || "";
+  document.getElementById("edit-ml").value = t.ml || "";
+  document.getElementById("edit-nt").value = t.nt || "";
+  var pr = t.pri || "high";
+  document.querySelectorAll("#edit-pri-seg .sg").forEach(function(b){
+    b.classList.toggle("on", b.getAttribute("data-pri") === pr);
+  });
+  document.getElementById("edit-modal-bg").classList.remove("hidden");
+}
+window.editT = editT;
+
+document.getElementById("edit-pri-seg").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  document.querySelectorAll("#edit-pri-seg .sg").forEach(function(b){ b.classList.remove("on"); });
+  btn.classList.add("on");
+});
+
+document.getElementById("btn-save-edit").addEventListener("click", function(){
+  var i = parseInt(document.getElementById("edit-idx").value);
+  if (isNaN(i) || !tls[i]) return;
+  var selPri = "high";
+  document.querySelectorAll("#edit-pri-seg .sg").forEach(function(b){
+    if (b.classList.contains("on")) selPri = b.getAttribute("data-pri");
+  });
+  tls[i] = {
+    co: document.getElementById("edit-co").value,
+    cy: document.getElementById("edit-cy").value.trim(),
+    dt: document.getElementById("edit-dt").value,
+    hd: document.getElementById("edit-hd").value.trim(),
+    nb: document.getElementById("edit-nb").value.trim(),
+    ml: document.getElementById("edit-ml").value.trim(),
+    nt: document.getElementById("edit-nt").value.trim(),
+    pri: selPri
+  };
+  if (!tls[i].hd){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0632\u064A\u0627\u0631\u0629"); return; }
+  tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
+  document.getElementById("edit-modal-bg").classList.add("hidden");
+  renT(); sched();
+  toast("\u2713 \u062A\u0645 \u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u0632\u064A\u0627\u0631\u0629");
+});
+
+document.getElementById("btn-cancel-edit").addEventListener("click", function(){
+  document.getElementById("edit-modal-bg").classList.add("hidden");
+});
 
 function toast(m){
   var t = document.getElementById("toast");
