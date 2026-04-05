@@ -107,19 +107,17 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .dl:active{color:var(--rd)}
 
 .grp-co{border-radius:14px;margin-bottom:10px;overflow:hidden;border:1.5px solid var(--bd);box-shadow:0 2px 8px #0000080a}
-.grp-co-hdr{display:flex;align-items:center;gap:8px;padding:13px 14px;cursor:pointer;background:var(--br);transition:opacity .15s}
-.grp-co-hdr:active{opacity:.85}
+.grp-co-hdr{display:flex;align-items:center;gap:8px;padding:13px 14px;background:var(--br)}
 .grp-flag{font-size:20px;flex-shrink:0}
 .grp-coname{font-family:'Amiri',serif;font-size:16px;color:#F5E6C8;flex:1}
 .grp-cnt{font-size:11px;color:#C9A84C;font-weight:700;background:rgba(201,168,76,.15);padding:2px 8px;border-radius:20px;flex-shrink:0}
-.grp-chev{font-size:12px;color:#C9A84C;transition:transform .25s;flex-shrink:0}
+.grp-chev{font-size:12px;color:#C9A84C;transition:transform .25s;flex-shrink:0;cursor:pointer;padding:6px 10px;margin:-6px -10px}
 .grp-chev.op{transform:rotate(180deg)}
 .grp-co-body{display:none;background:var(--wh);padding:8px}
 .grp-co-body.op{display:block}
 
 .grp-cy{border-radius:11px;margin-bottom:7px;overflow:hidden;border:1px solid var(--bd)}
-.grp-cy-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#f9f4ec;transition:background .15s}
-.grp-cy-hdr:active{background:#f0e9dc}
+.grp-cy-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f9f4ec}
 .grp-cy-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 0 2px #C9A84C33}
 .grp-cyname{font-family:'Amiri',serif;font-size:14px;color:var(--br);flex:1;font-weight:700}
 .grp-cy-body{display:none;padding:8px}
@@ -285,10 +283,24 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="mb">
       <label class="lbl">مَن دفع؟</label>
       <div class="seg" id="pay-seg">
-        <button class="sg" data-pay="omar">عمر</button>
-        <button class="sg" data-pay="majed">ماجد</button>
-        <button class="sg" data-pay="waseem">وسيم</button>
-        <button class="sg on" data-pay="split">بالتساوي</button>
+        <button class="sg on" data-pay="omar">عمر</button>
+        <button class="sg on" data-pay="majed">ماجد</button>
+        <button class="sg on" data-pay="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb" id="pay-split-wrap" style="display:none">
+      <label class="lbl">توزيع المبلغ</label>
+      <div class="seg" id="split-mode-seg">
+        <button class="sg on" data-mode="equal">بالتساوي</button>
+        <button class="sg" data-mode="custom">مبالغ مختلفة</button>
+      </div>
+      <div id="pay-custom-fields" style="display:none;margin-top:8px">
+        <div class="g3">
+          <div id="cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-omar" placeholder="٠"></div>
+          <div id="cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-majed" placeholder="٠"></div>
+          <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-waseem" placeholder="٠"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px" id="pay-sum-hint"></div>
       </div>
     </div>
     <button class="btn" id="btn-add-exp">تسجيل المصروف</button>
@@ -422,7 +434,7 @@ var CB = {transport:"btr",accommodation:"bac",food:"bfo",research:"bre",other:"b
 var CO = ["sa","ma","dz","eg","za"];
 
 
-var pay = "split", fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
+var pay = ["omar","majed","waseem"], fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
 var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\u0637\u0629", low:"\u0639\u0646\u062F \u0632\u064A\u0627\u062F\u0629 \u0627\u0644\u0648\u0642\u062A"};
 var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
@@ -447,13 +459,50 @@ function showPg(id, btn){
   btn.classList.add("on");
 }
 
-// Pay buttons
+// Pay buttons (multi-select toggle)
+var splitMode = "equal";
 document.getElementById("pay-seg").addEventListener("click", function(e){
   var btn = e.target.closest(".sg");
   if (!btn) return;
-  pay = btn.getAttribute("data-pay");
-  document.querySelectorAll("#pay-seg .sg").forEach(function(x){ x.classList.remove("on"); });
+  var p = btn.getAttribute("data-pay");
+  btn.classList.toggle("on");
+  pay = [];
+  document.querySelectorAll("#pay-seg .sg.on").forEach(function(x){ pay.push(x.getAttribute("data-pay")); });
+  if (pay.length === 0){ btn.classList.add("on"); pay = [p]; }
+  updatePayUI();
+});
+
+document.getElementById("split-mode-seg").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  splitMode = btn.getAttribute("data-mode");
+  document.querySelectorAll("#split-mode-seg .sg").forEach(function(x){ x.classList.remove("on"); });
   btn.classList.add("on");
+  document.getElementById("pay-custom-fields").style.display = splitMode === "custom" ? "block" : "none";
+});
+
+function updatePayUI(){
+  var wrap = document.getElementById("pay-split-wrap");
+  wrap.style.display = pay.length > 1 ? "block" : "none";
+  ["omar","majed","waseem"].forEach(function(p){
+    document.getElementById("cf-" + p).style.display = pay.indexOf(p) >= 0 ? "block" : "none";
+    if (pay.indexOf(p) < 0) document.getElementById("pa-" + p).value = "";
+  });
+}
+
+["pa-omar","pa-majed","pa-waseem"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", function(){
+    var total = parseFloat(document.getElementById("ea2").value) || 0;
+    var sum = 0;
+    pay.forEach(function(p){ sum += parseFloat(document.getElementById("pa-" + p).value) || 0; });
+    var hint = document.getElementById("pay-sum-hint");
+    if (sum > 0 && Math.abs(sum - total) > 0.5) {
+      hint.textContent = "\u26A0\uFE0F \u0627\u0644\u0645\u062C\u0645\u0648\u0639: " + FM(sum) + " \u0631.\u0633 (\u0627\u0644\u0645\u0637\u0644\u0648\u0628: " + FM(total) + " \u0631.\u0633)";
+      hint.style.color = "var(--rd)";
+    } else {
+      hint.textContent = "";
+    }
+  });
 });
 
 // Filter buttons
@@ -513,7 +562,23 @@ function parse(rows){
   rows.forEach(function(r){
     if (!r[0]) return;
     if (r[0] === "B") b = r[1];
-    else if (r[0] === "E") exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:r[5]});
+    else if (r[0] === "E") {
+      var payVal = r[5] || "split";
+      var payArr, payAmts;
+      if (payVal.indexOf("+") >= 0) {
+        payArr = payVal.split("+");
+        try { payAmts = r[6] ? JSON.parse(r[6]) : null; } catch(ex){ payAmts = null; }
+        if (!payAmts) { var each = (+r[2]) / payArr.length; payAmts = {}; payArr.forEach(function(p){ payAmts[p] = each; }); }
+      } else if (payVal === "split") {
+        payArr = ["omar","majed","waseem"];
+        var each3 = (+r[2]) / 3;
+        payAmts = {omar:each3, majed:each3, waseem:each3};
+      } else {
+        payArr = [payVal];
+        payAmts = {}; payAmts[payVal] = +r[2];
+      }
+      exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
+    }
     else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high"});
   });
   if (b) document.getElementById("tb").value = b;
@@ -525,7 +590,11 @@ function buildRows(){
   var rows = [];
   var b = document.getElementById("tb").value;
   if (b) rows.push(["B", b]);
-  exps.forEach(function(e){ rows.push(["E", e.nm, e.am, e.ct, e.co, e.pay]); });
+  exps.forEach(function(e){
+    var payStr = Array.isArray(e.pay) ? e.pay.join("+") : e.pay;
+    var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
+    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr]);
+  });
   tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high"]); });
   return rows;
 }
@@ -569,9 +638,35 @@ function addE(){
   var ct = document.getElementById("ect").value;
   var co = document.getElementById("eco").value;
   if (!nm || !am || am <= 0){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0644\u0628\u064A\u0627\u0646 \u0648\u0627\u0644\u0645\u0628\u0644\u063A"); return; }
-  exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay});
+
+  // Build pay info: {omar: amount, majed: amount, waseem: amount}
+  var payInfo = {};
+  if (pay.length === 1) {
+    // Single payer
+    payInfo[pay[0]] = am;
+  } else if (splitMode === "equal") {
+    // Equal split among selected
+    var each = am / pay.length;
+    pay.forEach(function(p){ payInfo[p] = each; });
+  } else {
+    // Custom amounts
+    var sum = 0;
+    pay.forEach(function(p){
+      var v = parseFloat(document.getElementById("pa-" + p).value) || 0;
+      payInfo[p] = v;
+      sum += v;
+    });
+    if (Math.abs(sum - am) > 0.5){
+      toast("\u26A0\uFE0F \u0645\u062C\u0645\u0648\u0639 \u0627\u0644\u0645\u0628\u0627\u0644\u063A \u0644\u0627 \u064A\u0633\u0627\u0648\u064A \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A");
+      return;
+    }
+  }
+
+  exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo});
   document.getElementById("en2").value = "";
   document.getElementById("ea2").value = "";
+  ["pa-omar","pa-majed","pa-waseem"].forEach(function(id){ document.getElementById(id).value = ""; });
+  document.getElementById("pay-sum-hint").textContent = "";
   calc(); renE(); sched();
 }
 
@@ -582,10 +677,20 @@ function calc(){
   var tot = parseFloat(document.getElementById("tb").value) || 0;
   var oP = 0, mP = 0, wP = 0, sh = 0;
   exps.forEach(function(e){
-    if (e.pay === "omar") oP += e.am;
-    else if (e.pay === "majed") mP += e.am;
-    else if (e.pay === "waseem") wP += e.am;
-    else { oP += e.am / 3; mP += e.am / 3; wP += e.am / 3; sh += e.am; }
+    if (e.payAmts) {
+      // New format: per-person amounts
+      oP += e.payAmts.omar || 0;
+      mP += e.payAmts.majed || 0;
+      wP += e.payAmts.waseem || 0;
+      var payers = e.pay;
+      if (Array.isArray(payers) && payers.length > 1) sh += e.am;
+    } else if (typeof e.pay === "string") {
+      // Old format backward compatibility
+      if (e.pay === "omar") oP += e.am;
+      else if (e.pay === "majed") mP += e.am;
+      else if (e.pay === "waseem") wP += e.am;
+      else { oP += e.am / 3; mP += e.am / 3; wP += e.am / 3; sh += e.am; }
+    }
   });
   var sp = exps.reduce(function(s, e){ return s + e.am; }, 0);
   var rm = tot - sp;
@@ -602,9 +707,19 @@ function calc(){
   document.getElementById("op").textContent = FM(oP) + " \u0631.\u0633";
   document.getElementById("mp2").textContent = FM(mP) + " \u0631.\u0633";
   document.getElementById("wp").textContent = FM(wP) + " \u0631.\u0633";
-  document.getElementById("os").textContent = FM(sh / 3) + " \u0631.\u0633";
-  document.getElementById("ms2").textContent = FM(sh / 3) + " \u0631.\u0633";
-  document.getElementById("ws2").textContent = FM(sh / 3) + " \u0631.\u0633";
+  // For shared expenses, show each person's share from multi-payer expenses
+  var oSh = 0, mSh = 0, wSh = 0;
+  exps.forEach(function(e){
+    var payers = Array.isArray(e.pay) ? e.pay : (e.pay === "split" ? ["omar","majed","waseem"] : [e.pay]);
+    if (payers.length > 1 && e.payAmts) {
+      oSh += e.payAmts.omar || 0;
+      mSh += e.payAmts.majed || 0;
+      wSh += e.payAmts.waseem || 0;
+    }
+  });
+  document.getElementById("os").textContent = FM(oSh) + " \u0631.\u0633";
+  document.getElementById("ms2").textContent = FM(mSh) + " \u0631.\u0633";
+  document.getElementById("ws2").textContent = FM(wSh) + " \u0631.\u0633";
 
   // Calculate net settlement between three people
   // Each person's fair share = total_spent / 3
@@ -675,8 +790,15 @@ function renE(){
   var rev = [].concat(list).reverse();
   rev.forEach(function(e){
     var i = exps.indexOf(e);
-    var ptc = e.pay === "split" ? "pts" : e.pay === "omar" ? "pto" : e.pay === "majed" ? "ptm" : "ptw";
-    var ptx = PN[e.pay] || "\u0645\u0634\u062A\u0631\u0643";
+    var ptc, ptx;
+    if (Array.isArray(e.pay)) {
+      if (e.pay.length === 3) { ptc = "pts"; ptx = "\u0645\u0634\u062A\u0631\u0643"; }
+      else if (e.pay.length === 1) { ptc = e.pay[0] === "omar" ? "pto" : e.pay[0] === "majed" ? "ptm" : "ptw"; ptx = PN[e.pay[0]]; }
+      else { ptc = "pts"; ptx = e.pay.map(function(p){ return PN[p]; }).join(" + "); }
+    } else {
+      ptc = e.pay === "split" ? "pts" : e.pay === "omar" ? "pto" : e.pay === "majed" ? "ptm" : "ptw";
+      ptx = PN[e.pay] || "\u0645\u0634\u062A\u0631\u0643";
+    }
     html += '<div class="er">'
       + '<button class="dl" onclick="delE(' + i + ')">\u2715</button>'
       + '<span class="bx ' + CB[e.ct] + '">' + CL[e.ct] + '</span>'
@@ -718,8 +840,12 @@ function togEl(id){
   el.classList.toggle("op");
   var chev = document.getElementById("ch-" + id);
   if (chev) chev.classList.toggle("op");
+  openState[id] = el.classList.contains("op");
 }
 window.togEl = togEl;
+
+// Track which groups are open
+var openState = {};
 
 function renT(){
   var el = document.getElementById("tl2");
@@ -727,6 +853,10 @@ function renT(){
     el.innerHTML = '<div class="emp"><div class="ei">\u{1F5FA}\uFE0F</div>\u0623\u0636\u0641 \u0632\u064A\u0627\u0631\u0627\u062A \u0631\u062D\u0644\u062A\u0643 \u0644\u0644\u0628\u062F\u0621</div>';
     return;
   }
+  // Save current open/close state before rebuild
+  document.querySelectorAll("[id^='grpco-'],[id^='grpcy-'],[id^='vc-']").forEach(function(e){
+    openState[e.id] = e.classList.contains("op");
+  });
   var tree = {};
   tls.forEach(function(t, i){
     var co = t.co || "sa";
@@ -747,25 +877,25 @@ function renT(){
     var total = cities.reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
     var coId = "grpco-" + co;
     html += '<div class="grp-co">'
-      + '<div class="grp-co-hdr" onclick="togEl(\'' + coId + '\')">'
+      + '<div class="grp-co-hdr">'
       + '<span class="grp-flag">' + CF[co] + '</span>'
       + '<span class="grp-coname">' + CN[co] + '</span>'
       + '<span class="grp-cnt">' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
-      + '<span class="grp-chev op" id="ch-' + coId + '">\u25BC</span>'
+      + '<span class="grp-chev' + (openState[coId] !== false ? ' op' : '') + '" id="ch-' + coId + '" onclick="togEl(\'' + coId + '\')">\u25BC</span>'
       + '</div>'
-      + '<div class="grp-co-body op" id="' + coId + '">';
+      + '<div class="grp-co-body' + (openState[coId] !== false ? ' op' : '') + '" id="' + coId + '">';
 
     cities.forEach(function(cy){
       var visits = tree[co][cy];
       var cyId = "grpcy-" + co + "-" + cy.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_");
       html += '<div class="grp-cy">'
-        + '<div class="grp-cy-hdr" onclick="togEl(\'' + cyId + '\')">'
+        + '<div class="grp-cy-hdr">'
         + '<span class="grp-cy-dot"' + (cy === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" ? ' style="background:#aaa"' : '') + '></span>'
         + '<span class="grp-cyname">' + cy + '</span>'
         + '<span class="grp-cnt">' + AR(visits.length) + ' \u0632\u064A\u0627\u0631\u0629</span>'
-        + '<span class="grp-chev op" id="ch-' + cyId + '">\u25BC</span>'
+        + '<span class="grp-chev' + (openState[cyId] !== false ? ' op' : '') + '" id="ch-' + cyId + '" onclick="togEl(\'' + cyId + '\')">\u25BC</span>'
         + '</div>'
-        + '<div class="grp-cy-body op" id="' + cyId + '">';
+        + '<div class="grp-cy-body' + (openState[cyId] !== false ? ' op' : '') + '" id="' + cyId + '">';
 
       visits.forEach(function(v){
         var t = v.t, i = v.i;
@@ -778,9 +908,9 @@ function renT(){
           + '<div class="vc-title">' + t.hd + '</div>'
           + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
           + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
-          + '<span class="vc-chev" id="ch-' + vcId + '">\u25BC</span>'
+          + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '">\u25BC</span>'
           + '</div>'
-          + '<div class="vc-body" id="' + vcId + '">'
+          + '<div class="vc-body' + (openState[vcId] ? ' op' : '') + '" id="' + vcId + '">'
           + (t.nb ? '<div class="tf"><div class="tfl">\u0646\u0628\u0630\u0629</div><div class="tfv">' + t.nb + '</div></div>' : "")
           + (t.ml ? '<div class="tf"><div class="tfl">\u0627\u0644\u0645\u0637\u0644\u0648\u0628</div><div class="tfv">' + t.ml + '</div></div>' : "")
           + (t.nt ? '<div class="tf"><div class="tfl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</div><div class="tfv">' + t.nt + '</div></div>' : "")
