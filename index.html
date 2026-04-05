@@ -76,7 +76,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .ao{background:#deedfb;color:#0C447C}
 .am{background:var(--gl);color:#633806}
 .aw{background:#dff0e6;color:#1a4731}
-.pn{font-size:13px;font-weight:700;color:var(--br);margin-bottom:1px}
+.pn{font-size:15px;font-weight:700;color:var(--br);margin-bottom:3px}
+.pn-o{color:var(--bl)}.pn-m{color:#854F0B}.pn-w{color:var(--gn)}
 .pl{font-size:9px;color:var(--t3)}
 .pv{font-size:16px;font-weight:700;margin-top:2px}
 .pvo{color:var(--bl)}.pvm{color:#854F0B}.pvw{color:var(--gn)}
@@ -244,24 +245,21 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 
   <div class="pers">
     <div class="pc po">
-      <div class="av ao">ع</div>
-      <div class="pn">عمر</div>
+      <div class="pn pn-o">عمر</div>
       <div class="pl">إجمالي ما دفع</div>
       <div class="pv pvo" id="op">&#x0660; ر.س</div>
       <div class="ps">من المشترك: <span id="os">&#x0660; ر.س</span></div>
       <div id="ob"></div>
     </div>
     <div class="pc pm">
-      <div class="av am">م</div>
-      <div class="pn">ماجد</div>
+      <div class="pn pn-m">ماجد</div>
       <div class="pl">إجمالي ما دفع</div>
       <div class="pv pvm" id="mp2">&#x0660; ر.س</div>
       <div class="ps">من المشترك: <span id="ms2">&#x0660; ر.س</span></div>
       <div id="mb2"></div>
     </div>
     <div class="pc pw">
-      <div class="av aw">و</div>
-      <div class="pn">وسيم</div>
+      <div class="pn pn-w">وسيم</div>
       <div class="pl">إجمالي ما دفع</div>
       <div class="pv pvw" id="wp">&#x0660; ر.س</div>
       <div class="ps">من المشترك: <span id="ws2">&#x0660; ر.س</span></div>
@@ -279,6 +277,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="br2"><span>نسبة الإنفاق</span><span id="bp">&#x0660;&#x066A;</span></div>
     <div class="bb"><div class="bf" id="bf" style="width:0%"></div></div>
   </div>
+
+  <div class="co-tabs" id="budget-co-tabs"></div>
 
   <div id="sa"></div>
 
@@ -307,10 +307,16 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
       </div>
       <div><label class="lbl">الفئة</label>
         <select class="fi" id="ect">
-          <option value="transport">&#x2708;&#xFE0F; مواصلات</option>
+          <option value="flights">&#x2708;&#xFE0F; تذاكر طيران</option>
+          <option value="taxi">&#x1F695; تاكسي</option>
+          <option value="carrental">&#x1F697; إيجار سيارة</option>
+          <option value="tolls">&#x1F6E3;&#xFE0F; ضرائب طريق</option>
+          <option value="food">&#x1F37D;&#xFE0F; أكل</option>
           <option value="accommodation">&#x1F3E8; سكن</option>
-          <option value="food">&#x1F37D;&#xFE0F; طعام</option>
-          <option value="research">&#x1F4DC; بحث علمي</option>
+          <option value="fuel">&#x26FD; وقود</option>
+          <option value="grocery">&#x1F6D2; بقالة</option>
+          <option value="books">&#x1F4DA; كتب</option>
+          <option value="manuscripts">&#x1F4DC; مخطوطات</option>
           <option value="other">&#x1F4E6; أخرى</option>
         </select>
       </div>
@@ -464,8 +470,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 var API = "https://script.google.com/macros/s/AKfycbygB2r1SytdCoN7HOlKjoZg97H_cwnXKW2rVdMJfhMEDZ2qsOGSJLIEJECpVmRvph9b/exec";
 var CF = {sa:"\u{1F1F8}\u{1F1E6}",ma:"\u{1F1F2}\u{1F1E6}",dz:"\u{1F1E9}\u{1F1FF}",eg:"\u{1F1EA}\u{1F1EC}",za:"\u{1F1FF}\u{1F1E6}"};
 var CN = {sa:"\u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629",ma:"\u0627\u0644\u0645\u063A\u0631\u0628",dz:"\u0627\u0644\u062C\u0632\u0627\u0626\u0631",eg:"\u0645\u0635\u0631",za:"\u062C\u0646\u0648\u0628 \u0623\u0641\u0631\u064A\u0642\u064A\u0627"};
-var CL = {transport:"\u0645\u0648\u0627\u0635\u0644\u0627\u062A",accommodation:"\u0633\u0643\u0646",food:"\u0637\u0639\u0627\u0645",research:"\u0628\u062D\u062B \u0639\u0644\u0645\u064A",other:"\u0623\u062E\u0631\u0649"};
-var CB = {transport:"btr",accommodation:"bac",food:"bfo",research:"bre",other:"bot"};
+var CL = {flights:"\u062A\u0630\u0627\u0643\u0631 \u0637\u064A\u0631\u0627\u0646",taxi:"\u062A\u0627\u0643\u0633\u064A",carrental:"\u0625\u064A\u062C\u0627\u0631 \u0633\u064A\u0627\u0631\u0629",tolls:"\u0636\u0631\u0627\u0626\u0628 \u0637\u0631\u064A\u0642",food:"\u0623\u0643\u0644",accommodation:"\u0633\u0643\u0646",fuel:"\u0648\u0642\u0648\u062F",grocery:"\u0628\u0642\u0627\u0644\u0629",books:"\u0643\u062A\u0628",manuscripts:"\u0645\u062E\u0637\u0648\u0637\u0627\u062A",other:"\u0623\u062E\u0631\u0649",transport:"\u0645\u0648\u0627\u0635\u0644\u0627\u062A",research:"\u0628\u062D\u062B \u0639\u0644\u0645\u064A"};
+var CB = {flights:"btr",taxi:"btr",carrental:"btr",tolls:"btr",food:"bfo",accommodation:"bac",fuel:"bot",grocery:"bfo",books:"bre",manuscripts:"bre",other:"bot",transport:"btr",research:"bre"};
 var CO = ["sa","ma","dz","eg","za"];
 
 
@@ -812,6 +818,20 @@ function calc(){
     settHtml += '</div></div>';
     sa.innerHTML = settHtml;
   }
+
+  // Country spending tabs
+  var coSpend = {};
+  exps.forEach(function(e){ coSpend[e.co] = (coSpend[e.co] || 0) + e.am; });
+  var bcoHtml = "";
+  CO.forEach(function(co){
+    var amt = coSpend[co] || 0;
+    bcoHtml += '<div class="co-tab">'
+      + '<span class="co-tab-flag">' + CF[co] + '</span>'
+      + '<span class="co-tab-name">' + CN[co] + '</span>'
+      + '<span class="co-tab-cnt">' + (amt > 0 ? FM(amt) + ' \u0631.\u0633' : '\u0660') + '</span>'
+      + '</div>';
+  });
+  document.getElementById("budget-co-tabs").innerHTML = bcoHtml;
 }
 
 function renE(){
