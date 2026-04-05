@@ -106,44 +106,79 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .dl{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:1px 4px;flex-shrink:0;line-height:1}
 .dl:active{color:var(--rd)}
 
-.grp-co{border-radius:14px;margin-bottom:10px;overflow:hidden;border:1.5px solid var(--bd);box-shadow:0 2px 8px #0000080a}
-.grp-co-hdr{display:flex;align-items:center;gap:8px;padding:13px 14px;background:var(--br)}
-.grp-flag{font-size:20px;flex-shrink:0}
-.grp-coname{font-family:'Amiri',serif;font-size:16px;color:#F5E6C8;flex:1}
-.grp-cnt{font-size:11px;color:#C9A84C;font-weight:700;background:rgba(201,168,76,.15);padding:2px 8px;border-radius:20px;flex-shrink:0}
+/* Trip stats bar */
+.trip-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.trip-stat{background:#f4ede0;border-radius:12px;padding:10px 6px;text-align:center}
+.trip-stat-l{font-size:10px;color:var(--t3);margin-bottom:2px;font-weight:700}
+.trip-stat-v{font-size:18px;font-weight:700;color:var(--br)}
+
+/* Country horizontal tabs */
+.co-tabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:2px 0 8px;margin-bottom:4px;scrollbar-width:none}
+.co-tabs::-webkit-scrollbar{display:none}
+.co-tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:14px;border:1.5px solid var(--bd);background:var(--wh);cursor:pointer;flex-shrink:0;transition:all .2s;min-width:68px;box-shadow:0 1px 4px #0000060a}
+.co-tab.on{background:linear-gradient(135deg,var(--br),#3d2518);border-color:var(--br);box-shadow:0 3px 12px #2C181033}
+.co-tab-flag{font-size:22px;line-height:1}
+.co-tab-name{font-family:'Tajawal',sans-serif;font-size:10px;font-weight:700;color:var(--t2)}
+.co-tab.on .co-tab-name{color:#F5E6C8}
+.co-tab-cnt{font-size:9px;color:var(--t3);font-weight:500}
+.co-tab.on .co-tab-cnt{color:#C9A84C}
+
+/* Country content area */
+.co-content{min-height:40px}
+.co-panel{display:none}
+.co-panel.on{display:block;animation:fadeIn .25s ease}
+.co-panel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:0 2px}
+.co-panel-title{font-family:'Amiri',serif;font-size:16px;color:var(--br);flex:1}
+.co-panel-info{font-size:10px;color:var(--t3);font-weight:500}
+
+/* Legacy classes kept for compatibility */
+.grp-cnt{font-size:10px;color:#C9A84C;font-weight:700;background:rgba(201,168,76,.18);padding:3px 9px;border-radius:20px;flex-shrink:0}
 .grp-chev{font-size:12px;color:#C9A84C;transition:transform .25s;flex-shrink:0;cursor:pointer;padding:6px 10px;margin:-6px -10px}
 .grp-chev.op{transform:rotate(180deg)}
-.grp-co-body{display:none;background:var(--wh);padding:8px}
-.grp-co-body.op{display:block}
 
-.grp-cy{border-radius:11px;margin-bottom:7px;overflow:hidden;border:1px solid var(--bd)}
-.grp-cy-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f9f4ec}
-.grp-cy-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 0 2px #C9A84C33}
-.grp-cyname{font-family:'Amiri',serif;font-size:14px;color:var(--br);flex:1;font-weight:700}
-.grp-cy-body{display:none;padding:8px}
+/* City group */
+.grp-cy{border-radius:12px;margin-bottom:8px;overflow:hidden;border:1px solid var(--bd)}
+.grp-cy-hdr{display:flex;align-items:center;gap:8px;padding:11px 13px;background:linear-gradient(135deg,#f9f4ec,#f3ebdb)}
+.grp-cy-icon{font-size:14px;flex-shrink:0}
+.grp-cyname{font-family:'Amiri',serif;font-size:15px;color:var(--br);flex:1;font-weight:700}
+.grp-cy-dates{font-size:9px;color:var(--t3);flex-shrink:0;font-weight:500;direction:ltr}
+.grp-cy-body{display:none;padding:6px 10px 10px;position:relative}
 .grp-cy-body.op{display:block}
 
-.vc{background:var(--wh);border:1px solid var(--bd);border-radius:11px;margin-bottom:8px;overflow:hidden}
+/* Timeline line inside city */
+.grp-cy-body.op::before{content:'';position:absolute;right:22px;top:10px;bottom:14px;width:2px;background:linear-gradient(to bottom,var(--gold),#e3d8c4);border-radius:2px;opacity:.4}
+
+/* Visit card */
+.vc{background:var(--wh);border:1px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden;position:relative;border-right:3.5px solid var(--gold);transition:box-shadow .2s}
 .vc:last-child{margin-bottom:0}
-.vc-hdr{display:flex;align-items:center;gap:7px;padding:11px 12px;cursor:pointer;transition:background .15s}
+.vc.vc-pri-high{border-right-color:#c0392b}
+.vc.vc-pri-med{border-right-color:#e6a817}
+.vc.vc-pri-low{border-right-color:#27643a}
+.vc-hdr{display:flex;align-items:center;gap:8px;padding:12px 13px;cursor:pointer;transition:background .15s}
 .vc-hdr:active{background:#fdf8f0}
-.vc-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
-.vc-title{font-family:'Amiri',serif;font-size:14px;color:var(--br);flex:1}
+.vc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2.5px #fff,0 0 0 3.5px var(--gold);position:relative;z-index:1}
+.vc-dot-high{background:#c0392b;box-shadow:0 0 0 2.5px #fff,0 0 0 3.5px #c0392b55}
+.vc-dot-med{background:#e6a817;box-shadow:0 0 0 2.5px #fff,0 0 0 3.5px #e6a81755}
+.vc-dot-low{background:#27643a;box-shadow:0 0 0 2.5px #fff,0 0 0 3.5px #27643a55}
+.vc-info{flex:1;min-width:0}
+.vc-title{font-family:'Amiri',serif;font-size:14px;color:var(--br);line-height:1.3}
+.vc-summary{font-size:11px;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vc-date{font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0}
 .vc-chev{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0}
 .vc-chev.op{transform:rotate(180deg)}
-.vc-body{display:none;padding:0 12px 12px;border-top:1px solid #f0e8d8}
+.vc-body{display:none;padding:0 13px 13px;border-top:1px solid #f0e8d8;animation:fadeIn .2s ease}
 .vc-body.op{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .tf{margin-top:9px}
 .tfl{font-size:10px;font-weight:700;color:var(--gold);margin-bottom:2px;letter-spacing:.3px}
 .tfv{font-size:13px;color:var(--tx);line-height:1.65}
 .tfv.mu{color:var(--t3);font-style:italic}
-.ta{margin-top:9px;padding-top:7px;border-top:1px solid #f0e8d8;display:flex;justify-content:flex-end;gap:6px}
-.db{font-size:12px;padding:5px 12px;border:1px solid var(--bd);border-radius:20px;background:none;color:var(--t3);cursor:pointer;font-family:'Tajawal',sans-serif}
-.db:active{color:var(--rd);border-color:var(--rd)}
-.eb{font-size:12px;padding:5px 12px;border:1px solid var(--gold);border-radius:20px;background:none;color:var(--gold);cursor:pointer;font-family:'Tajawal',sans-serif}
+.ta{margin-top:10px;padding-top:8px;border-top:1px solid #f0e8d8;display:flex;justify-content:flex-end;gap:7px}
+.db{font-size:12px;padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:none;color:var(--t3);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s}
+.db:active{color:var(--rd);border-color:var(--rd);background:#fdecea}
+.eb{font-size:12px;padding:6px 14px;border:1px solid var(--gold);border-radius:20px;background:none;color:var(--gold);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .15s}
 .eb:active{background:var(--gold);color:var(--wh)}
-.pri-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.pri-badge{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0}
 .pri-high{background:#fdecea;color:#7f1d1d}
 .pri-med{background:#fef3cd;color:#856404}
 .pri-low{background:#e8f4f0;color:#3d6b5e}
@@ -844,6 +879,22 @@ function togEl(id){
 }
 window.togEl = togEl;
 
+function selCo(co){
+  openState._activeCo = co;
+  // Toggle tab classes
+  document.querySelectorAll('.co-tab').forEach(function(t){ t.classList.remove('on'); });
+  document.querySelectorAll('.co-panel').forEach(function(p){ p.classList.remove('on'); });
+  // Find and activate the clicked tab
+  var tabs = document.querySelectorAll('.co-tab');
+  var panels = document.querySelectorAll('.co-panel');
+  tabs.forEach(function(t){
+    if (t.getAttribute('onclick').indexOf("'" + co + "'") >= 0) t.classList.add('on');
+  });
+  var panel = document.getElementById('copanel-' + co);
+  if (panel) panel.classList.add('on');
+}
+window.selCo = selCo;
+
 // Track which groups are open
 var openState = {};
 
@@ -858,6 +909,7 @@ function renT(){
     openState[e.id] = e.classList.contains("op");
   });
   var tree = {};
+  var totalCities = {};
   tls.forEach(function(t, i){
     var co = t.co || "sa";
     var cy = t.cy && t.cy.trim() !== "" ? t.cy : "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
@@ -866,32 +918,70 @@ function renT(){
     tree[co][cy].push({t:t, i:i});
   });
 
-  var html = "";
-  CO.filter(function(co){ return tree[co]; }).forEach(function(co){
+  // Stats
+  var countryCount = Object.keys(tree).length;
+  var cityCount = 0;
+  Object.keys(tree).forEach(function(co){ cityCount += Object.keys(tree[co]).length; });
+  var activeCos = CO.filter(function(co){ return tree[co]; });
+
+  // Remember which country tab is active
+  if (!openState._activeCo || activeCos.indexOf(openState._activeCo) < 0) {
+    openState._activeCo = activeCos[0];
+  }
+
+  var html = '<div class="trip-stats">'
+    + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u062F\u0648\u0644</div><div class="trip-stat-v">' + AR(countryCount) + '</div></div>'
+    + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u0645\u062F\u0646</div><div class="trip-stat-v">' + AR(cityCount) + '</div></div>'
+    + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u0632\u064A\u0627\u0631\u0627\u062A</div><div class="trip-stat-v">' + AR(tls.length) + '</div></div>'
+    + '</div>';
+
+  // Horizontal country tabs
+  html += '<div class="co-tabs">';
+  activeCos.forEach(function(co){
+    var total = Object.keys(tree[co]).reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
+    var isOn = openState._activeCo === co;
+    html += '<div class="co-tab' + (isOn ? ' on' : '') + '" onclick="selCo(\'' + co + '\')">'
+      + '<span class="co-tab-flag">' + CF[co] + '</span>'
+      + '<span class="co-tab-name">' + CN[co] + '</span>'
+      + '<span class="co-tab-cnt">' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
+      + '</div>';
+  });
+  html += '</div>';
+
+  // Country content panels
+  html += '<div class="co-content">';
+  activeCos.forEach(function(co){
+    var isOn = openState._activeCo === co;
     var cities = Object.keys(tree[co]).sort(function(a, b){
-      // Put "غير معروف" at the end
       if (a === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641") return 1;
       if (b === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641") return -1;
       return a.localeCompare(b, "ar");
     });
     var total = cities.reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
-    var coId = "grpco-" + co;
-    html += '<div class="grp-co">'
-      + '<div class="grp-co-hdr">'
-      + '<span class="grp-flag">' + CF[co] + '</span>'
-      + '<span class="grp-coname">' + CN[co] + '</span>'
-      + '<span class="grp-cnt">' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
-      + '<span class="grp-chev' + (openState[coId] !== false ? ' op' : '') + '" id="ch-' + coId + '" onclick="togEl(\'' + coId + '\')">\u25BC</span>'
-      + '</div>'
-      + '<div class="grp-co-body' + (openState[coId] !== false ? ' op' : '') + '" id="' + coId + '">';
+    html += '<div class="co-panel' + (isOn ? ' on' : '') + '" id="copanel-' + co + '">'
+      + '<div class="co-panel-hdr">'
+      + '<span class="co-panel-title">' + CF[co] + ' ' + CN[co] + '</span>'
+      + '<span class="co-panel-info">' + AR(cities.length) + ' \u0645\u062F\u0646 \u00B7 ' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
+      + '</div>';
 
     cities.forEach(function(cy){
       var visits = tree[co][cy];
       var cyId = "grpcy-" + co + "-" + cy.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, "_");
+
+      // Date range for city
+      var dates = visits.map(function(v){ return v.t.dt; }).filter(Boolean).sort();
+      var dateRange = "";
+      if (dates.length > 0) {
+        var fmt = function(d){ return new Date(d + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}); };
+        dateRange = dates.length === 1 ? fmt(dates[0]) : fmt(dates[0]) + " \u2013 " + fmt(dates[dates.length - 1]);
+      }
+
+      var cyIcon = cy === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" ? "\u{1F4CD}" : "\u{1F4CD}";
       html += '<div class="grp-cy">'
         + '<div class="grp-cy-hdr">'
-        + '<span class="grp-cy-dot"' + (cy === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" ? ' style="background:#aaa"' : '') + '></span>'
+        + '<span class="grp-cy-icon">' + cyIcon + '</span>'
         + '<span class="grp-cyname">' + cy + '</span>'
+        + (dateRange ? '<span class="grp-cy-dates">' + dateRange + '</span>' : '')
         + '<span class="grp-cnt">' + AR(visits.length) + ' \u0632\u064A\u0627\u0631\u0629</span>'
         + '<span class="grp-chev' + (openState[cyId] !== false ? ' op' : '') + '" id="ch-' + cyId + '" onclick="togEl(\'' + cyId + '\')">\u25BC</span>'
         + '</div>'
@@ -902,10 +992,15 @@ function renT(){
         var vcId = "vc-" + i;
         var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"long", day:"numeric"}) : "";
         var pr = t.pri || "high";
-        html += '<div class="vc">'
+        var summary = t.nb || t.ml || "";
+        if (summary.length > 60) summary = summary.substring(0, 60) + "...";
+        html += '<div class="vc vc-pri-' + pr + '">'
           + '<div class="vc-hdr" onclick="togEl(\'' + vcId + '\')">'
-          + '<div class="vc-dot"></div>'
+          + '<div class="vc-dot vc-dot-' + pr + '"></div>'
+          + '<div class="vc-info">'
           + '<div class="vc-title">' + t.hd + '</div>'
+          + (summary ? '<div class="vc-summary">' + summary + '</div>' : '')
+          + '</div>'
           + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
           + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
           + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '">\u25BC</span>'
@@ -923,9 +1018,10 @@ function renT(){
       html += '</div></div>';
     });
 
-    html += '</div></div>';
+    html += '</div>'; // close co-panel
   });
 
+  html += '</div>'; // close co-content
   el.innerHTML = html;
 }
 
