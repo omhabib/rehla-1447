@@ -208,6 +208,32 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .emp{text-align:center;padding:28px 12px;color:var(--t3);font-size:13px}
 .ei{font-size:32px;margin-bottom:8px}
 
+/* Booking cards */
+.bk-card{background:var(--wh);border:1px solid var(--bd);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:box-shadow .2s}
+.bk-card.bk-confirmed{border-right:3.5px solid var(--gn)}
+.bk-card.bk-pending{border-right:3.5px solid #e6a817}
+.bk-card.bk-cancelled{border-right:3.5px solid var(--rd);opacity:.6}
+.bk-hdr{display:flex;align-items:center;gap:8px;padding:12px 13px;cursor:pointer;transition:background .15s}
+.bk-hdr:active{background:#fdf8f0}
+.bk-icon{font-size:20px;flex-shrink:0}
+.bk-info{flex:1;min-width:0}
+.bk-title{font-family:'Amiri',serif;font-size:14px;color:var(--br);line-height:1.3}
+.bk-meta{font-size:10px;color:var(--t3);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bk-status{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.bk-st-confirmed{background:#dff0e6;color:#1a4731}
+.bk-st-pending{background:#fef3cd;color:#856404}
+.bk-st-cancelled{background:#fdecea;color:#7f1d1d}
+.bk-chev{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.bk-chev.op{transform:rotate(180deg)}
+.bk-body{display:none;padding:0 13px 13px;border-top:1px solid #f0e8d8}
+.bk-body.op{display:block;animation:fadeIn .2s ease}
+.bk-detail{display:flex;gap:8px;margin-top:8px;align-items:baseline}
+.bk-dl{font-size:10px;font-weight:700;color:var(--gold);min-width:60px;flex-shrink:0}
+.bk-dv{font-size:13px;color:var(--tx);line-height:1.6;flex:1}
+.bk-dv.ltr{direction:ltr;text-align:left}
+.bk-travelers{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.bk-tr-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0e9dc;color:var(--t2)}
+
 </style>
 </head>
 <body>
@@ -233,6 +259,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 <div class="tabs">
   <button class="tab on" id="tab-b">&#x1F4B0; الميزانية</button>
   <button class="tab" id="tab-t">&#x1F4C5; البرنامج</button>
+  <button class="tab" id="tab-k">&#x1F3AB; الحجوزات</button>
 </div>
 
 <!-- BUDGET PAGE -->
@@ -411,6 +438,135 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   </div>
 </div>
 
+
+<!-- BOOKINGS PAGE -->
+<div id="pg-k" class="pg">
+  <div class="mets" id="bk-stats">
+    <div class="met"><div class="ml">إجمالي الحجوزات</div><div class="mv mo" id="bk-total">٠</div></div>
+    <div class="met"><div class="ml">مؤكدة</div><div class="mv mg" id="bk-conf">٠</div></div>
+    <div class="met"><div class="ml">معلّقة</div><div class="mv mr" id="bk-pend">٠</div></div>
+  </div>
+
+  <div class="card">
+    <div class="stitle">&#x2795; إضافة حجز</div>
+    <div class="g2">
+      <div><label class="lbl">نوع الحجز</label>
+        <select class="fi" id="bk-type">
+          <option value="flight">&#x2708;&#xFE0F; طيران</option>
+          <option value="hotel">&#x1F3E8; فندق</option>
+          <option value="car">&#x1F697; سيارة</option>
+          <option value="visa">&#x1F4C4; تأشيرة</option>
+          <option value="activity">&#x1F3AF; نشاط</option>
+          <option value="other">&#x1F4E6; أخرى</option>
+        </select>
+      </div>
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="bk-co">
+          <option value="sa">&#x1F1F8;&#x1F1E6; السعودية</option>
+          <option value="ma">&#x1F1F2;&#x1F1E6; المغرب</option>
+          <option value="dz">&#x1F1E9;&#x1F1FF; الجزائر</option>
+          <option value="eg">&#x1F1EA;&#x1F1EC; مصر</option>
+          <option value="za">&#x1F1FF;&#x1F1E6; جنوب أفريقيا</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">عنوان الحجز</label><input class="fi" type="text" id="bk-title" placeholder="مثال: طيران الرياض - الدار البيضاء"></div>
+    <div class="g3">
+      <div><label class="lbl">التاريخ</label><input class="fi" type="date" id="bk-date"></div>
+      <div><label class="lbl">الوقت (اختياري)</label><input class="fi" type="time" id="bk-time"></div>
+      <div><label class="lbl">الحالة</label>
+        <select class="fi" id="bk-status">
+          <option value="confirmed">مؤكد</option>
+          <option value="pending">معلّق</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div><label class="lbl">رقم التأكيد (اختياري)</label><input class="fi" type="text" id="bk-ref" placeholder="ABC123" style="direction:ltr"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="bk-cost" placeholder="٠"></div>
+    </div>
+    <div class="mb">
+      <label class="lbl">المسافرون</label>
+      <div class="seg" id="bk-travelers">
+        <button class="sg on" data-tr="omar">عمر</button>
+        <button class="sg on" data-tr="majed">ماجد</button>
+        <button class="sg on" data-tr="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظات (اختياري)</label><textarea class="fi" id="bk-notes" placeholder="رابط الحجز، تفاصيل إضافية..."></textarea></div>
+    <button class="btn" id="btn-add-bk">إضافة الحجز</button>
+  </div>
+
+  <div class="card">
+    <div class="stitle">&#x1F4CB; سجل الحجوزات</div>
+    <div class="frow" id="bk-filter-row">
+      <button class="fb on" data-bkf="all">الكل</button>
+      <button class="fb" data-bkf="flight">&#x2708;&#xFE0F;</button>
+      <button class="fb" data-bkf="hotel">&#x1F3E8;</button>
+      <button class="fb" data-bkf="car">&#x1F697;</button>
+      <button class="fb" data-bkf="visa">&#x1F4C4;</button>
+      <button class="fb" data-bkf="activity">&#x1F3AF;</button>
+    </div>
+    <div id="bk-list"></div>
+  </div>
+</div>
+
+<!-- EDIT BOOKING MODAL -->
+<div class="modal-bg hidden" id="edit-bk-modal-bg">
+  <div class="modal">
+    <div class="modal-t">تعديل الحجز</div>
+    <input type="hidden" id="edit-bk-idx">
+    <div class="g2">
+      <div><label class="lbl">نوع الحجز</label>
+        <select class="fi" id="edit-bk-type">
+          <option value="flight">&#x2708;&#xFE0F; طيران</option>
+          <option value="hotel">&#x1F3E8; فندق</option>
+          <option value="car">&#x1F697; سيارة</option>
+          <option value="visa">&#x1F4C4; تأشيرة</option>
+          <option value="activity">&#x1F3AF; نشاط</option>
+          <option value="other">&#x1F4E6; أخرى</option>
+        </select>
+      </div>
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="edit-bk-co">
+          <option value="sa">&#x1F1F8;&#x1F1E6; السعودية</option>
+          <option value="ma">&#x1F1F2;&#x1F1E6; المغرب</option>
+          <option value="dz">&#x1F1E9;&#x1F1FF; الجزائر</option>
+          <option value="eg">&#x1F1EA;&#x1F1EC; مصر</option>
+          <option value="za">&#x1F1FF;&#x1F1E6; جنوب أفريقيا</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">عنوان الحجز</label><input class="fi" type="text" id="edit-bk-title"></div>
+    <div class="g3">
+      <div><label class="lbl">التاريخ</label><input class="fi" type="date" id="edit-bk-date"></div>
+      <div><label class="lbl">الوقت</label><input class="fi" type="time" id="edit-bk-time"></div>
+      <div><label class="lbl">الحالة</label>
+        <select class="fi" id="edit-bk-status">
+          <option value="confirmed">مؤكد</option>
+          <option value="pending">معلّق</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div><label class="lbl">رقم التأكيد</label><input class="fi" type="text" id="edit-bk-ref" style="direction:ltr"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-bk-cost"></div>
+    </div>
+    <div class="mb">
+      <label class="lbl">المسافرون</label>
+      <div class="seg" id="edit-bk-travelers">
+        <button class="sg on" data-tr="omar">عمر</button>
+        <button class="sg on" data-tr="majed">ماجد</button>
+        <button class="sg on" data-tr="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-bk-notes"></textarea></div>
+    <button class="btn" id="btn-save-edit-bk" style="margin-bottom:10px">حفظ التعديل</button>
+    <button id="btn-cancel-edit-bk" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-bg hidden" id="modal-bg">
@@ -1108,6 +1264,239 @@ function toast(m){
   clearTimeout(t._x);
   t._x = setTimeout(function(){ t.classList.remove("on"); }, 2400);
 }
+
+// ========== BOOKINGS TAB ==========
+var BT = {flight:"\u2708\uFE0F",hotel:"\u{1F3E8}",car:"\u{1F697}",visa:"\u{1F4C4}",activity:"\u{1F3AF}",other:"\u{1F4E6}"};
+var BTN = {flight:"\u0637\u064A\u0631\u0627\u0646",hotel:"\u0641\u0646\u062F\u0642",car:"\u0633\u064A\u0627\u0631\u0629",visa:"\u062A\u0623\u0634\u064A\u0631\u0629",activity:"\u0646\u0634\u0627\u0637",other:"\u0623\u062E\u0631\u0649"};
+var BSN = {confirmed:"\u0645\u0624\u0643\u062F",pending:"\u0645\u0639\u0644\u0651\u0642",cancelled:"\u0645\u0644\u063A\u064A"};
+var bks = [], bkFil = "all", bkTravelers = ["omar","majed","waseem"];
+
+// Default booking data from PDF
+var defaultBks = [
+  {type:"flight",co:"ma",title:"\u062C\u062F\u0629 (JED) \u2190 \u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN)",dt:"2026-07-03",tm:"01:00",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629 SV377 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0666\u0633 \u0664\u0660\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 46L, 46K, 46J"},
+  {type:"flight",co:"dz",title:"\u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN) \u2190 \u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG)",dt:"2026-07-10",tm:"02:50",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062A\u0648\u0646\u0633\u064A\u0629 TU706, TU374 \u00B7 \u062A\u0648\u0642\u0641 \u00B7 \u0661\u0661\u0633 \u0662\u0665\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 15F-D, 27F-D"},
+  {type:"flight",co:"za",title:"\u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG) \u2190 \u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB)",dt:"2026-07-14",tm:"22:55",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062C\u0632\u0627\u0626\u0631\u064A\u0629 AH5360 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0669\u0633 \u0662\u0660\u062F"},
+  {type:"flight",co:"eg",title:"\u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB) \u2190 \u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI)",dt:"2026-07-19",tm:"21:45",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"South African Airways SA7208 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0668\u0633 \u0662\u0665\u062F"},
+  {type:"flight",co:"sa",title:"\u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI) \u2190 \u062C\u062F\u0629 (JED)",dt:"2026-07-23",tm:"03:55",status:"confirmed",ref:"9NBG2E",cost:8278.29,travelers:["omar","majed","waseem"],notes:"Air Cairo SM477 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0662\u0633 \u0661\u0660\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 11F-D\n\u0625\u062C\u0645\u0627\u0644\u064A \u0643\u0644 \u0627\u0644\u062A\u0630\u0627\u0643\u0631: \u0662\u0664,\u0668\u0663\u0664.\u0668\u0668 \u0631.\u0633 (\u0668,\u0662\u0667\u0668.\u0662\u0669 \u0644\u0644\u0634\u062E\u0635) \u00B7 \u062A\u0630\u0643\u0631\u0629 \u0645\u0631\u0646\u0629 \u00B7 \u0648\u062C\u0628\u0629 \u062D\u0644\u0627\u0644"}
+];
+
+// Tab switching for bookings
+document.getElementById("tab-k").addEventListener("click", function(){ showPg("k", this); });
+
+// Travelers toggle
+document.getElementById("bk-travelers").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  btn.classList.toggle("on");
+  bkTravelers = [];
+  document.querySelectorAll("#bk-travelers .sg.on").forEach(function(x){ bkTravelers.push(x.getAttribute("data-tr")); });
+  if (bkTravelers.length === 0){ btn.classList.add("on"); bkTravelers = [btn.getAttribute("data-tr")]; }
+});
+
+// Edit modal travelers toggle
+document.getElementById("edit-bk-travelers").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  btn.classList.toggle("on");
+  var sel = [];
+  document.querySelectorAll("#edit-bk-travelers .sg.on").forEach(function(x){ sel.push(x.getAttribute("data-tr")); });
+  if (sel.length === 0){ btn.classList.add("on"); }
+});
+
+// Filter bookings
+document.getElementById("bk-filter-row").addEventListener("click", function(e){
+  var btn = e.target.closest(".fb");
+  if (!btn) return;
+  bkFil = btn.getAttribute("data-bkf");
+  document.querySelectorAll("#bk-filter-row .fb").forEach(function(x){ x.classList.remove("on"); });
+  btn.classList.add("on");
+  renBk();
+});
+
+// Add booking
+document.getElementById("btn-add-bk").addEventListener("click", function(){
+  var title = document.getElementById("bk-title").value.trim();
+  if (!title){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062D\u062C\u0632"); return; }
+  bks.push({
+    type: document.getElementById("bk-type").value,
+    co: document.getElementById("bk-co").value,
+    title: title,
+    dt: document.getElementById("bk-date").value,
+    tm: document.getElementById("bk-time").value,
+    status: document.getElementById("bk-status").value,
+    ref: document.getElementById("bk-ref").value.trim(),
+    cost: parseFloat(document.getElementById("bk-cost").value) || 0,
+    travelers: bkTravelers.slice(),
+    notes: document.getElementById("bk-notes").value.trim()
+  });
+  bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
+  ["bk-title","bk-date","bk-time","bk-ref","bk-cost","bk-notes"].forEach(function(id){ document.getElementById(id).value = ""; });
+  document.getElementById("bk-status").value = "confirmed";
+  renBk(); sched();
+  toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u062D\u062C\u0632");
+});
+
+function delBk(i){ bks.splice(i, 1); renBk(); sched(); }
+window.delBk = delBk;
+
+function editBk(i){
+  var b = bks[i];
+  if (!b) return;
+  document.getElementById("edit-bk-idx").value = i;
+  document.getElementById("edit-bk-type").value = b.type;
+  document.getElementById("edit-bk-co").value = b.co;
+  document.getElementById("edit-bk-title").value = b.title;
+  document.getElementById("edit-bk-date").value = b.dt || "";
+  document.getElementById("edit-bk-time").value = b.tm || "";
+  document.getElementById("edit-bk-status").value = b.status;
+  document.getElementById("edit-bk-ref").value = b.ref || "";
+  document.getElementById("edit-bk-cost").value = b.cost || "";
+  document.getElementById("edit-bk-notes").value = b.notes || "";
+  document.querySelectorAll("#edit-bk-travelers .sg").forEach(function(btn){
+    var tr = btn.getAttribute("data-tr");
+    btn.classList.toggle("on", b.travelers && b.travelers.indexOf(tr) >= 0);
+  });
+  document.getElementById("edit-bk-modal-bg").classList.remove("hidden");
+}
+window.editBk = editBk;
+
+document.getElementById("btn-save-edit-bk").addEventListener("click", function(){
+  var i = parseInt(document.getElementById("edit-bk-idx").value);
+  if (isNaN(i) || !bks[i]) return;
+  var title = document.getElementById("edit-bk-title").value.trim();
+  if (!title){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062D\u062C\u0632"); return; }
+  var trav = [];
+  document.querySelectorAll("#edit-bk-travelers .sg.on").forEach(function(x){ trav.push(x.getAttribute("data-tr")); });
+  bks[i] = {
+    type: document.getElementById("edit-bk-type").value,
+    co: document.getElementById("edit-bk-co").value,
+    title: title,
+    dt: document.getElementById("edit-bk-date").value,
+    tm: document.getElementById("edit-bk-time").value,
+    status: document.getElementById("edit-bk-status").value,
+    ref: document.getElementById("edit-bk-ref").value.trim(),
+    cost: parseFloat(document.getElementById("edit-bk-cost").value) || 0,
+    travelers: trav,
+    notes: document.getElementById("edit-bk-notes").value.trim()
+  };
+  bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
+  document.getElementById("edit-bk-modal-bg").classList.add("hidden");
+  renBk(); sched();
+  toast("\u2713 \u062A\u0645 \u062A\u0639\u062F\u064A\u0644 \u0627\u0644\u062D\u062C\u0632");
+});
+
+document.getElementById("btn-cancel-edit-bk").addEventListener("click", function(){
+  document.getElementById("edit-bk-modal-bg").classList.add("hidden");
+});
+
+function togBk(id){
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle("op");
+  var chev = document.getElementById("bkch-" + id);
+  if (chev) chev.classList.toggle("op");
+}
+window.togBk = togBk;
+
+function renBk(){
+  // Stats
+  var conf = bks.filter(function(b){ return b.status === "confirmed"; }).length;
+  var pend = bks.filter(function(b){ return b.status === "pending"; }).length;
+  document.getElementById("bk-total").textContent = AR(bks.length);
+  document.getElementById("bk-conf").textContent = AR(conf);
+  document.getElementById("bk-pend").textContent = AR(pend);
+
+  var el = document.getElementById("bk-list");
+  var list = bkFil === "all" ? bks : bks.filter(function(b){ return b.type === bkFil; });
+  if (!list.length){
+    el.innerHTML = '<div class="emp"><div class="ei">\u{1F3AB}</div>\u0644\u0627 \u062A\u0648\u062C\u062F \u062D\u062C\u0648\u0632\u0627\u062A \u0628\u0639\u062F</div>';
+    return;
+  }
+  var html = "";
+  list.forEach(function(b){
+    var i = bks.indexOf(b);
+    var vcId = "bk-" + i;
+    var ds = b.dt ? new Date(b.dt + "T12:00").toLocaleDateString("ar-SA", {weekday:"short", month:"short", day:"numeric"}) : "";
+    var timeStr = b.tm || "";
+    var travHtml = "";
+    if (b.travelers && b.travelers.length > 0 && b.travelers.length < 3) {
+      travHtml = b.travelers.map(function(t){ return '<span class="bk-tr-chip">' + PN[t] + '</span>'; }).join("");
+    } else {
+      travHtml = '<span class="bk-tr-chip">\u0627\u0644\u062C\u0645\u064A\u0639</span>';
+    }
+    html += '<div class="bk-card bk-' + b.status + '">'
+      + '<div class="bk-hdr" onclick="togBk(\'' + vcId + '\')">'
+      + '<span class="bk-icon">' + (BT[b.type] || "\u{1F4E6}") + '</span>'
+      + '<div class="bk-info">'
+      + '<div class="bk-title">' + b.title + '</div>'
+      + '<div class="bk-meta">'
+      + '<span>' + CF[b.co] + '</span>'
+      + (ds ? '<span>' + ds + '</span>' : '')
+      + (timeStr ? '<span>' + timeStr + '</span>' : '')
+      + (b.cost > 0 ? '<span>' + FM(b.cost) + ' \u0631.\u0633</span>' : '')
+      + '</div>'
+      + '</div>'
+      + '<span class="bk-status bk-st-' + b.status + '">' + BSN[b.status] + '</span>'
+      + '<span class="bk-chev" id="bkch-' + vcId + '">\u25BC</span>'
+      + '</div>'
+      + '<div class="bk-body" id="' + vcId + '">'
+      + '<div class="bk-detail"><span class="bk-dl">\u0627\u0644\u0646\u0648\u0639</span><span class="bk-dv">' + (BTN[b.type] || b.type) + '</span></div>'
+      + (b.ref ? '<div class="bk-detail"><span class="bk-dl">\u0631\u0642\u0645 \u0627\u0644\u062A\u0623\u0643\u064A\u062F</span><span class="bk-dv ltr">' + b.ref + '</span></div>' : '')
+      + '<div class="bk-detail"><span class="bk-dl">\u0627\u0644\u0645\u0633\u0627\u0641\u0631\u0648\u0646</span><span class="bk-dv"><div class="bk-travelers">' + travHtml + '</div></span></div>'
+      + (b.notes ? '<div class="bk-detail"><span class="bk-dl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</span><span class="bk-dv">' + b.notes.replace(/\n/g, "<br>") + '</span></div>' : '')
+      + '<div class="ta"><button class="db" onclick="delBk(' + i + ')">\u062D\u0630\u0641</button><button class="eb" onclick="editBk(' + i + ')">\u062A\u0639\u062F\u064A\u0644</button></div>'
+      + '</div>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// Extend saveLoc/loadLoc for bookings
+var _saveLoc = saveLoc;
+saveLoc = function(){
+  _saveLoc();
+  try { localStorage.setItem("t_k", JSON.stringify(bks)); } catch(e){}
+};
+
+var _loadLoc = loadLoc;
+loadLoc = function(){
+  _loadLoc();
+  try {
+    var k = localStorage.getItem("t_k");
+    if (k) { bks = JSON.parse(k); bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; }); }
+    else { bks = defaultBks.slice(); saveLoc(); }
+  } catch(e){}
+  renBk();
+};
+
+// Extend buildRows/parse for bookings sync
+var _buildRows = buildRows;
+buildRows = function(){
+  var rows = _buildRows();
+  bks.forEach(function(b){
+    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||""]);
+  });
+  return rows;
+};
+
+var _parse = parse;
+parse = function(rows){
+  var hadBk = false;
+  rows.forEach(function(r){
+    if (r[0] === "K") hadBk = true;
+  });
+  _parse(rows);
+  if (hadBk) {
+    bks = [];
+    rows.forEach(function(r){
+      if (r[0] === "K") {
+        bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||""});
+      }
+    });
+    bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
+  }
+  renBk();
+};
 
 // Auto refresh every 30s
 setInterval(function(){ if (!busy) pull(); }, 30000);
