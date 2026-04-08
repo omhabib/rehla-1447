@@ -184,6 +184,20 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .pri-med{background:#fef3cd;color:#856404}
 .pri-low{background:#e8f4f0;color:#3d6b5e}
 
+/* Visit done state */
+.vc.vc-done{opacity:.55;border-right-color:var(--gn)!important}
+.vc.vc-done .vc-title{text-decoration:line-through;color:var(--t3)}
+.vc-done-btn{width:20px;height:20px;border-radius:50%;border:2px solid var(--bd);background:var(--wh);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;transition:all .2s;padding:0}
+.vc-done-btn.on{background:var(--gn);border-color:var(--gn);color:#fff}
+/* Progress bars for countries & overall */
+.prog-wrap{margin-bottom:10px}
+.prog-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.prog-lbl{font-size:11px;color:var(--t3);font-weight:700}
+.prog-num{font-size:12px;font-weight:700;color:var(--br)}
+.prog-bar{height:7px;background:#e8dcc8;border-radius:8px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gn),#4caf50);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.co-prog{margin:0 13px 8px;padding-top:6px}
+
 .cfg{background:linear-gradient(135deg,#fff8e8,#fdedc6);border:1.5px solid #C9A84C55;border-radius:13px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .cfg-txt{flex:1;font-size:12px;color:#633806;line-height:1.5;font-weight:500}
 .cfg-btn{background:var(--br);color:#F5E6C8;border:none;border-radius:9px;padding:8px 13px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap}
@@ -234,6 +248,24 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .bk-travelers{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .bk-tr-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0e9dc;color:var(--t2)}
 
+/* Tasks */
+.tk-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0e8d8;transition:opacity .2s}
+.tk-item:last-child{border-bottom:none}
+.tk-item.tk-done{opacity:.55}
+.tk-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd);background:var(--wh);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px;color:transparent}
+.tk-check.on{background:var(--gn);border-color:var(--gn);color:#fff}
+.tk-body2{flex:1;min-width:0}
+.tk-name{font-size:14px;color:var(--tx);font-weight:500;line-height:1.4}
+.tk-done .tk-name{text-decoration:line-through;color:var(--t3)}
+.tk-row{display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap}
+.tk-date2{font-size:10px;color:var(--gold);font-weight:700}
+.tk-assignee{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0e9dc;color:var(--t2)}
+.tk-del{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:1px 4px;flex-shrink:0;line-height:1}
+.tk-del:active{color:var(--rd)}
+.tk-progress{margin-bottom:12px}
+.tk-prog-bar{height:8px;background:#e8dcc8;border-radius:8px;overflow:hidden}
+.tk-prog-fill{height:100%;background:linear-gradient(90deg,var(--gn),#4caf50);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
 </style>
 </head>
 <body>
@@ -260,6 +292,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   <button class="tab on" id="tab-b">&#x1F4B0; الميزانية</button>
   <button class="tab" id="tab-t">&#x1F4C5; البرنامج</button>
   <button class="tab" id="tab-k">&#x1F3AB; الحجوزات</button>
+  <button class="tab" id="tab-m">&#x2705; المهام</button>
 </div>
 
 <!-- BUDGET PAGE -->
@@ -509,6 +542,55 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
       <button class="fb" data-bkf="activity">&#x1F3AF;</button>
     </div>
     <div id="bk-list"></div>
+  </div>
+</div>
+
+<!-- TASKS PAGE -->
+<div id="pg-m" class="pg">
+  <div class="mets">
+    <div class="met"><div class="ml">إجمالي المهام</div><div class="mv mo" id="tk-total">٠</div></div>
+    <div class="met"><div class="ml">مُنجزة</div><div class="mv mg" id="tk-done">٠</div></div>
+    <div class="met"><div class="ml">متبقية</div><div class="mv mr" id="tk-left">٠</div></div>
+  </div>
+
+  <div class="tk-progress">
+    <div class="br2"><span>نسبة الإنجاز</span><span id="tk-pct">٠٪</span></div>
+    <div class="tk-prog-bar"><div class="tk-prog-fill" id="tk-prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="stitle">&#x2795; إضافة مهمة</div>
+    <div class="mb"><label class="lbl">المهمة</label><input class="fi" type="text" id="tk-name" placeholder="مثال: حجز فندق الرباط"></div>
+    <div class="g2">
+      <div><label class="lbl">التاريخ (اختياري)</label><input class="fi" type="date" id="tk-date"></div>
+      <div><label class="lbl">الأولوية</label>
+        <select class="fi" id="tk-pri">
+          <option value="high">عالية</option>
+          <option value="med">متوسطة</option>
+          <option value="low">منخفضة</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb">
+      <label class="lbl">المكلّف</label>
+      <div class="seg" id="tk-assign">
+        <button class="sg on" data-ta="omar">عمر</button>
+        <button class="sg on" data-ta="majed">ماجد</button>
+        <button class="sg on" data-ta="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظات (اختياري)</label><textarea class="fi" id="tk-notes" placeholder="تفاصيل إضافية..."></textarea></div>
+    <button class="btn" id="btn-add-tk">إضافة المهمة</button>
+  </div>
+
+  <div class="card">
+    <div class="stitle">&#x1F4CB; قائمة المهام</div>
+    <div class="frow" id="tk-filter-row">
+      <button class="fb on" data-tkf="all">الكل</button>
+      <button class="fb" data-tkf="pending">متبقية</button>
+      <button class="fb" data-tkf="done">مُنجزة</button>
+    </div>
+    <div id="tk-list"></div>
   </div>
 </div>
 
@@ -776,7 +858,7 @@ function parse(rows){
       }
       exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
     }
-    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high"});
+    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:r[9]==="1"});
   });
   if (b) document.getElementById("tb").value = b;
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
@@ -792,7 +874,7 @@ function buildRows(){
     var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
     rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr]);
   });
-  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high"]); });
+  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0"]); });
   return rows;
 }
 
@@ -1045,6 +1127,13 @@ function addT(){
 function delT(i){ tls.splice(i, 1); renT(); sched(); }
 window.delT = delT;
 
+function togDone(i){
+  if (!tls[i]) return;
+  tls[i].done = !tls[i].done;
+  renT(); sched();
+}
+window.togDone = togDone;
+
 function togEl(id){
   var el = document.getElementById(id);
   if (!el) return;
@@ -1105,21 +1194,28 @@ function renT(){
     openState._activeCo = activeCos[0];
   }
 
+  // Overall progress
+  var totalDone = tls.filter(function(t){ return t.done; }).length;
+  var totalPct = tls.length > 0 ? Math.round(totalDone / tls.length * 100) : 0;
+
   var html = '<div class="trip-stats">'
     + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u062F\u0648\u0644</div><div class="trip-stat-v">' + AR(countryCount) + '</div></div>'
     + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u0645\u062F\u0646</div><div class="trip-stat-v">' + AR(cityCount) + '</div></div>'
     + '<div class="trip-stat"><div class="trip-stat-l">\u0627\u0644\u0632\u064A\u0627\u0631\u0627\u062A</div><div class="trip-stat-v">' + AR(tls.length) + '</div></div>'
-    + '</div>';
+    + '</div>'
+    + '<div class="prog-wrap"><div class="prog-hdr"><span class="prog-lbl">\u0646\u0633\u0628\u0629 \u0625\u0646\u062C\u0627\u0632 \u0627\u0644\u0631\u062D\u0644\u0629</span><span class="prog-num">' + AR(totalDone) + '/' + AR(tls.length) + ' \u00B7 ' + AR(totalPct) + '\u066A</span></div>'
+    + '<div class="prog-bar"><div class="prog-fill" style="width:' + totalPct + '%"></div></div></div>';
 
   // Horizontal country tabs
   html += '<div class="co-tabs">';
   activeCos.forEach(function(co){
     var total = Object.keys(tree[co]).reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
+    var coDone = Object.keys(tree[co]).reduce(function(s, cy){ return s + tree[co][cy].filter(function(v){ return v.t.done; }).length; }, 0);
     var isOn = openState._activeCo === co;
     html += '<div class="co-tab' + (isOn ? ' on' : '') + '" onclick="selCo(\'' + co + '\')">'
       + '<span class="co-tab-flag">' + CF[co] + '</span>'
       + '<span class="co-tab-name">' + CN[co] + '</span>'
-      + '<span class="co-tab-cnt">' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
+      + '<span class="co-tab-cnt">' + AR(coDone) + '/' + AR(total) + '</span>'
       + '</div>';
   });
   html += '</div>';
@@ -1134,11 +1230,14 @@ function renT(){
       return a.localeCompare(b, "ar");
     });
     var total = cities.reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
+    var coDone = cities.reduce(function(s, cy){ return s + tree[co][cy].filter(function(v){ return v.t.done; }).length; }, 0);
+    var coPct = total > 0 ? Math.round(coDone / total * 100) : 0;
     html += '<div class="co-panel' + (isOn ? ' on' : '') + '" id="copanel-' + co + '">'
       + '<div class="co-panel-hdr">'
       + '<span class="co-panel-title">' + CF[co] + ' ' + CN[co] + '</span>'
-      + '<span class="co-panel-info">' + AR(cities.length) + ' \u0645\u062F\u0646 \u00B7 ' + AR(total) + ' \u0632\u064A\u0627\u0631\u0629</span>'
-      + '</div>';
+      + '<span class="co-panel-info">' + AR(coDone) + '/' + AR(total) + ' \u00B7 ' + AR(coPct) + '\u066A</span>'
+      + '</div>'
+      + '<div class="co-prog"><div class="prog-bar"><div class="prog-fill" style="width:' + coPct + '%"></div></div></div>';
 
     cities.forEach(function(cy){
       var visits = tree[co][cy];
@@ -1170,16 +1269,17 @@ function renT(){
         var pr = t.pri || "high";
         var summary = t.nb || t.ml || "";
         if (summary.length > 60) summary = summary.substring(0, 60) + "...";
-        html += '<div class="vc vc-pri-' + pr + '">'
-          + '<div class="vc-hdr" onclick="togEl(\'' + vcId + '\')">'
-          + '<div class="vc-dot vc-dot-' + pr + '"></div>'
-          + '<div class="vc-info">'
+        var isDone = t.done;
+        html += '<div class="vc vc-pri-' + pr + (isDone ? ' vc-done' : '') + '">'
+          + '<div class="vc-hdr">'
+          + '<button class="vc-done-btn' + (isDone ? ' on' : '') + '" onclick="event.stopPropagation();togDone(' + i + ')">' + (isDone ? '\u2713' : '') + '</button>'
+          + '<div class="vc-info" onclick="togEl(\'' + vcId + '\')" style="cursor:pointer">'
           + '<div class="vc-title">' + t.hd + '</div>'
           + (summary ? '<div class="vc-summary">' + summary + '</div>' : '')
           + '</div>'
           + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
           + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
-          + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '">\u25BC</span>'
+          + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '" onclick="togEl(\'' + vcId + '\')">\u25BC</span>'
           + '</div>'
           + '<div class="vc-body' + (openState[vcId] ? ' op' : '') + '" id="' + vcId + '">'
           + (t.nb ? '<div class="tf"><div class="tfl">\u0646\u0628\u0630\u0629</div><div class="tfv">' + t.nb + '</div></div>' : "")
@@ -1263,6 +1363,106 @@ function toast(m){
   t.classList.add("on");
   clearTimeout(t._x);
   t._x = setTimeout(function(){ t.classList.remove("on"); }, 2400);
+}
+
+// ========== TASKS TAB ==========
+var tasks = [], tkFil = "all", tkAssign = ["omar","majed","waseem"];
+
+document.getElementById("tab-m").addEventListener("click", function(){ showPg("m", this); });
+
+// Assign toggle
+document.getElementById("tk-assign").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg");
+  if (!btn) return;
+  btn.classList.toggle("on");
+  tkAssign = [];
+  document.querySelectorAll("#tk-assign .sg.on").forEach(function(x){ tkAssign.push(x.getAttribute("data-ta")); });
+  if (tkAssign.length === 0){ btn.classList.add("on"); tkAssign = [btn.getAttribute("data-ta")]; }
+});
+
+// Filter
+document.getElementById("tk-filter-row").addEventListener("click", function(e){
+  var btn = e.target.closest(".fb");
+  if (!btn) return;
+  tkFil = btn.getAttribute("data-tkf");
+  document.querySelectorAll("#tk-filter-row .fb").forEach(function(x){ x.classList.remove("on"); });
+  btn.classList.add("on");
+  renTk();
+});
+
+// Add task
+document.getElementById("btn-add-tk").addEventListener("click", function(){
+  var name = document.getElementById("tk-name").value.trim();
+  if (!name){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0645\u0647\u0645\u0629"); return; }
+  tasks.push({
+    name: name,
+    dt: document.getElementById("tk-date").value,
+    pri: document.getElementById("tk-pri").value,
+    assign: tkAssign.slice(),
+    notes: document.getElementById("tk-notes").value.trim(),
+    done: false
+  });
+  tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
+  ["tk-name","tk-date","tk-notes"].forEach(function(id){ document.getElementById(id).value = ""; });
+  document.getElementById("tk-pri").value = "high";
+  renTk(); sched();
+  toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0645\u0647\u0645\u0629");
+});
+
+function togTk(i){
+  if (!tasks[i]) return;
+  tasks[i].done = !tasks[i].done;
+  tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
+  renTk(); sched();
+}
+window.togTk = togTk;
+
+function delTk(i){ tasks.splice(i, 1); renTk(); sched(); }
+window.delTk = delTk;
+
+function renTk(){
+  var done = tasks.filter(function(t){ return t.done; }).length;
+  var left = tasks.length - done;
+  var pct = tasks.length > 0 ? Math.round(done / tasks.length * 100) : 0;
+  document.getElementById("tk-total").textContent = AR(tasks.length);
+  document.getElementById("tk-done").textContent = AR(done);
+  document.getElementById("tk-left").textContent = AR(left);
+  document.getElementById("tk-pct").textContent = AR(pct) + "\u066A";
+  document.getElementById("tk-prog-fill").style.width = pct + "%";
+
+  var el = document.getElementById("tk-list");
+  var list = tkFil === "all" ? tasks : tkFil === "done" ? tasks.filter(function(t){ return t.done; }) : tasks.filter(function(t){ return !t.done; });
+  if (!list.length){
+    var msg = tkFil === "done" ? "\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0647\u0627\u0645 \u0645\u064F\u0646\u062C\u0632\u0629" : tkFil === "pending" ? "\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0647\u0627\u0645 \u0645\u062A\u0628\u0642\u064A\u0629" : "\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0647\u0627\u0645 \u0628\u0639\u062F";
+    el.innerHTML = '<div class="emp"><div class="ei">\u2705</div>' + msg + '</div>';
+    return;
+  }
+  var html = "";
+  list.forEach(function(t){
+    var i = tasks.indexOf(t);
+    var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}) : "";
+    var assignHtml = "";
+    if (t.assign && t.assign.length > 0 && t.assign.length < 3) {
+      assignHtml = t.assign.map(function(a){ return '<span class="tk-assignee">' + PN[a] + '</span>'; }).join("");
+    } else {
+      assignHtml = '<span class="tk-assignee">\u0627\u0644\u062C\u0645\u064A\u0639</span>';
+    }
+    var priDot = t.pri === "high" ? "var(--rd)" : t.pri === "med" ? "#e6a817" : "var(--gn)";
+    html += '<div class="tk-item' + (t.done ? ' tk-done' : '') + '">'
+      + '<div class="tk-check' + (t.done ? ' on' : '') + '" onclick="togTk(' + i + ')">' + (t.done ? '\u2713' : '') + '</div>'
+      + '<div class="tk-body2">'
+      + '<div class="tk-name">' + t.name + '</div>'
+      + '<div class="tk-row">'
+      + (ds ? '<span class="tk-date2">' + ds + '</span>' : '')
+      + '<span style="width:7px;height:7px;border-radius:50%;background:' + priDot + ';flex-shrink:0"></span>'
+      + assignHtml
+      + '</div>'
+      + (t.notes ? '<div style="font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5">' + t.notes + '</div>' : '')
+      + '</div>'
+      + '<button class="tk-del" onclick="delTk(' + i + ')">\u2715</button>'
+      + '</div>';
+  });
+  el.innerHTML = html;
 }
 
 // ========== BOOKINGS TAB ==========
@@ -1451,11 +1651,14 @@ function renBk(){
   el.innerHTML = html;
 }
 
-// Extend saveLoc/loadLoc for bookings
+// Extend saveLoc/loadLoc for bookings + tasks
 var _saveLoc = saveLoc;
 saveLoc = function(){
   _saveLoc();
-  try { localStorage.setItem("t_k", JSON.stringify(bks)); } catch(e){}
+  try {
+    localStorage.setItem("t_k", JSON.stringify(bks));
+    localStorage.setItem("t_m", JSON.stringify(tasks));
+  } catch(e){}
 };
 
 var _loadLoc = loadLoc;
@@ -1466,24 +1669,32 @@ loadLoc = function(){
     if (k) { bks = JSON.parse(k); bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; }); }
     else { bks = defaultBks.slice(); saveLoc(); }
   } catch(e){}
-  renBk();
+  try {
+    var m = localStorage.getItem("t_m");
+    if (m) { tasks = JSON.parse(m); tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; }); }
+  } catch(e){}
+  renBk(); renTk();
 };
 
-// Extend buildRows/parse for bookings sync
+// Extend buildRows/parse for bookings + tasks sync
 var _buildRows = buildRows;
 buildRows = function(){
   var rows = _buildRows();
   bks.forEach(function(b){
     rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||""]);
   });
+  tasks.forEach(function(t){
+    rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
+  });
   return rows;
 };
 
 var _parse = parse;
 parse = function(rows){
-  var hadBk = false;
+  var hadBk = false, hadTk = false;
   rows.forEach(function(r){
     if (r[0] === "K") hadBk = true;
+    if (r[0] === "M") hadTk = true;
   });
   _parse(rows);
   if (hadBk) {
@@ -1495,7 +1706,16 @@ parse = function(rows){
     });
     bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   }
-  renBk();
+  if (hadTk) {
+    tasks = [];
+    rows.forEach(function(r){
+      if (r[0] === "M") {
+        tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:r[6]==="1"});
+      }
+    });
+    tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
+  }
+  renBk(); renTk();
 };
 
 // Auto refresh every 30s
