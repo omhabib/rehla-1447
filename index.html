@@ -1130,7 +1130,37 @@ window.delT = delT;
 function togDone(i){
   if (!tls[i]) return;
   tls[i].done = !tls[i].done;
-  renT(); sched();
+  // Quick UI update without full rebuild
+  var card = document.querySelector('.vc-done-btn[onclick*="(' + i + ')"]');
+  if (card) {
+    var vc = card.closest('.vc');
+    vc.classList.toggle('vc-done', tls[i].done);
+    card.classList.toggle('on', tls[i].done);
+    card.textContent = tls[i].done ? '\u2713' : '';
+  }
+  // Update progress bars and stats
+  var totalDone = tls.filter(function(t){ return t.done; }).length;
+  var totalPct = tls.length > 0 ? Math.round(totalDone / tls.length * 100) : 0;
+  var progHdr = document.querySelector('#tl2 .prog-num');
+  var progFill = document.querySelector('#tl2 .prog-fill');
+  if (progHdr) progHdr.textContent = AR(totalDone) + '/' + AR(tls.length) + ' \u00B7 ' + AR(totalPct) + '\u066A';
+  if (progFill) progFill.style.width = totalPct + '%';
+  // Update country progress
+  var co = tls[i].co;
+  var coVisits = tls.filter(function(t){ return t.co === co; });
+  var coDone = coVisits.filter(function(t){ return t.done; }).length;
+  var coPct = coVisits.length > 0 ? Math.round(coDone / coVisits.length * 100) : 0;
+  var panel = document.getElementById('copanel-' + co);
+  if (panel) {
+    var info = panel.querySelector('.co-panel-info');
+    if (info) info.textContent = AR(coDone) + '/' + AR(coVisits.length) + ' \u00B7 ' + AR(coPct) + '\u066A';
+    var pf = panel.querySelector('.prog-fill');
+    if (pf) pf.style.width = coPct + '%';
+  }
+  // Update country tab counter
+  var coTab = document.querySelector('#tl2 .co-tab[data-co="' + co + '"] .co-tab-cnt');
+  if (coTab) coTab.textContent = AR(coDone) + '/' + AR(coVisits.length);
+  sched();
 }
 window.togDone = togDone;
 
@@ -1146,17 +1176,9 @@ window.togEl = togEl;
 
 function selCo(co){
   openState._activeCo = co;
-  // Toggle tab classes
-  document.querySelectorAll('.co-tab').forEach(function(t){ t.classList.remove('on'); });
-  document.querySelectorAll('.co-panel').forEach(function(p){ p.classList.remove('on'); });
-  // Find and activate the clicked tab
-  var tabs = document.querySelectorAll('.co-tab');
-  var panels = document.querySelectorAll('.co-panel');
-  tabs.forEach(function(t){
-    if (t.getAttribute('onclick').indexOf("'" + co + "'") >= 0) t.classList.add('on');
-  });
-  var panel = document.getElementById('copanel-' + co);
-  if (panel) panel.classList.add('on');
+  var el = document.getElementById('tl2');
+  el.querySelectorAll('.co-tab').forEach(function(t){ t.classList.toggle('on', t.dataset.co === co); });
+  el.querySelectorAll('.co-panel').forEach(function(p){ p.classList.toggle('on', p.id === 'copanel-' + co); });
 }
 window.selCo = selCo;
 
@@ -1212,7 +1234,7 @@ function renT(){
     var total = Object.keys(tree[co]).reduce(function(s, cy){ return s + tree[co][cy].length; }, 0);
     var coDone = Object.keys(tree[co]).reduce(function(s, cy){ return s + tree[co][cy].filter(function(v){ return v.t.done; }).length; }, 0);
     var isOn = openState._activeCo === co;
-    html += '<div class="co-tab' + (isOn ? ' on' : '') + '" onclick="selCo(\'' + co + '\')">'
+    html += '<div class="co-tab' + (isOn ? ' on' : '') + '" data-co="' + co + '" onclick="selCo(\'' + co + '\')">'
       + '<span class="co-tab-flag">' + CF[co] + '</span>'
       + '<span class="co-tab-name">' + CN[co] + '</span>'
       + '<span class="co-tab-cnt">' + AR(coDone) + '/' + AR(total) + '</span>'
