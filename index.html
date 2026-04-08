@@ -713,6 +713,14 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 "use strict";
 
 var API = "https://script.google.com/macros/s/AKfycbygB2r1SytdCoN7HOlKjoZg97H_cwnXKW2rVdMJfhMEDZ2qsOGSJLIEJECpVmRvph9b/exec";
+function safeDate(d){
+  if (!d) return null;
+  // If already YYYY-MM-DD, add noon to avoid timezone shift
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return new Date(d + "T12:00");
+  // Full ISO or other format - parse directly
+  var dt = new Date(d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
 var CF = {sa:"\u{1F1F8}\u{1F1E6}",ma:"\u{1F1F2}\u{1F1E6}",dz:"\u{1F1E9}\u{1F1FF}",eg:"\u{1F1EA}\u{1F1EC}",za:"\u{1F1FF}\u{1F1E6}"};
 var CN = {sa:"\u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629",ma:"\u0627\u0644\u0645\u063A\u0631\u0628",dz:"\u0627\u0644\u062C\u0632\u0627\u0626\u0631",eg:"\u0645\u0635\u0631",za:"\u062C\u0646\u0648\u0628 \u0623\u0641\u0631\u064A\u0642\u064A\u0627"};
 var CL = {flights:"\u062A\u0630\u0627\u0643\u0631 \u0637\u064A\u0631\u0627\u0646",taxi:"\u062A\u0627\u0643\u0633\u064A",carrental:"\u0625\u064A\u062C\u0627\u0631 \u0633\u064A\u0627\u0631\u0629",tolls:"\u0636\u0631\u0627\u0626\u0628 \u0637\u0631\u064A\u0642",food:"\u0623\u0643\u0644",accommodation:"\u0633\u0643\u0646",fuel:"\u0648\u0642\u0648\u062F",grocery:"\u0628\u0642\u0627\u0644\u0629",books:"\u0643\u062A\u0628",manuscripts:"\u0645\u062E\u0637\u0648\u0637\u0627\u062A",other:"\u0623\u062E\u0631\u0649",transport:"\u0645\u0648\u0627\u0635\u0644\u0627\u062A",research:"\u0628\u062D\u062B \u0639\u0644\u0645\u064A"};
@@ -725,7 +733,7 @@ var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\
 var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
 
-function AR(n){ return String(n).replace(/\d/g, function(d){ return "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669"[d]; }); }
+function AR(n){ return String(n); }
 function FM(n){ return AR(Math.round(n).toLocaleString("en")); }
 
 function dot(s, lbl){
@@ -833,10 +841,12 @@ function saveApi(){
 }
 
 function pull(){
+  if (dirty) return;
   dot("sy", "\u062C\u0627\u0631\u064A...");
   fetch(API + "?t=" + Date.now())
     .then(function(r){ return r.json(); })
     .then(function(j){
+      if (dirty) return;
       if (j.status === "ok"){ parse(j.data); dot("ok", "\u0645\u062A\u0632\u0627\u0645\u0646"); }
       else { dot("er", "\u062E\u0637\u0623"); loadLoc(); }
     })
@@ -885,7 +895,8 @@ function buildRows(){
   return rows;
 }
 
-function sched(){ clearTimeout(sv); sv = setTimeout(push, 1400); }
+var dirty = false;
+function sched(){ saveLoc(); dirty = true; clearTimeout(sv); sv = setTimeout(push, 1400); }
 
 function push(){
   saveLoc();
@@ -893,8 +904,8 @@ function push(){
   busy = true;
   dot("sy", "\u064A\u062D\u0641\u0638...");
   fetch(API, {method: "POST", body: JSON.stringify({action: "save", rows: buildRows()})})
-    .then(function(){ dot("ok", "\u062A\u0645"); toast("\u2713 \u062A\u0645 \u0627\u0644\u062D\u0641\u0638 \u0648\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"); busy = false; })
-    .catch(function(){ dot("er", "\u0641\u0634\u0644"); toast("\u26A0\uFE0F \u0645\u062D\u0641\u0648\u0638 \u0645\u062D\u0644\u064A\u0627\u064B"); busy = false; });
+    .then(function(){ dot("ok", "\u062A\u0645"); toast("\u2713 \u062A\u0645 \u0627\u0644\u062D\u0641\u0638 \u0648\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"); busy = false; dirty = false; })
+    .catch(function(){ dot("er", "\u0641\u0634\u0644"); toast("\u26A0\uFE0F \u0645\u062D\u0641\u0648\u0638 \u0645\u062D\u0644\u064A\u0627\u064B"); busy = false; dirty = false; });
 }
 
 function saveLoc(){
@@ -1073,7 +1084,7 @@ function calc(){
     bcoHtml += '<div class="co-tab">'
       + '<span class="co-tab-flag">' + CF[co] + '</span>'
       + '<span class="co-tab-name">' + CN[co] + '</span>'
-      + '<span class="co-tab-cnt">' + (amt > 0 ? FM(amt) + ' \u0631.\u0633' : '\u0660') + '</span>'
+      + '<span class="co-tab-cnt">' + (amt > 0 ? FM(amt) + ' \u0631.\u0633' : '0') + '</span>'
       + '</div>';
   });
   document.getElementById("budget-co-tabs").innerHTML = bcoHtml;
@@ -1276,7 +1287,7 @@ function renT(){
       var dates = visits.map(function(v){ return v.t.dt; }).filter(Boolean).sort();
       var dateRange = "";
       if (dates.length > 0) {
-        var fmt = function(d){ return new Date(d + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}); };
+        var fmt = function(d){ var dt = safeDate(d); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"short", day:"numeric"}) : ""; };
         dateRange = dates.length === 1 ? fmt(dates[0]) : fmt(dates[0]) + " \u2013 " + fmt(dates[dates.length - 1]);
       }
 
@@ -1294,7 +1305,7 @@ function renT(){
       visits.forEach(function(v){
         var t = v.t, i = v.i;
         var vcId = "vc-" + i;
-        var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"long", day:"numeric"}) : "";
+        var ds = t.dt ? (function(){ var dt = safeDate(t.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"long", day:"numeric"}) : ""; })() : "";
         var pr = t.pri || "high";
         var summary = t.nb || t.ml || "";
         if (summary.length > 60) summary = summary.substring(0, 60) + "...";
@@ -1484,7 +1495,7 @@ function renTk(){
       + '</div>';
     myTasks.forEach(function(t){
       var i = tasks.indexOf(t);
-      var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}) : "";
+      var ds = t.dt ? (function(){ var dt = safeDate(t.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"short", day:"numeric"}) : ""; })() : "";
       var priDot = t.pri === "high" ? "var(--rd)" : t.pri === "med" ? "#e6a817" : "var(--gn)";
       // Shared badge
       var sharedHtml = "";
@@ -1523,11 +1534,11 @@ var bks = [], bkFil = "all", bkTravelers = ["omar","majed","waseem"];
 
 // Default booking data from PDF
 var defaultBks = [
-  {type:"flight",co:"ma",title:"\u062C\u062F\u0629 (JED) \u2190 \u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN)",dt:"2026-07-03",tm:"01:00",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629 SV377 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0666\u0633 \u0664\u0660\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 46L, 46K, 46J"},
-  {type:"flight",co:"dz",title:"\u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN) \u2190 \u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG)",dt:"2026-07-10",tm:"02:50",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062A\u0648\u0646\u0633\u064A\u0629 TU706, TU374 \u00B7 \u062A\u0648\u0642\u0641 \u00B7 \u0661\u0661\u0633 \u0662\u0665\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 15F-D, 27F-D"},
-  {type:"flight",co:"za",title:"\u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG) \u2190 \u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB)",dt:"2026-07-14",tm:"22:55",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062C\u0632\u0627\u0626\u0631\u064A\u0629 AH5360 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0669\u0633 \u0662\u0660\u062F"},
-  {type:"flight",co:"eg",title:"\u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB) \u2190 \u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI)",dt:"2026-07-19",tm:"21:45",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"South African Airways SA7208 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0668\u0633 \u0662\u0665\u062F"},
-  {type:"flight",co:"sa",title:"\u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI) \u2190 \u062C\u062F\u0629 (JED)",dt:"2026-07-23",tm:"03:55",status:"confirmed",ref:"9NBG2E",cost:8278.29,travelers:["omar","majed","waseem"],notes:"Air Cairo SM477 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 \u0662\u0633 \u0661\u0660\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 11F-D\n\u0625\u062C\u0645\u0627\u0644\u064A \u0643\u0644 \u0627\u0644\u062A\u0630\u0627\u0643\u0631: \u0662\u0664,\u0668\u0663\u0664.\u0668\u0668 \u0631.\u0633 (\u0668,\u0662\u0667\u0668.\u0662\u0669 \u0644\u0644\u0634\u062E\u0635) \u00B7 \u062A\u0630\u0643\u0631\u0629 \u0645\u0631\u0646\u0629 \u00B7 \u0648\u062C\u0628\u0629 \u062D\u0644\u0627\u0644"}
+  {type:"flight",co:"ma",title:"\u062C\u062F\u0629 (JED) \u2190 \u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN)",dt:"2026-07-03",tm:"01:00",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u0633\u0639\u0648\u062F\u064A\u0629 SV377 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 6\u0633 40\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 46L, 46K, 46J"},
+  {type:"flight",co:"dz",title:"\u0627\u0644\u062F\u0627\u0631 \u0627\u0644\u0628\u064A\u0636\u0627\u0621 (CMN) \u2190 \u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG)",dt:"2026-07-10",tm:"02:50",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062A\u0648\u0646\u0633\u064A\u0629 TU706, TU374 \u00B7 \u062A\u0648\u0642\u0641 \u00B7 11\u0633 25\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 15F-D, 27F-D"},
+  {type:"flight",co:"za",title:"\u0627\u0644\u062C\u0632\u0627\u0626\u0631 (ALG) \u2190 \u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB)",dt:"2026-07-14",tm:"22:55",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"\u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062C\u0632\u0627\u0626\u0631\u064A\u0629 AH5360 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 9\u0633 20\u062F"},
+  {type:"flight",co:"eg",title:"\u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A (JNB) \u2190 \u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI)",dt:"2026-07-19",tm:"21:45",status:"confirmed",ref:"9NBG2E",cost:0,travelers:["omar","majed","waseem"],notes:"South African Airways SA7208 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 8\u0633 25\u062F"},
+  {type:"flight",co:"sa",title:"\u0627\u0644\u0642\u0627\u0647\u0631\u0629 (CAI) \u2190 \u062C\u062F\u0629 (JED)",dt:"2026-07-23",tm:"03:55",status:"confirmed",ref:"9NBG2E",cost:8278.29,travelers:["omar","majed","waseem"],notes:"Air Cairo SM477 \u00B7 \u0645\u0628\u0627\u0634\u0631 \u00B7 2\u0633 10\u062F \u00B7 \u0645\u0642\u0627\u0639\u062F: 11F-D\n\u0625\u062C\u0645\u0627\u0644\u064A \u0643\u0644 \u0627\u0644\u062A\u0630\u0627\u0643\u0631: 24,834.88 \u0631.\u0633 (8,278.29 \u0644\u0644\u0634\u062E\u0635) \u00B7 \u062A\u0630\u0643\u0631\u0629 \u0645\u0631\u0646\u0629 \u00B7 \u0648\u062C\u0628\u0629 \u062D\u0644\u0627\u0644"}
 ];
 
 // Tab switching for bookings
@@ -1666,8 +1677,16 @@ function renBk(){
   list.forEach(function(b){
     var i = bks.indexOf(b);
     var vcId = "bk-" + i;
-    var ds = b.dt ? new Date(b.dt + "T12:00").toLocaleDateString("ar-SA", {weekday:"short", month:"short", day:"numeric"}) : "";
-    var timeStr = b.tm || "";
+    var ds = b.dt ? (function(){ var dt = safeDate(b.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {weekday:"short", month:"short", day:"numeric"}) : ""; })() : "";
+    var timeStr = "";
+    if (b.tm) {
+      if (/^\d{2}:\d{2}/.test(b.tm)) { timeStr = b.tm.substring(0,5); }
+      else {
+        var td = new Date(b.tm);
+        if (!isNaN(td.getTime())) { timeStr = ("0"+td.getUTCHours()).slice(-2) + ":" + ("0"+td.getUTCMinutes()).slice(-2); }
+        else { timeStr = b.tm; }
+      }
+    }
     var travHtml = "";
     if (b.travelers && b.travelers.length > 0 && b.travelers.length < 3) {
       travHtml = b.travelers.map(function(t){ return '<span class="bk-tr-chip">' + PN[t] + '</span>'; }).join("");
@@ -1769,7 +1788,7 @@ parse = function(rows){
 };
 
 // Auto refresh every 30s
-setInterval(function(){ if (!busy) pull(); }, 30000);
+setInterval(function(){ if (!busy && !dirty) pull(); }, 30000);
 
 // INIT
 var saved = localStorage.getItem("t_api");
