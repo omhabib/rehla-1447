@@ -262,6 +262,13 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .tk-assignee{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0e9dc;color:var(--t2)}
 .tk-del{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:1px 4px;flex-shrink:0;line-height:1}
 .tk-del:active{color:var(--rd)}
+.tk-person-section{margin-bottom:18px}
+.tk-person-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,#f7f0e4,#efe6d5);border-radius:10px;margin-bottom:6px}
+.tk-person-name{font-size:15px;font-weight:700;color:var(--pr)}
+.tk-person-stat{font-size:12px;color:var(--t2);font-weight:600;margin-right:auto}
+.tk-person-prog{flex:1;max-width:80px;height:5px;background:#e8dfd0;border-radius:3px;overflow:hidden}
+.tk-person-fill{height:100%;background:var(--gn);border-radius:3px;transition:width .3s}
+.tk-shared{font-size:10px;padding:2px 8px;border-radius:20px;background:#e8f4f0;color:#2a7d65;font-weight:600}
 .tk-progress{margin-bottom:12px}
 .tk-prog-bar{height:8px;background:#e8dcc8;border-radius:8px;overflow:hidden}
 .tk-prog-fill{height:100%;background:linear-gradient(90deg,var(--gn),#4caf50);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
@@ -1459,30 +1466,51 @@ function renTk(){
     el.innerHTML = '<div class="emp"><div class="ei">\u2705</div>' + msg + '</div>';
     return;
   }
+  // Group by person
+  var people = ["omar","majed","waseem"];
   var html = "";
-  list.forEach(function(t){
-    var i = tasks.indexOf(t);
-    var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}) : "";
-    var assignHtml = "";
-    if (t.assign && t.assign.length > 0 && t.assign.length < 3) {
-      assignHtml = t.assign.map(function(a){ return '<span class="tk-assignee">' + PN[a] + '</span>'; }).join("");
-    } else {
-      assignHtml = '<span class="tk-assignee">\u0627\u0644\u062C\u0645\u064A\u0639</span>';
-    }
-    var priDot = t.pri === "high" ? "var(--rd)" : t.pri === "med" ? "#e6a817" : "var(--gn)";
-    html += '<div class="tk-item' + (t.done ? ' tk-done' : '') + '">'
-      + '<div class="tk-check' + (t.done ? ' on' : '') + '" onclick="togTk(' + i + ')">' + (t.done ? '\u2713' : '') + '</div>'
-      + '<div class="tk-body2">'
-      + '<div class="tk-name">' + t.name + '</div>'
-      + '<div class="tk-row">'
-      + (ds ? '<span class="tk-date2">' + ds + '</span>' : '')
-      + '<span style="width:7px;height:7px;border-radius:50%;background:' + priDot + ';flex-shrink:0"></span>'
-      + assignHtml
-      + '</div>'
-      + (t.notes ? '<div style="font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5">' + t.notes + '</div>' : '')
-      + '</div>'
-      + '<button class="tk-del" onclick="delTk(' + i + ')">\u2715</button>'
+  people.forEach(function(person){
+    var myTasks = list.filter(function(t){
+      return (t.assign && t.assign.length > 0 && t.assign.length < 3) ? t.assign.indexOf(person) >= 0 : true;
+    });
+    if (!myTasks.length) return;
+    var myDone = myTasks.filter(function(t){ return t.done; }).length;
+    var myPct = myTasks.length > 0 ? Math.round(myDone / myTasks.length * 100) : 0;
+    html += '<div class="tk-person-section">'
+      + '<div class="tk-person-hdr">'
+      + '<span class="tk-person-name">' + PN[person] + '</span>'
+      + '<span class="tk-person-stat">' + AR(myDone) + '/' + AR(myTasks.length) + '</span>'
+      + '<div class="tk-person-prog"><div class="tk-person-fill" style="width:' + myPct + '%"></div></div>'
       + '</div>';
+    myTasks.forEach(function(t){
+      var i = tasks.indexOf(t);
+      var ds = t.dt ? new Date(t.dt + "T12:00").toLocaleDateString("ar-SA", {month:"short", day:"numeric"}) : "";
+      var priDot = t.pri === "high" ? "var(--rd)" : t.pri === "med" ? "#e6a817" : "var(--gn)";
+      // Shared badge
+      var sharedHtml = "";
+      var isAll = !t.assign || t.assign.length === 0 || t.assign.length >= 3;
+      if (isAll) {
+        var others = people.filter(function(p){ return p !== person; });
+        sharedHtml = '<span class="tk-shared">\u0645\u0639 ' + others.map(function(o){ return PN[o]; }).join(" \u0648 ") + '</span>';
+      } else if (t.assign.length > 1) {
+        var others = t.assign.filter(function(a){ return a !== person; });
+        sharedHtml = '<span class="tk-shared">\u0645\u0639 ' + others.map(function(o){ return PN[o]; }).join(" \u0648 ") + '</span>';
+      }
+      html += '<div class="tk-item' + (t.done ? ' tk-done' : '') + '">'
+        + '<div class="tk-check' + (t.done ? ' on' : '') + '" onclick="togTk(' + i + ')">' + (t.done ? '\u2713' : '') + '</div>'
+        + '<div class="tk-body2">'
+        + '<div class="tk-name">' + t.name + '</div>'
+        + '<div class="tk-row">'
+        + (ds ? '<span class="tk-date2">' + ds + '</span>' : '')
+        + '<span style="width:7px;height:7px;border-radius:50%;background:' + priDot + ';flex-shrink:0"></span>'
+        + sharedHtml
+        + '</div>'
+        + (t.notes ? '<div style="font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5">' + t.notes + '</div>' : '')
+        + '</div>'
+        + '<button class="tk-del" onclick="delTk(' + i + ')">\u2715</button>'
+        + '</div>';
+    });
+    html += '</div>';
   });
   el.innerHTML = html;
 }
