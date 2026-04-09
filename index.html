@@ -854,11 +854,7 @@ function pull(){
 }
 
 function parse(rows){
-  // Preserve local done states for timeline
-  var localTlDone = {};
-  tls.forEach(function(t){ localTlDone[t.hd + "|" + t.dt] = t.done; });
   exps = []; tls = []; var b = "";
-  var tlNeedPush = false;
   rows.forEach(function(r){
     if (!r[0]) return;
     if (r[0] === "B") b = r[1];
@@ -879,19 +875,11 @@ function parse(rows){
       }
       exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
     }
-    else if (r[0] === "T") {
-      var remoteDone = r[9]==="1";
-      var key = r[4] + "|" + r[3];
-      var localD = localTlDone[key];
-      var finalDone = remoteDone;
-      if (localD === true && !remoteDone) { finalDone = true; tlNeedPush = true; }
-      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:finalDone});
-    }
+    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:r[9]==="1"});
   });
   if (b) document.getElementById("tb").value = b;
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
   calc(); renE(); renT(); saveLoc();
-  if (tlNeedPush) setTimeout(push, 500);
 }
 
 function buildRows(){
@@ -1787,25 +1775,13 @@ parse = function(rows){
     bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   }
   if (hadTk) {
-    // Build a map of local done states keyed by name+dt
-    var localDone = {};
-    tasks.forEach(function(t){ localDone[t.name + "|" + (t.dt||"")] = t.done; });
-    var remoteTasks = [];
-    var needPush = false;
+    tasks = [];
     rows.forEach(function(r){
       if (r[0] === "M") {
-        var key = r[1] + "|" + (r[2]||"");
-        var remoteDone = r[6]==="1";
-        var localD = localDone[key];
-        // If locally done but remote not done, keep local (user toggled recently)
-        var finalDone = remoteDone;
-        if (localD === true && !remoteDone) { finalDone = true; needPush = true; }
-        remoteTasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:finalDone});
+        tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:r[6]==="1"});
       }
     });
-    tasks = remoteTasks;
     tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
-    if (needPush) { saveLoc(); setTimeout(push, 500); }
   }
   renBk(); renTk();
 };
@@ -1816,7 +1792,15 @@ setInterval(function(){ if (!busy && !dirty) pull(); }, 30000);
 // INIT
 var saved = localStorage.getItem("t_api");
 if (saved){ API = saved; document.getElementById("cfg-banner").style.display = "none"; }
-loadLoc();
+// Reset cache: open page with ?reset to force reload from Sheets
+if (location.search.indexOf("reset") >= 0) {
+  ["t_e","t_t","t_b","t_k","t_m"].forEach(function(k){ localStorage.removeItem(k); });
+  exps = []; tls = []; tasks = []; bks = defaultBks.slice();
+  toast("\u062A\u0645 \u0645\u0633\u062D \u0627\u0644\u0643\u0627\u0634 - \u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644 \u0645\u0646 Sheets...");
+  history.replaceState(null, "", location.pathname);
+} else {
+  loadLoc();
+}
 pull();
 
 })();
