@@ -1199,7 +1199,7 @@ function togDone(i){
   // Update country tab counter
   var coTab = document.querySelector('#tl2 .co-tab[data-co="' + co + '"] .co-tab-cnt');
   if (coTab) coTab.textContent = AR(coDone) + '/' + AR(coVisits.length);
-  sched();
+  saveLoc(); dirty = true; clearTimeout(sv); push();
 }
 window.togDone = togDone;
 
@@ -1473,7 +1473,7 @@ document.getElementById("btn-add-tk").addEventListener("click", function(){
 function togTk(i){
   if (!tasks[i]) return;
   tasks[i].done = !tasks[i].done;
-  renTk(); sched();
+  renTk(); saveLoc(); dirty = true; clearTimeout(sv); push();
 }
 window.togTk = togTk;
 
