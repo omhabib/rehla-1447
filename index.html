@@ -854,6 +854,9 @@ function pull(){
 }
 
 function parse(rows){
+  // Preserve local done states before overwriting
+  var localTlDone = {};
+  tls.forEach(function(t){ if (t.done) localTlDone[t.co + "|" + t.cy + "|" + t.dt + "|" + t.hd] = true; });
   exps = []; tls = []; var b = "";
   rows.forEach(function(r){
     if (!r[0]) return;
@@ -875,11 +878,18 @@ function parse(rows){
       }
       exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
     }
-    else if (r[0] === "T") tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:r[9]==="1"});
+    else if (r[0] === "T") {
+      var key = r[1] + "|" + r[2] + "|" + r[3] + "|" + r[4];
+      var isDone = r[9]==="1" || !!localTlDone[key];
+      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone});
+    }
   });
   if (b) document.getElementById("tb").value = b;
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
+  // If local had done states not in Sheets, sync them
+  var needSync = Object.keys(localTlDone).length > 0 && tls.some(function(t){ var k = t.co+"|"+t.cy+"|"+t.dt+"|"+t.hd; return t.done && localTlDone[k] && !rows.some(function(r){ return r[0]==="T" && r[1]+"|"+r[2]+"|"+r[3]+"|"+r[4]===k && r[9]==="1"; }); });
   calc(); renE(); renT(); saveLoc();
+  if (needSync) sched();
 }
 
 function buildRows(){
@@ -903,10 +913,21 @@ function push(){
   if (!API || busy) return;
   busy = true;
   dot("sy", "\u064A\u062D\u0641\u0638...");
-  fetch(API, {method: "POST", body: JSON.stringify({action: "save", rows: buildRows()})})
+  fetch(API, {method: "POST", body: JSON.stringify({action: "save", rows: buildRows()}), keepalive: true})
     .then(function(){ dot("ok", "\u062A\u0645"); toast("\u2713 \u062A\u0645 \u0627\u0644\u062D\u0641\u0638 \u0648\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"); busy = false; dirty = false; })
     .catch(function(){ dot("er", "\u0641\u0634\u0644"); toast("\u26A0\uFE0F \u0645\u062D\u0641\u0648\u0638 \u0645\u062D\u0644\u064A\u0627\u064B"); busy = false; dirty = false; });
 }
+
+// Save immediately when page is closed/hidden
+window.addEventListener("visibilitychange", function(){
+  if (document.visibilityState === "hidden" && dirty) push();
+});
+window.addEventListener("beforeunload", function(){
+  if (dirty) {
+    saveLoc();
+    if (API) navigator.sendBeacon(API, JSON.stringify({action: "save", rows: buildRows()}));
+  }
+});
 
 function saveLoc(){
   try {
@@ -1782,17 +1803,24 @@ parse = function(rows){
     bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   }
   if (hadTk) {
+    // Build map of local done states before overwriting
+    var localDone = {};
+    tasks.forEach(function(t){ if (t.done) localDone[t.name + "|" + (t.dt||"")] = true; });
     tasks = []; var seenTk = {};
     rows.forEach(function(r){
       if (r[0] === "M") {
         var key = r[1] + "|" + r[2];
         if (!seenTk[key]) {
           seenTk[key] = true;
-          tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:r[6]==="1"});
+          var isDone = r[6]==="1" || !!localDone[key];
+          tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:isDone});
         }
       }
     });
     tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
+    // If local had done states that Sheets didn't, push to sync
+    var needSync = tasks.some(function(t){ return t.done && localDone[t.name + "|" + (t.dt||"")] && !rows.some(function(r){ return r[0]==="M" && r[1]===t.name && r[6]==="1"; }); });
+    if (needSync) { saveLoc(); sched(); }
   }
   renBk(); renTk();
 };
