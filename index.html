@@ -854,9 +854,6 @@ function pull(){
 }
 
 function parse(rows){
-  // Preserve local done states before overwriting
-  var localTlDone = {};
-  tls.forEach(function(t){ if (t.done) localTlDone[t.co + "|" + t.cy + "|" + t.dt + "|" + t.hd] = true; });
   exps = []; tls = []; var b = "";
   rows.forEach(function(r){
     if (!r[0]) return;
@@ -879,17 +876,12 @@ function parse(rows){
       exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
     }
     else if (r[0] === "T") {
-      var key = r[1] + "|" + r[2] + "|" + r[3] + "|" + r[4];
-      var isDone = r[9]==="1" || !!localTlDone[key];
-      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone});
+      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:r[9]==="1"});
     }
   });
   if (b) document.getElementById("tb").value = b;
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
-  // If local had done states not in Sheets, sync them
-  var needSync = Object.keys(localTlDone).length > 0 && tls.some(function(t){ var k = t.co+"|"+t.cy+"|"+t.dt+"|"+t.hd; return t.done && localTlDone[k] && !rows.some(function(r){ return r[0]==="T" && r[1]+"|"+r[2]+"|"+r[3]+"|"+r[4]===k && r[9]==="1"; }); });
   calc(); renE(); renT(); saveLoc();
-  if (needSync) sched();
 }
 
 function buildRows(){
@@ -1774,20 +1766,11 @@ loadLoc = function(){
 var _buildRows = buildRows;
 buildRows = function(){
   var rows = _buildRows();
-  var seenBk = {}, seenTk = {};
   bks.forEach(function(b){
-    var key = b.title + "|" + (b.dt||"") + "|" + (b.tm||"");
-    if (!seenBk[key]) {
-      seenBk[key] = true;
-      rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||""]);
-    }
+    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||""]);
   });
   tasks.forEach(function(t){
-    var key = t.name + "|" + (t.dt||"");
-    if (!seenTk[key]) {
-      seenTk[key] = true;
-      rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
-    }
+    rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
   });
   return rows;
 };
@@ -1795,34 +1778,19 @@ buildRows = function(){
 var _parse = parse;
 parse = function(rows){
   _parse(rows);
-  // Bookings
-  var localDoneTk = {};
-  tasks.forEach(function(t){ if (t.done) localDoneTk[t.name + "|" + (t.dt||"")] = true; });
-  bks = []; var seenBk = {};
-  tasks = []; var seenTk = {};
+  // Bookings & Tasks - read only from Sheets, never auto-push
+  bks = []; tasks = [];
   rows.forEach(function(r){
     if (r[0] === "K") {
-      var key = r[3] + "|" + r[4] + "|" + r[5];
-      if (!seenBk[key]) {
-        seenBk[key] = true;
-        bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||""});
-      }
+      bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||""});
     }
     if (r[0] === "M") {
-      var key2 = r[1] + "|" + r[2];
-      if (!seenTk[key2]) {
-        seenTk[key2] = true;
-        var isDone = r[6]==="1" || !!localDoneTk[key2];
-        tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:isDone});
-      }
+      tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:r[6]==="1"});
     }
   });
   bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
-  // If local had done states that Sheets didn't, push to sync
-  var needSync = tasks.some(function(t){ return t.done && localDoneTk[t.name + "|" + (t.dt||"")] && !rows.some(function(r){ return r[0]==="M" && r[1]===t.name && r[6]==="1"; }); });
-  if (needSync) { saveLoc(); sched(); }
-  renBk(); renTk();
+  saveLoc(); renBk(); renTk();
 };
 
 // Auto refresh every 30s
