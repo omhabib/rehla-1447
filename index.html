@@ -11,10 +11,42 @@
   --br:#2C1810;--gold:#C9A84C;--gl:#FAEEDA;--cr:#F7F2EA;
   --tx:#1a1208;--t2:#6b5c3e;--t3:#a08860;--bd:#e3d8c4;
   --wh:#fff;--rd:#c0392b;--gn:#27643a;--bl:#185FA5;
+  /* semantic surfaces (theme-aware) */
+  --bg:#F7F2EA;--surface:#fff;--surface2:#f4ede0;--surface3:#f0e9dc;
+  --hdr-bg:#2C1810;--shadow:0 1px 4px #0000060a;--shadow-lg:0 8px 28px #2c181018;
+  --grad-warm:linear-gradient(135deg,#f9f4ec,#f3ebdb);
+}
+html[data-theme="dark"]{
+  --br:#ECD9B0;--gold:#D8B65C;--gl:#2a2114;--cr:#15110c;
+  --tx:#f0e7d6;--t2:#c3b394;--t3:#9a886a;--bd:#352c1e;
+  --wh:#1d1810;--rd:#e06a5d;--gn:#4caf72;--bl:#5fa0e0;
+  --bg:#15110c;--surface:#1d1810;--surface2:#241d13;--surface3:#2a2114;
+  --hdr-bg:#0e0a06;--shadow:0 1px 6px #0000003a;--shadow-lg:0 8px 28px #0000005a;
+  --grad-warm:linear-gradient(135deg,#241d13,#1d1810);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--cr)}
-body{font-family:'Tajawal',sans-serif;color:var(--tx);display:flex;flex-direction:column;max-width:480px;margin:0 auto;height:100svh;overflow:hidden;box-shadow:0 0 40px #0003}
+html,body{height:100%;background:var(--bg)}
+body{font-family:'Tajawal',sans-serif;color:var(--tx);display:flex;flex-direction:column;max-width:480px;margin:0 auto;height:100svh;overflow:hidden;box-shadow:0 0 40px #0003;background:var(--bg);transition:background .3s,color .3s}
+
+/* Dark-mode overrides for hardcoded light surfaces */
+html[data-theme="dark"] .met,html[data-theme="dark"] .trip-stat{background:var(--surface2)}
+html[data-theme="dark"] .seg{background:var(--surface3)}
+html[data-theme="dark"] .bb,html[data-theme="dark"] .prog-bar,html[data-theme="dark"] .tk-prog-bar{background:#3a2f1e}
+html[data-theme="dark"] .fi:focus{background:#241d13}
+html[data-theme="dark"] .grp-cy-hdr,html[data-theme="dark"] .tk-person-hdr{background:var(--grad-warm)}
+html[data-theme="dark"] .vc-hdr:active,html[data-theme="dark"] .bk-hdr:active{background:#241d13}
+html[data-theme="dark"] .av.ao{background:#16314a}html[data-theme="dark"] .av.am{background:#3a2c10}html[data-theme="dark"] .av.aw{background:#15311f}
+html[data-theme="dark"] .co-tab.on{background:linear-gradient(135deg,#2a2114,#1d1810)}
+/* --br is used as both a dark background AND a text color; in dark mode --br
+   becomes light (for text), so restore dark backgrounds where it was a surface */
+html[data-theme="dark"] .hdr{background:var(--hdr-bg)}
+html[data-theme="dark"] .btn,html[data-theme="dark"] .cfg-btn{background:#322817}
+html[data-theme="dark"] .fb.on{background:#322817;border-color:#4a3c22}
+html[data-theme="dark"] .modal-s code{background:#2a2114;color:var(--gold)}
+/* hardcoded warm-brown text that disappears on dark surfaces */
+html[data-theme="dark"] .set-t,html[data-theme="dark"] .pn-m,html[data-theme="dark"] .pvm,html[data-theme="dark"] .mo,html[data-theme="dark"] .ea{color:var(--gold)}
+html[data-theme="dark"] .cfg{background:linear-gradient(135deg,#2a2114,#241d13);border-color:#C9A84C44}
+html[data-theme="dark"] .cfg-txt{color:var(--gold)}
 
 .hdr{background:var(--br);padding:16px 16px 12px;flex-shrink:0;position:relative;overflow:hidden}
 .hdr-pat{position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 14px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 1px,transparent 14px)}
@@ -241,6 +273,10 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .bk-chev.op{transform:rotate(180deg)}
 .bk-body{display:none;padding:0 13px 13px;border-top:1px solid #f0e8d8}
 .bk-body.op{display:block;animation:fadeIn .2s ease}
+.bk-prayer{margin-top:9px;background:var(--gl);border:1px solid #C9A84C44;border-radius:11px;padding:9px 11px;display:flex;gap:8px;align-items:flex-start}
+.bk-prayer .pi{font-size:15px;flex-shrink:0;line-height:1.5}
+.bk-prayer .pt2{font-size:11.5px;color:#7a5a18;line-height:1.65;font-weight:600}
+html[data-theme="dark"] .bk-prayer .pt2{color:var(--gold)}
 .bk-detail{display:flex;gap:8px;margin-top:8px;align-items:baseline}
 .bk-dl{font-size:10px;font-weight:700;color:var(--gold);min-width:60px;flex-shrink:0}
 .bk-dv{font-size:13px;color:var(--tx);line-height:1.6;flex:1}
@@ -273,6 +309,176 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .tk-prog-bar{height:8px;background:#e8dcc8;border-radius:8px;overflow:hidden}
 .tk-prog-fill{height:100%;background:linear-gradient(90deg,var(--gn),#4caf50);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 
+/* ===== MODERN REFRESH (Stage 1) ===== */
+.card{box-shadow:var(--shadow);transition:box-shadow .2s,background .3s,border-color .3s}
+.pg{transition:background .3s}
+.fi,.btn,.tab,.co-tab,.bk-card,.vc{transition:all .2s}
+
+/* Header controls (theme + lock) */
+.hdr-ctrls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:11px;border:1px solid rgba(201,168,76,.32);background:rgba(201,168,76,.12);color:#F5E6C8;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s,background .2s;padding:0;line-height:1}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn.locked{border-color:rgba(201,168,76,.32)}
+.icon-btn.unlocked{background:rgba(76,175,80,.22);border-color:rgba(76,175,80,.45)}
+
+/* Countdown banner in header */
+.countdown{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:11px;position:relative;z-index:1;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);border-radius:12px;padding:7px 12px}
+.cd-num{font-family:'Amiri',serif;font-size:19px;font-weight:700;color:var(--gold);line-height:1}
+.cd-txt{font-size:11px;color:#E8D9B8;font-weight:500}
+.cd-done{color:#7fd49a}
+
+/* View-only mode: hide all editing UI */
+html.view-mode .edit-only{display:none!important}
+html.view-mode .cfg{display:none!important}
+html.view-mode .dl,html.view-mode .tk-del,html.view-mode .ta{display:none!important}
+html.view-mode .vc-done-btn,html.view-mode .tk-check{pointer-events:none}
+.view-badge{display:none}
+html.view-mode .view-badge{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--gl);border:1px solid #C9A84C44;border-radius:12px;padding:9px 12px;margin-bottom:12px;font-size:12px;font-weight:700;color:#7a5a18}
+html[data-theme="dark"].view-mode .view-badge{color:var(--gold)}
+
+/* Passcode modal */
+.pc-dots{display:flex;justify-content:center;gap:9px;margin:14px 0}
+.pc-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bd);transition:all .2s}
+.pc-dot.fill{background:var(--gold);border-color:var(--gold)}
+.pc-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pc-key{padding:15px 0;border:1px solid var(--bd);border-radius:13px;background:var(--surface);font-family:'Tajawal',sans-serif;font-size:21px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .12s}
+.pc-key:active{background:var(--gl);transform:scale(.95)}
+.pc-key.wide{font-size:15px}
+.pc-shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+
+/* ===== DAILY VIEW (Stage 2) ===== */
+.legs{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:6px;scrollbar-width:none}
+.legs::-webkit-scrollbar{display:none}
+.leg{flex-shrink:0;border:1.5px solid var(--bd);border-radius:13px;padding:8px 12px;background:var(--surface);min-width:118px;box-shadow:var(--shadow)}
+.leg-flag{font-size:17px}
+.leg-name{font-size:13px;font-weight:700;color:var(--br)}
+.leg-dates{font-size:9px;color:var(--t3);direction:ltr;font-weight:700;margin-top:2px}
+.leg-cnt{font-size:9px;color:var(--gold);font-weight:700;margin-top:2px}
+.day{background:var(--surface);border:1px solid var(--bd);border-radius:15px;margin-bottom:11px;overflow:hidden;box-shadow:var(--shadow);border-right:3.5px solid var(--gold)}
+.day.travel{border-right-color:var(--bl)}
+.day.empty{opacity:.7}
+.day-head{display:flex;align-items:center;gap:11px;padding:11px 12px;background:var(--grad-warm)}
+.day-num{width:44px;height:44px;border-radius:12px;background:var(--surface);border:1.5px solid var(--bd);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.day-num .d{font-family:'Amiri',serif;font-size:19px;font-weight:700;color:var(--gold);line-height:1}
+.day-num .m{font-size:8px;color:var(--t3);font-weight:700}
+.day-info{flex:1;min-width:0}
+.day-wday{font-family:'Amiri',serif;font-size:14px;color:var(--br);font-weight:700}
+.day-sub{font-size:10px;color:var(--t3);font-weight:600;display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.daytrip{font-size:9px;font-weight:700;background:#e7f0fb;color:#185FA5;padding:2px 7px;border-radius:20px}
+html[data-theme="dark"] .daytrip{background:#16314a;color:#9cc4ec}
+.dcount{font-size:9px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.16);padding:2px 8px;border-radius:20px}
+.day-body{padding:6px 11px 10px}
+.vrow{display:flex;align-items:center;gap:8px;padding:8px 3px;border-bottom:1px solid #f0e8d8}
+html[data-theme="dark"] .vrow{border-bottom-color:var(--surface3)}
+.vrow:last-child{border-bottom:none}
+.vdot2{width:9px;height:9px;border-radius:50%;background:#c0392b;flex-shrink:0}
+.vdot2.med{background:#e6a817}.vdot2.low{background:#27643a}
+.vname{flex:1;min-width:0;font-size:13px;color:var(--tx);font-weight:500}
+.vname .vcity{font-size:10px;color:var(--t3);font-weight:600}
+.vmap{font-size:11px;color:var(--bl);text-decoration:none;flex-shrink:0;font-weight:700}
+.vunassign{background:none;border:none;color:#ccc;font-size:15px;cursor:pointer;flex-shrink:0;padding:0 3px;line-height:1}
+.vunassign:active{color:var(--rd)}
+.day-empty{text-align:center;color:var(--t3);font-size:11.5px;padding:9px 8px;border:1.5px dashed var(--bd);border-radius:10px;margin:3px}
+.unsched{background:var(--gl);border:1px solid #C9A84C44;border-radius:15px;padding:13px;margin-top:16px}
+.unsched-t{font-family:'Amiri',serif;font-size:14px;color:var(--br);margin-bottom:3px;display:flex;justify-content:space-between;align-items:center}
+.unsched-s{font-size:10.5px;color:var(--t2);margin-bottom:11px;line-height:1.5}
+.uchip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--bd);border-radius:11px;padding:9px 11px;margin-bottom:7px}
+.uchip .un{flex:1;min-width:0;font-size:12.5px;font-weight:500}
+.uchip .un .uc{font-size:10px;color:var(--t3)}
+.assignbtn{font-size:10.5px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid var(--gold);background:none;color:var(--gold);cursor:pointer;font-family:'Tajawal',sans-serif;flex-shrink:0}
+.assignbtn.active{background:var(--gold);color:#2C1810}
+.picker{margin:0 0 9px;padding:10px;background:var(--surface3);border-radius:11px;display:none}
+.picker.open{display:block}
+.picker-hint{font-size:10px;color:var(--t2);font-weight:700;margin-bottom:7px}
+.picker-days{display:flex;gap:5px;flex-wrap:wrap}
+.pday{padding:6px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--surface);font-size:11.5px;font-weight:700;color:var(--tx);cursor:pointer;font-family:'Tajawal',sans-serif}
+.pday:active{background:var(--gl);border-color:var(--gold)}
+html.view-mode .assignbtn,html.view-mode .vunassign,html.view-mode .picker{display:none!important}
+
+/* map link (visit cards + bookings) — visible in view mode too */
+.vc-map{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--bl);text-decoration:none;font-weight:700;margin-top:10px;padding:6px 12px;border:1px solid var(--bd);border-radius:20px}
+.vc-map:active{background:var(--gl)}
+.vc-att{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#854F0B;text-decoration:none;font-weight:700;padding:6px 12px;border:1px solid var(--gold);border-radius:20px;background:var(--gl)}
+.vc-att:active{background:var(--surface3)}
+html[data-theme="dark"] .vc-att{color:var(--gold)}
+.vc-img{max-height:160px;max-width:100%;border-radius:11px;border:1px solid var(--bd);cursor:zoom-in;margin-top:10px;display:block;object-fit:cover}
+.imgbox{position:fixed;inset:0;background:#000e;z-index:600;display:flex;align-items:center;justify-content:center;padding:18px;cursor:zoom-out}
+.imgbox.hidden{display:none}
+.imgbox img{max-width:100%;max-height:100%;border-radius:10px;object-fit:contain;box-shadow:0 8px 40px #000}
+
+/* by-city view: country section header */
+.city-co-hdr{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px;padding-bottom:6px;border-bottom:2px solid #C9A84C33}
+.city-co-hdr:first-child{margin-top:4px}
+.city-co-name{font-family:'Amiri',serif;font-size:17px;color:var(--br);font-weight:700}
+.city-co-cnt{font-size:11px;color:var(--t3);font-weight:700}
+
+/* ===== REPORT (Stage 2) ===== */
+.report-btn{width:100%;padding:13px;margin-bottom:12px;background:var(--gl);border:1.5px solid var(--gold);border-radius:13px;color:#7a5a18;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.report-btn:active{background:var(--surface3)}
+html[data-theme="dark"] .report-btn{color:var(--gold)}
+.report-bg{position:fixed;inset:0;background:#241a10;z-index:550;overflow-y:auto}
+.report-bg.hidden{display:none}
+.rp-wrap{max-width:640px;margin:0 auto;background:#fff;min-height:100%}
+.rp-actions{position:sticky;top:0;display:flex;gap:8px;padding:12px 14px;background:#2C1810;z-index:2}
+.rp-actions button{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+#btn-report-print{background:#C9A84C;color:#2C1810}
+#btn-report-close{background:rgba(255,255,255,.12);color:#F5E6C8}
+#report-content{background:#fff;color:#1a1208;padding:22px 18px 42px;font-family:'Tajawal',sans-serif}
+.rp-title{font-family:'Amiri',serif;font-size:22px;color:#2C1810;text-align:center;line-height:1.3}
+.rp-sub{text-align:center;font-size:12px;color:#6b5c3e;margin:5px 0 6px}
+.rp-sec{font-family:'Amiri',serif;font-size:16px;color:#854F0B;margin:22px 0 11px;padding-bottom:6px;border-bottom:2px solid #C9A84C44}
+.rp-mets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:11px}
+.rp-met{background:#f4ede0;border-radius:10px;padding:11px 6px;text-align:center}
+.rp-met-l{font-size:10px;color:#6b5c3e;font-weight:700}
+.rp-met-v{font-size:17px;font-weight:700;color:#2C1810;margin-top:3px}
+.rp-bar-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.rp-bar-label{font-size:12px;color:#1a1208;width:96px;flex-shrink:0;font-weight:500}
+.rp-bar-track{flex:1;height:15px;background:#eee4d2;border-radius:8px;overflow:hidden}
+.rp-bar-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#e8a020);border-radius:8px}
+.rp-bar-fill.gn{background:linear-gradient(90deg,#27643a,#4caf50)}
+.rp-bar-val{font-size:11px;color:#854F0B;font-weight:700;width:70px;text-align:left;flex-shrink:0;direction:ltr}
+.rp-line{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #f0e8d8;color:#1a1208}
+.rp-foot{text-align:center;font-size:10px;color:#a08860;margin-top:26px}
+@media print{
+  body.rep-open{max-width:none;height:auto;overflow:visible;box-shadow:none;display:block}
+  body.rep-open .hdr,body.rep-open .tabs,body.rep-open .pg,body.rep-open .toast,body.rep-open .modal-bg,body.rep-open .imgbox{display:none!important}
+  body.rep-open .report-bg{position:static;background:#fff;overflow:visible}
+  body.rep-open .rp-wrap{max-width:none}
+  body.rep-open .rp-actions{display:none!important}
+}
+
+/* ===== RESPONSIVE: DESKTOP (Stage 2) ===== */
+.bgrid>*{min-width:0}
+@media(min-width:760px){
+  body{max-width:1100px}
+  .hdr{display:flex;align-items:center;gap:24px;padding:18px 30px}
+  .hdr-in{flex:1;align-items:center}
+  .hdr-title{font-size:24px}
+  .countdown{margin-top:0;flex-shrink:0}
+  .tabs{padding:0 22px}
+  .tab{flex:none;padding:15px 30px;font-size:14px}
+  .pg{padding:22px 30px 44px}
+  /* budget: dashboard | data entry+log, two columns */
+  .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .bcol-a>*:last-child,.bcol-b>*:last-child{margin-bottom:0}
+  /* bookings & tasks: cards flow into two columns */
+  #bk-list{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  #bk-list .bk-card{margin-bottom:0}
+  #tk-list{display:grid;grid-template-columns:1fr 1fr;column-gap:22px;align-items:start}
+  .tk-person-section{break-inside:avoid}
+  /* timeline: visit cards in two columns inside each city */
+  .grp-cy-body.op{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+  .grp-cy-body.op::before{display:none}
+  .grp-cy-body.op .vc{margin-bottom:0}
+  /* daily view: day cards in two columns */
+  .daywrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .daywrap .day{margin-bottom:0}
+}
+@media(min-width:1024px){
+  body{max-width:1180px}
+}
+
 </style>
 </head>
 <body>
@@ -281,11 +487,16 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   <div class="hdr-pat"></div>
   <div class="hdr-in">
     <div class="hdr-title">الرحلة الصيفية الثانية ١٤٤٧هـ</div>
-    <div class="sync-wrap">
-      <div class="sync-dot" id="sd"></div>
-      <div class="sync-lbl" id="sl">&mdash;</div>
+    <div class="hdr-ctrls">
+      <button class="icon-btn" id="btn-theme" title="الوضع الليلي">&#x1F319;</button>
+      <button class="icon-btn locked" id="btn-lock" title="وضع التحرير">&#x1F512;</button>
+      <div class="sync-wrap">
+        <div class="sync-dot" id="sd"></div>
+        <div class="sync-lbl" id="sl">&mdash;</div>
+      </div>
     </div>
   </div>
+  <div class="countdown" id="countdown"></div>
   <div class="pills" style="display:none">
     <span class="pill">&#x1F1F8;&#x1F1E6; السعودية</span>
     <span class="pill">&#x1F1F2;&#x1F1E6; المغرب</span>
@@ -305,11 +516,17 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 <!-- BUDGET PAGE -->
 <div id="pg-b" class="pg on">
 
-  <div class="cfg" id="cfg-banner">
+  <div class="cfg edit-only" id="cfg-banner">
     <div class="cfg-txt">&#x1F517; اربط التطبيق بـ Google Sheets للمشاركة</div>
     <button class="cfg-btn" id="cfg-btn-link">ربط &larr;</button>
   </div>
 
+  <div class="view-badge">&#x1F441;&#xFE0F; وضع المشاهدة &mdash; اضغط &#x1F512; للتحرير</div>
+
+  <button class="report-btn" id="btn-report">&#x1F4CA; تقرير الرحلة الكامل (عرض / طباعة PDF)</button>
+
+  <div class="bgrid">
+  <div class="bcol-a">
   <div class="pers">
     <div class="pc po">
       <div class="pn pn-o">عمر</div>
@@ -348,14 +565,16 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
   <div class="co-tabs" id="budget-co-tabs"></div>
 
   <div id="sa"></div>
+  </div><!-- /bcol-a -->
 
-  <div class="card">
+  <div class="bcol-b">
+  <div class="card edit-only">
     <div class="stitle">&#x2699;&#xFE0F; الميزانية الإجمالية</div>
     <label class="lbl">الميزانية الكاملة للرحلة (ر.س)</label>
     <input class="fi" type="number" inputmode="numeric" id="tb" placeholder="مثال: 15000">
   </div>
 
-  <div class="card">
+  <div class="card edit-only">
     <div class="stitle">&#x2795; تسجيل مصروف</div>
     <div class="mb">
       <label class="lbl">البيان</label>
@@ -432,11 +651,14 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <span style="flex:1"><div class="gt">فتح Google Sheets</div><div class="gs">عرض البيانات التفصيلية</div></span>
     <span class="ga">&larr;</span>
   </a>
+  </div><!-- /bcol-b -->
+  </div><!-- /bgrid -->
 </div>
 
 <!-- TIMELINE PAGE -->
 <div id="pg-t" class="pg">
-  <div class="card">
+  <div class="view-badge">&#x1F441;&#xFE0F; وضع المشاهدة &mdash; اضغط &#x1F512; للتحرير</div>
+  <div class="card edit-only">
     <div class="stitle">&#x2795; إضافة زيارة</div>
     <div class="g3">
       <div><label class="lbl">البلد</label>
@@ -455,6 +677,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="mb"><label class="lbl">نبذة</label><textarea class="fi" id="tnb" placeholder="وصف مختصر عن المكان..."></textarea></div>
     <div class="mb"><label class="lbl">المطلوب</label><textarea class="fi" id="tml" placeholder="ما الذي تريد تحقيقه..."></textarea></div>
     <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="tnt" placeholder="تحضيرات، أرقام تواصل..."></textarea></div>
+    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط Drive/PDF)</label><input class="fi" type="url" id="tatt" placeholder="https://drive.google.com/..." style="direction:ltr;font-size:13px"></div>
     <div class="mb">
       <label class="lbl">الأولوية</label>
       <div class="seg">
@@ -466,8 +689,16 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <button class="btn" id="btn-add-visit">إضافة الزيارة</button>
   </div>
 
+  <div class="seg" id="tl-view-seg">
+    <button class="sg on" data-v="country">&#x1F30D; حسب الدولة</button>
+    <button class="sg" data-v="city">&#x1F3D9;&#xFE0F; حسب المدينة</button>
+    <button class="sg" data-v="day">&#x1F5D3;&#xFE0F; حسب اليوم</button>
+  </div>
+
   <div class="stitle" style="padding:0 2px 10px;font-family:'Amiri',serif;font-size:16px;color:var(--br)">&#x1F9ED; مسار الرحلة</div>
   <div id="tl2"><div class="emp"><div class="ei">&#x1F5FA;&#xFE0F;</div>أضف زيارات رحلتك للبدء</div></div>
+  <div id="tl2day" style="display:none"></div>
+  <div id="tl2city" style="display:none"></div>
 
   <div style="margin-top:14px">
     <a href="https://calendar.google.com" target="_blank" class="gl">
@@ -487,7 +718,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="met"><div class="ml">معلّقة</div><div class="mv mr" id="bk-pend">٠</div></div>
   </div>
 
-  <div class="card">
+  <div class="view-badge">&#x1F441;&#xFE0F; وضع المشاهدة &mdash; اضغط &#x1F512; للتحرير</div>
+  <div class="card edit-only">
     <div class="stitle">&#x2795; إضافة حجز</div>
     <div class="g2">
       <div><label class="lbl">نوع الحجز</label>
@@ -535,6 +767,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
       </div>
     </div>
     <div class="mb"><label class="lbl">ملاحظات (اختياري)</label><textarea class="fi" id="bk-notes" placeholder="رابط الحجز، تفاصيل إضافية..."></textarea></div>
+    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط تذكرة/PDF)</label><input class="fi" type="url" id="bk-att" placeholder="https://..." style="direction:ltr;font-size:13px"></div>
     <button class="btn" id="btn-add-bk">إضافة الحجز</button>
   </div>
 
@@ -565,7 +798,8 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="tk-prog-bar"><div class="tk-prog-fill" id="tk-prog-fill" style="width:0%"></div></div>
   </div>
 
-  <div class="card">
+  <div class="view-badge">&#x1F441;&#xFE0F; وضع المشاهدة &mdash; اضغط &#x1F512; للتحرير</div>
+  <div class="card edit-only">
     <div class="stitle">&#x2795; إضافة مهمة</div>
     <div class="mb"><label class="lbl">المهمة</label><input class="fi" type="text" id="tk-name" placeholder="مثال: حجز فندق الرباط"></div>
     <div class="g2">
@@ -652,6 +886,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
       </div>
     </div>
     <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-bk-notes"></textarea></div>
+    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط تذكرة/PDF)</label><input class="fi" type="url" id="edit-bk-att" placeholder="https://..." style="direction:ltr;font-size:13px"></div>
     <button class="btn" id="btn-save-edit-bk" style="margin-bottom:10px">حفظ التعديل</button>
     <button id="btn-cancel-edit-bk" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
   </div>
@@ -693,6 +928,7 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <div class="mb"><label class="lbl">نبذة</label><textarea class="fi" id="edit-nb"></textarea></div>
     <div class="mb"><label class="lbl">المطلوب</label><textarea class="fi" id="edit-ml"></textarea></div>
     <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-nt"></textarea></div>
+    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط Drive/PDF)</label><input class="fi" type="url" id="edit-att" placeholder="https://drive.google.com/..." style="direction:ltr;font-size:13px"></div>
     <div class="mb">
       <label class="lbl">الأولوية</label>
       <div class="seg" id="edit-pri-seg">
@@ -705,6 +941,99 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
     <button id="btn-cancel-edit" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
   </div>
 </div>
+
+<!-- EDIT EXPENSE MODAL -->
+<div class="modal-bg hidden" id="edit-e-modal-bg">
+  <div class="modal">
+    <div class="modal-t">تعديل المصروف</div>
+    <input type="hidden" id="edit-e-idx">
+    <div class="mb"><label class="lbl">البيان</label><input class="fi" type="text" id="edit-en"></div>
+    <div class="g3">
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-ea"></div>
+      <div><label class="lbl">البلد</label>
+        <select class="fi" id="edit-eco">
+          <option value="sa">🇸🇦 السعودية</option><option value="ma">🇲🇦 المغرب</option><option value="dz">🇩🇿 الجزائر</option><option value="eg">🇪🇬 مصر</option><option value="za">🇿🇦 جنوب أفريقيا</option>
+        </select>
+      </div>
+      <div><label class="lbl">الفئة</label>
+        <select class="fi" id="edit-ect">
+          <option value="flights">✈️ تذاكر طيران</option><option value="taxi">🚕 تاكسي</option><option value="carrental">🚗 إيجار سيارة</option><option value="tolls">🛣️ ضرائب طريق</option><option value="food">🍽️ أكل</option><option value="accommodation">🏨 سكن</option><option value="fuel">⛽ وقود</option><option value="grocery">🛒 بقالة</option><option value="books">📚 كتب</option><option value="manuscripts">📜 مخطوطات</option><option value="other">📦 أخرى</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb">
+      <label class="lbl">مَن دفع؟</label>
+      <div class="seg" id="edit-pay-seg">
+        <button class="sg on" data-pay="omar">عمر</button><button class="sg on" data-pay="majed">ماجد</button><button class="sg on" data-pay="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb" id="edit-pay-split-wrap" style="display:none">
+      <label class="lbl">توزيع المبلغ</label>
+      <div class="seg" id="edit-split-mode-seg">
+        <button class="sg on" data-mode="equal">بالتساوي</button><button class="sg" data-mode="custom">مبالغ مختلفة</button>
+      </div>
+      <div id="edit-pay-custom-fields" style="display:none;margin-top:8px">
+        <div class="g3">
+          <div id="edit-cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-omar"></div>
+          <div id="edit-cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-majed"></div>
+          <div id="edit-cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-waseem"></div>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px" id="edit-pay-sum-hint"></div>
+      </div>
+    </div>
+    <button class="btn" id="btn-save-edit-e" style="margin-bottom:10px">حفظ التعديل</button>
+    <button id="btn-cancel-edit-e" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
+  </div>
+</div>
+
+<!-- EDIT TASK MODAL -->
+<div class="modal-bg hidden" id="edit-tk-modal-bg">
+  <div class="modal">
+    <div class="modal-t">تعديل المهمة</div>
+    <input type="hidden" id="edit-tk-idx">
+    <div class="mb"><label class="lbl">المهمة</label><input class="fi" type="text" id="edit-tk-name"></div>
+    <div class="g2">
+      <div><label class="lbl">التاريخ (اختياري)</label><input class="fi" type="date" id="edit-tk-date"></div>
+      <div><label class="lbl">الأولوية</label>
+        <select class="fi" id="edit-tk-pri"><option value="high">عالية</option><option value="med">متوسطة</option><option value="low">منخفضة</option></select>
+      </div>
+    </div>
+    <div class="mb">
+      <label class="lbl">المكلّف</label>
+      <div class="seg" id="edit-tk-assign">
+        <button class="sg on" data-ta="omar">عمر</button><button class="sg on" data-ta="majed">ماجد</button><button class="sg on" data-ta="waseem">وسيم</button>
+      </div>
+    </div>
+    <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-tk-notes"></textarea></div>
+    <button class="btn" id="btn-save-edit-tk" style="margin-bottom:10px">حفظ التعديل</button>
+    <button id="btn-cancel-edit-tk" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
+  </div>
+</div>
+
+<!-- PASSCODE MODAL -->
+<div class="modal-bg hidden" id="pc-modal-bg">
+  <div class="modal" id="pc-modal">
+    <div class="modal-t" id="pc-title">&#x1F512; وضع التحرير</div>
+    <div class="modal-s">أدخل رمز المرور لتفعيل التعديل على هذا الجهاز</div>
+    <div class="pc-dots" id="pc-dots"></div>
+    <div class="pc-keys" id="pc-keys"></div>
+    <button id="btn-pc-close" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer;margin-top:14px">إغلاق</button>
+  </div>
+</div>
+
+<!-- TRIP REPORT -->
+<div class="report-bg hidden" id="report-bg">
+  <div class="rp-wrap">
+    <div class="rp-actions">
+      <button id="btn-report-print">&#x1F5A8;&#xFE0F; طباعة / حفظ PDF</button>
+      <button id="btn-report-close">إغلاق</button>
+    </div>
+    <div id="report-content"></div>
+  </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div class="imgbox hidden" id="imgbox" onclick="closeImg()"><img src="" alt="مرفق مكبّر"></div>
 
 <div class="toast" id="toast"></div>
 
@@ -887,7 +1216,7 @@ function parse(rows){
       if (seenT[kT]) return;
       seenT[kT] = true;
       var isDone = r[9]==="1" || !!prevTlDone[r[1]+"|"+r[2]+"|"+r[3]+"|"+r[4]];
-      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone});
+      tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone, att:r[10]||""});
     }
   });
   if (b) document.getElementById("tb").value = b;
@@ -903,7 +1232,7 @@ function buildRows(){
     var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
     rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr]);
   });
-  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0"]); });
+  tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0", t.att||""]); });
   return rows;
 }
 
@@ -1145,6 +1474,7 @@ function renE(){
     }
     html += '<div class="er">'
       + '<button class="dl" onclick="delE(' + i + ')">\u2715</button>'
+      + '<button class="dl" onclick="editE(' + i + ')" style="color:var(--gold)">\u270e</button>'
       + '<span class="bx ' + CB[e.ct] + '">' + CL[e.ct] + '</span>'
       + '<span class="cb">' + CF[e.co] + '</span>'
       + '<span class="en2">' + e.nm + '</span>'
@@ -1165,10 +1495,11 @@ function addT(){
   var nb = document.getElementById("tnb").value.trim();
   var ml = document.getElementById("tml").value.trim();
   var nt = document.getElementById("tnt").value.trim();
+  var att = document.getElementById("tatt").value.trim();
   if (!hd){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0633\u0645 \u0627\u0644\u0632\u064A\u0627\u0631\u0629"); return; }
-  tls.push({co:co, cy:cy, dt:dt, hd:hd, nb:nb, ml:ml, nt:nt, pri:curPri});
+  tls.push({co:co, cy:cy, dt:dt, hd:hd, nb:nb, ml:ml, nt:nt, pri:curPri, att:att});
   tls.sort(function(a, b){ return a.dt > b.dt ? 1 : -1; });
-  ["tcy","tdt","thd","tnb","tml","tnt"].forEach(function(id){ document.getElementById(id).value = ""; });
+  ["tcy","tdt","thd","tnb","tml","tnt","tatt"].forEach(function(id){ document.getElementById(id).value = ""; });
   curPri = "high";
   ["pri-high","pri-med","pri-low"].forEach(function(x){ document.getElementById(x).classList.remove("on"); });
   document.getElementById("pri-high").classList.add("on");
@@ -1235,6 +1566,52 @@ window.selCo = selCo;
 
 // Track which groups are open
 var openState = {};
+
+// Attachment helpers: detect image links, build inline preview / button, lightbox
+function isImage(u){ return /\.(jpe?g|png|gif|webp|bmp|svg|avif)(\?|#|$)/i.test(u||"") || /googleusercontent\.com/i.test(u||""); }
+function attEsc(u){ return String(u||"").replace(/"/g,"%22"); }
+function attBlock(url){
+  if(!url) return "";
+  if(isImage(url)) return '<img class="vc-img" src="'+attEsc(url)+'" loading="lazy" onclick="openImg(this.src)" alt="مرفق">';
+  return '<a class="vc-att" href="'+attEsc(url)+'" target="_blank">\u{1F4CE} المرفق</a>';
+}
+function openImg(src){ var lb=document.getElementById("imgbox"); lb.querySelector("img").src=src; lb.classList.remove("hidden"); }
+function closeImg(){ var lb=document.getElementById("imgbox"); lb.classList.add("hidden"); lb.querySelector("img").src=""; }
+window.openImg=openImg; window.closeImg=closeImg;
+
+// Shared visit-card builder (used by country view + city view)
+function buildVisitCard(t, i){
+  var vcId = "vc-" + i;
+  var ds = t.dt ? (function(){ var dt = safeDate(t.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"long", day:"numeric"}) : ""; })() : "";
+  var pr = t.pri || "high";
+  var summary = t.nb || t.ml || "";
+  if (summary.length > 60) summary = summary.substring(0, 60) + "...";
+  var isDone = t.done;
+  return '<div class="vc vc-pri-' + pr + (isDone ? ' vc-done' : '') + '">'
+    + '<div class="vc-hdr">'
+    + '<button class="vc-done-btn' + (isDone ? ' on' : '') + '" onclick="event.stopPropagation();togDone(' + i + ')">' + (isDone ? '✓' : '') + '</button>'
+    + '<div class="vc-info" onclick="togEl(\'' + vcId + '\')" style="cursor:pointer">'
+    + '<div class="vc-title">' + t.hd + '</div>'
+    + (summary ? '<div class="vc-summary">' + summary + '</div>' : '')
+    + '</div>'
+    + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
+    + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
+    + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '" onclick="togEl(\'' + vcId + '\')">▼</span>'
+    + '</div>'
+    + '<div class="vc-body' + (openState[vcId] ? ' op' : '') + '" id="' + vcId + '">'
+    + (t.nb ? '<div class="tf"><div class="tfl">نبذة</div><div class="tfv">' + t.nb + '</div></div>' : "")
+    + (t.ml ? '<div class="tf"><div class="tfl">المطلوب</div><div class="tfv">' + t.ml + '</div></div>' : "")
+    + (t.nt ? '<div class="tf"><div class="tfl">ملاحظات</div><div class="tfv">' + t.nt + '</div></div>' : "")
+    + (!t.nb && !t.ml && !t.nt ? '<div class="tf"><div class="tfv mu">لا توجد تفاصيل</div></div>' : "")
+    + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">'
+    + '<a class="vc-map" style="margin-top:0" href="' + mapUrl(t) + '" target="_blank">\u{1F4CD} خرائط Google</a>'
+    + (t.att && !isImage(t.att) ? attBlock(t.att) : '')
+    + '</div>'
+    + (t.att && isImage(t.att) ? attBlock(t.att) : '')
+    + '<div class="ta"><button class="db" onclick="delT(' + i + ')">حذف</button><button class="eb" onclick="editT(' + i + ')">تعديل</button></div>'
+    + '</div>'
+    + '</div>';
+}
 
 function renT(){
   var el = document.getElementById("tl2");
@@ -1335,34 +1712,7 @@ function renT(){
         + '</div>'
         + '<div class="grp-cy-body' + (openState[cyId] !== false ? ' op' : '') + '" id="' + cyId + '">';
 
-      visits.forEach(function(v){
-        var t = v.t, i = v.i;
-        var vcId = "vc-" + i;
-        var ds = t.dt ? (function(){ var dt = safeDate(t.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"long", day:"numeric"}) : ""; })() : "";
-        var pr = t.pri || "high";
-        var summary = t.nb || t.ml || "";
-        if (summary.length > 60) summary = summary.substring(0, 60) + "...";
-        var isDone = t.done;
-        html += '<div class="vc vc-pri-' + pr + (isDone ? ' vc-done' : '') + '">'
-          + '<div class="vc-hdr">'
-          + '<button class="vc-done-btn' + (isDone ? ' on' : '') + '" onclick="event.stopPropagation();togDone(' + i + ')">' + (isDone ? '\u2713' : '') + '</button>'
-          + '<div class="vc-info" onclick="togEl(\'' + vcId + '\')" style="cursor:pointer">'
-          + '<div class="vc-title">' + t.hd + '</div>'
-          + (summary ? '<div class="vc-summary">' + summary + '</div>' : '')
-          + '</div>'
-          + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
-          + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
-          + '<span class="vc-chev' + (openState[vcId] ? ' op' : '') + '" id="ch-' + vcId + '" onclick="togEl(\'' + vcId + '\')">\u25BC</span>'
-          + '</div>'
-          + '<div class="vc-body' + (openState[vcId] ? ' op' : '') + '" id="' + vcId + '">'
-          + (t.nb ? '<div class="tf"><div class="tfl">\u0646\u0628\u0630\u0629</div><div class="tfv">' + t.nb + '</div></div>' : "")
-          + (t.ml ? '<div class="tf"><div class="tfl">\u0627\u0644\u0645\u0637\u0644\u0648\u0628</div><div class="tfv">' + t.ml + '</div></div>' : "")
-          + (t.nt ? '<div class="tf"><div class="tfl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</div><div class="tfv">' + t.nt + '</div></div>' : "")
-          + (!t.nb && !t.ml && !t.nt ? '<div class="tf"><div class="tfv mu">\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u0641\u0627\u0635\u064A\u0644</div></div>' : "")
-          + '<div class="ta"><button class="db" onclick="delT(' + i + ')">\u062D\u0630\u0641</button><button class="eb" onclick="editT(' + i + ')">\u062A\u0639\u062F\u064A\u0644</button></div>'
-          + '</div>'
-          + '</div>';
-      });
+      visits.forEach(function(v){ html += buildVisitCard(v.t, v.i); });
 
       html += '</div></div>';
     });
@@ -1386,6 +1736,7 @@ function editT(i){
   document.getElementById("edit-nb").value = t.nb || "";
   document.getElementById("edit-ml").value = t.ml || "";
   document.getElementById("edit-nt").value = t.nt || "";
+  document.getElementById("edit-att").value = t.att || "";
   var pr = t.pri || "high";
   document.querySelectorAll("#edit-pri-seg .sg").forEach(function(b){
     b.classList.toggle("on", b.getAttribute("data-pri") === pr);
@@ -1417,6 +1768,7 @@ document.getElementById("btn-save-edit").addEventListener("click", function(){
     nb: document.getElementById("edit-nb").value.trim(),
     ml: document.getElementById("edit-ml").value.trim(),
     nt: document.getElementById("edit-nt").value.trim(),
+    att: document.getElementById("edit-att").value.trim(),
     pri: selPri,
     done: wasDone
   };
@@ -1552,6 +1904,7 @@ function renTk(){
         + '</div>'
         + (t.notes ? '<div style="font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5">' + t.notes + '</div>' : '')
         + '</div>'
+        + '<button class="tk-del" onclick="editTk(' + i + ')" style="color:var(--gold)">\u270e</button>'
         + '<button class="tk-del" onclick="delTk(' + i + ')">\u2715</button>'
         + '</div>';
     });
@@ -1561,6 +1914,31 @@ function renTk(){
 }
 
 // ========== BOOKINGS TAB ==========
+// In-flight prayer guidance per flight route (by airport codes in title)
+var FLIGHT_PRAYERS = {
+  "JED-CMN":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0666:\u0660\u0665\u0635 \u0628\u062A\u0648\u0642\u064A\u062A \u062C\u062F\u0629\u060C \u0641\u0648\u0642 \u0627\u0644\u062C\u0632\u0627\u0626\u0631) \u2014 \u064A\u062F\u062E\u0644 \u0642\u0628\u0644 \u0627\u0644\u0647\u0628\u0648\u0637 \u0628\u0633\u0627\u0639\u0629 \u0648\u0646\u0635\u0641. \u0635\u0644\u0651\u0648\u0647 \u062C\u0648\u0627\u064B.",
+  "CMN-TUN":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0664:\u0660\u0660\u0635 \u0641\u0648\u0642 \u0634\u0631\u0642 \u0627\u0644\u062C\u0632\u0627\u0626\u0631) \u2014 \u0627\u0644\u0647\u0628\u0648\u0637 \u064A\u0642\u0639 \u0639\u0646\u062F \u0627\u0644\u0634\u0631\u0648\u0642\u060C \u0641\u0635\u0644\u0651\u0648\u0647 \u062C\u0648\u0627\u064B.",
+  "CMN-ALG":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0664:\u0660\u0660\u0635 \u0641\u0648\u0642 \u0634\u0631\u0642 \u0627\u0644\u062C\u0632\u0627\u0626\u0631)\u060C \u0648\u0627\u0644\u0638\u0647\u0631 \u0641\u064A \u0645\u0637\u0627\u0631 \u062A\u0648\u0646\u0633 (~\u0661\u0662:\u0663\u0660\u0638) \u0623\u062B\u0646\u0627\u0621 \u0627\u0644\u062A\u0648\u0642\u0651\u0641.",
+  "TUN-ALG":"\u0644\u0627 \u0635\u0644\u0627\u0629 \u0641\u064A \u0627\u0644\u062C\u0648 \u2014 \u0635\u0644\u0651\u0648\u0627 \u0627\u0644\u0638\u0647\u0631 \u0641\u064A \u0645\u0637\u0627\u0631 \u062A\u0648\u0646\u0633 (~\u0661\u0662:\u0663\u0660\u0638) \u0642\u0628\u0644 \u0627\u0644\u0635\u0639\u0648\u062F.",
+  "ALG-JNB":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0665:\u0664\u0660\u0635 \u0628\u062A\u0648\u0642\u064A\u062A \u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A\u060C \u0641\u0648\u0642 \u0627\u0644\u0643\u0648\u0646\u063A\u0648). \u0648\u0627\u0644\u0645\u063A\u0631\u0628+\u0627\u0644\u0639\u0634\u0627\u0621 \u0641\u064A \u0645\u0637\u0627\u0631 \u0627\u0644\u062C\u0632\u0627\u0626\u0631 \u0642\u0628\u0644 \u0627\u0644\u0625\u0642\u0644\u0627\u0639.",
+  "JNB-CAI":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0665:\u0661\u0664\u0635 \u0628\u062A\u0648\u0642\u064A\u062A \u0627\u0644\u0642\u0627\u0647\u0631\u0629\u060C \u0641\u0648\u0642 \u0627\u0644\u0633\u0648\u062F\u0627\u0646). \u0648\u0627\u0644\u0645\u063A\u0631\u0628+\u0627\u0644\u0639\u0634\u0627\u0621 \u0641\u064A \u0645\u0637\u0627\u0631 \u062C\u0648\u0647\u0627\u0646\u0633\u0628\u0631\u063A \u0642\u0628\u0644 \u0627\u0644\u0625\u0642\u0644\u0627\u0639.",
+  "CAI-JED":"\u0627\u0644\u0641\u062C\u0631 \u0641\u064A \u0627\u0644\u0637\u0627\u0626\u0631\u0629 (~\u0664:\u0663\u0666\u0635) \u2014 \u0627\u0644\u0647\u0628\u0648\u0637 \u0628\u0639\u062F \u0627\u0644\u0634\u0631\u0648\u0642 \u0645\u0628\u0627\u0634\u0631\u0629\u060C \u0641\u0635\u0644\u0651\u0648\u0647 \u062C\u0648\u0627\u064B \u0648\u0644\u0627 \u062A\u0624\u062E\u0651\u0631\u0648\u0647."
+};
+function flightPrayer(title){
+  var codes = (String(title||"").match(/[A-Z]{3}/g) || []);
+  if (codes.length < 2) return "";
+  return FLIGHT_PRAYERS[codes[0] + "-" + codes[1]] || "";
+}
+// Robust HH:MM extraction (handles clean "07:00" and dirty "1899-12-30T07:00:00.000Z")
+function fmtBkTime(tm){
+  if (!tm) return "";
+  if (/^\d{1,2}:\d{2}/.test(tm)) { var p = tm.match(/^(\d{1,2}):(\d{2})/); return ("0"+p[1]).slice(-2)+":"+p[2]; }
+  var d = new Date(tm);
+  if (!isNaN(d.getTime())) return ("0"+d.getUTCHours()).slice(-2)+":"+("0"+d.getUTCMinutes()).slice(-2);
+  var m = String(tm).match(/(\d{1,2}):(\d{2})/);
+  return m ? (("0"+m[1]).slice(-2)+":"+m[2]) : "";
+}
+function bkMapUrl(b){ var q=[b.title, CN[b.co]].filter(Boolean).join(" "); return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q); }
 var BT = {flight:"\u2708\uFE0F",hotel:"\u{1F3E8}",car:"\u{1F697}",visa:"\u{1F4C4}",activity:"\u{1F3AF}",other:"\u{1F4E6}"};
 var BTN = {flight:"\u0637\u064A\u0631\u0627\u0646",hotel:"\u0641\u0646\u062F\u0642",car:"\u0633\u064A\u0627\u0631\u0629",visa:"\u062A\u0623\u0634\u064A\u0631\u0629",activity:"\u0646\u0634\u0627\u0637",other:"\u0623\u062E\u0631\u0649"};
 var BSN = {confirmed:"\u0645\u0624\u0643\u062F",pending:"\u0645\u0639\u0644\u0651\u0642",cancelled:"\u0645\u0644\u063A\u064A"};
@@ -1616,10 +1994,11 @@ document.getElementById("btn-add-bk").addEventListener("click", function(){
     ref: document.getElementById("bk-ref").value.trim(),
     cost: parseFloat(document.getElementById("bk-cost").value) || 0,
     travelers: bkTravelers.slice(),
-    notes: document.getElementById("bk-notes").value.trim()
+    notes: document.getElementById("bk-notes").value.trim(),
+    att: document.getElementById("bk-att").value.trim()
   });
   bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
-  ["bk-title","bk-date","bk-time","bk-ref","bk-cost","bk-notes"].forEach(function(id){ document.getElementById(id).value = ""; });
+  ["bk-title","bk-date","bk-time","bk-ref","bk-cost","bk-notes","bk-att"].forEach(function(id){ document.getElementById(id).value = ""; });
   document.getElementById("bk-status").value = "confirmed";
   renBk(); sched();
   toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u062D\u062C\u0632");
@@ -1641,6 +2020,7 @@ function editBk(i){
   document.getElementById("edit-bk-ref").value = b.ref || "";
   document.getElementById("edit-bk-cost").value = b.cost || "";
   document.getElementById("edit-bk-notes").value = b.notes || "";
+  document.getElementById("edit-bk-att").value = b.att || "";
   document.querySelectorAll("#edit-bk-travelers .sg").forEach(function(btn){
     var tr = btn.getAttribute("data-tr");
     btn.classList.toggle("on", b.travelers && b.travelers.indexOf(tr) >= 0);
@@ -1666,7 +2046,8 @@ document.getElementById("btn-save-edit-bk").addEventListener("click", function()
     ref: document.getElementById("edit-bk-ref").value.trim(),
     cost: parseFloat(document.getElementById("edit-bk-cost").value) || 0,
     travelers: trav,
-    notes: document.getElementById("edit-bk-notes").value.trim()
+    notes: document.getElementById("edit-bk-notes").value.trim(),
+    att: document.getElementById("edit-bk-att").value.trim()
   };
   bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
   document.getElementById("edit-bk-modal-bg").classList.add("hidden");
@@ -1706,15 +2087,8 @@ function renBk(){
     var i = bks.indexOf(b);
     var vcId = "bk-" + i;
     var ds = b.dt ? (function(){ var dt = safeDate(b.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {weekday:"short", month:"short", day:"numeric"}) : ""; })() : "";
-    var timeStr = "";
-    if (b.tm) {
-      if (/^\d{2}:\d{2}/.test(b.tm)) { timeStr = b.tm.substring(0,5); }
-      else {
-        var td = new Date(b.tm);
-        if (!isNaN(td.getTime())) { timeStr = ("0"+td.getUTCHours()).slice(-2) + ":" + ("0"+td.getUTCMinutes()).slice(-2); }
-        else { timeStr = b.tm; }
-      }
-    }
+    var timeStr = fmtBkTime(b.tm);
+    var prayerNote = b.type === "flight" ? flightPrayer(b.title) : "";
     var travHtml = "";
     if (b.travelers && b.travelers.length > 0 && b.travelers.length < 3) {
       travHtml = b.travelers.map(function(t){ return '<span class="bk-tr-chip">' + PN[t] + '</span>'; }).join("");
@@ -1741,6 +2115,12 @@ function renBk(){
       + (b.ref ? '<div class="bk-detail"><span class="bk-dl">\u0631\u0642\u0645 \u0627\u0644\u062A\u0623\u0643\u064A\u062F</span><span class="bk-dv ltr">' + b.ref + '</span></div>' : '')
       + '<div class="bk-detail"><span class="bk-dl">\u0627\u0644\u0645\u0633\u0627\u0641\u0631\u0648\u0646</span><span class="bk-dv"><div class="bk-travelers">' + travHtml + '</div></span></div>'
       + (b.notes ? '<div class="bk-detail"><span class="bk-dl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</span><span class="bk-dv">' + b.notes.replace(/\n/g, "<br>") + '</span></div>' : '')
+      + (prayerNote ? '<div class="bk-prayer"><span class="pi">\u{1F54C}</span><span class="pt2">' + prayerNote + '</span></div>' : '')
+      + ((["hotel","car","activity"].indexOf(b.type) >= 0 || (b.att && !isImage(b.att))) ? '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">'
+          + (["hotel","car","activity"].indexOf(b.type) >= 0 ? '<a class="vc-map" style="margin-top:0" href="' + bkMapUrl(b) + '" target="_blank">\u{1F4CD} \u062E\u0631\u0627\u0626\u0637 Google</a>' : '')
+          + (b.att && !isImage(b.att) ? attBlock(b.att) : '')
+          + '</div>' : '')
+      + (b.att && isImage(b.att) ? attBlock(b.att) : '')
       + '<div class="ta"><button class="db" onclick="delBk(' + i + ')">\u062D\u0630\u0641</button><button class="eb" onclick="editBk(' + i + ')">\u062A\u0639\u062F\u064A\u0644</button></div>'
       + '</div>'
       + '</div>';
@@ -1795,7 +2175,7 @@ var _buildRows = buildRows;
 buildRows = function(){
   var rows = _buildRows();
   bks.forEach(function(b){
-    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||""]);
+    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||"", b.att||""]);
   });
   tasks.forEach(function(t){
     rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
@@ -1816,7 +2196,7 @@ parse = function(rows){
       var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+(r[4]||"");
       if (seenK[kK]) return;
       seenK[kK] = true;
-      bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||""});
+      bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||"", att:r[11]||""});
     }
     if (r[0] === "M") {
       var kM = (r[1]||"")+"|"+(r[2]||"");
@@ -1833,6 +2213,493 @@ parse = function(rows){
 
 // Auto refresh every 30s
 setInterval(function(){ if (!busy && !dirty) pull(); }, 30000);
+
+// ===== STAGE 2: TRIP REPORT =====
+function maxv(arr){ var m=1; arr.forEach(function(x){ if(x>m) m=x; }); return m; }
+function barRow(label, val, max, valText, green){
+  var w = max>0 ? Math.round(val/max*100) : 0;
+  return '<div class="rp-bar-row"><span class="rp-bar-label">'+label+'</span>'
+    +'<div class="rp-bar-track"><div class="rp-bar-fill'+(green?' gn':'')+'" style="width:'+w+'%"></div></div>'
+    +'<span class="rp-bar-val">'+(valText||FM(val))+'</span></div>';
+}
+function buildReport(){
+  var tot=parseFloat(document.getElementById("tb").value)||0;
+  var sp=exps.reduce(function(s,e){return s+e.am;},0);
+  var rm=tot-sp;
+  var pc=tot>0?Math.min(100,Math.round(sp/tot*100)):0;
+  var oP=0,mP=0,wP=0;
+  exps.forEach(function(e){
+    if(e.payAmts){ oP+=e.payAmts.omar||0; mP+=e.payAmts.majed||0; wP+=e.payAmts.waseem||0; }
+    else if(typeof e.pay==="string"){ if(e.pay==="omar")oP+=e.am; else if(e.pay==="majed")mP+=e.am; else if(e.pay==="waseem")wP+=e.am; else {oP+=e.am/3;mP+=e.am/3;wP+=e.am/3;} }
+  });
+  var coSpend={},catSpend={};
+  exps.forEach(function(e){ coSpend[e.co]=(coSpend[e.co]||0)+e.am; catSpend[e.ct]=(catSpend[e.ct]||0)+e.am; });
+  var fair=sp/3;
+  var ppl=[{n:"عمر",net:oP-fair},{n:"ماجد",net:mP-fair},{n:"وسيم",net:wP-fair}];
+  var debt=ppl.filter(function(p){return p.net<-0.5;}).map(function(p){return {n:p.n,a:-p.net};});
+  var cred=ppl.filter(function(p){return p.net>0.5;}).map(function(p){return {n:p.n,a:p.net};});
+  var setl=[],di=0,ci=0;
+  while(di<debt.length&&ci<cred.length){ var tr=Math.min(debt[di].a,cred[ci].a); if(tr>0.5) setl.push(debt[di].n+" يدفع لـ"+cred[ci].n+": "+FM(tr)+" ر.س"); debt[di].a-=tr; cred[ci].a-=tr; if(debt[di].a<0.5)di++; if(cred[ci].a<0.5)ci++; }
+
+  var h='<div class="rp-title">الرحلة الصيفية الثانية ١٤٤٧هـ</div>';
+  h+='<div class="rp-sub">٣ – ٢٣ يوليو ٢٠٢٦ · عمر · ماجد · وسيم</div>';
+
+  h+='<div class="rp-sec">💰 الميزانية</div>';
+  h+='<div class="rp-mets"><div class="rp-met"><div class="rp-met-l">الميزانية</div><div class="rp-met-v">'+FM(tot)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">المُنفق</div><div class="rp-met-v">'+FM(sp)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">المتبقي</div><div class="rp-met-v">'+FM(rm)+'</div></div></div>';
+  h+='<div class="rp-line"><span>نسبة الإنفاق</span><span>'+AR(pc)+'٪</span></div>';
+  h+='<div class="rp-line"><span>عمر دفع</span><span>'+FM(oP)+' ر.س</span></div>';
+  h+='<div class="rp-line"><span>ماجد دفع</span><span>'+FM(mP)+' ر.س</span></div>';
+  h+='<div class="rp-line"><span>وسيم دفع</span><span>'+FM(wP)+' ر.س</span></div>';
+  if(setl.length){ h+='<div class="rp-sec">⚖️ التسوية المطلوبة</div>'; setl.forEach(function(s){ h+='<div class="rp-line"><span>'+s+'</span></div>'; }); }
+  else if(exps.length){ h+='<div class="rp-line"><span>✓ الحساب متساوٍ بين الجميع</span></div>'; }
+
+  var coMax=maxv(CO.map(function(c){return coSpend[c]||0;}));
+  var anyCo=CO.some(function(c){return (coSpend[c]||0)>0;});
+  if(anyCo){ h+='<div class="rp-sec">🌍 المصاريف حسب الدولة</div>';
+    CO.forEach(function(c){ var v=coSpend[c]||0; if(v>0) h+=barRow(CF[c]+" "+CN[c], v, coMax); }); }
+
+  var cats=Object.keys(catSpend);
+  if(cats.length){ var catMax=maxv(cats.map(function(c){return catSpend[c];}));
+    h+='<div class="rp-sec">🏷️ المصاريف حسب الفئة</div>';
+    cats.sort(function(a,b){return catSpend[b]-catSpend[a];}).forEach(function(c){ h+=barRow(CL[c]||c, catSpend[c], catMax); }); }
+
+  var vDone=tls.filter(function(t){return t.done;}).length;
+  h+='<div class="rp-sec">📅 البرنامج</div>';
+  h+='<div class="rp-mets"><div class="rp-met"><div class="rp-met-l">الزيارات</div><div class="rp-met-v">'+AR(tls.length)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">مُنجزة</div><div class="rp-met-v">'+AR(vDone)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">متبقية</div><div class="rp-met-v">'+AR(tls.length-vDone)+'</div></div></div>';
+  CO.forEach(function(c){ var v=tls.filter(function(t){return t.co===c;}); if(!v.length) return; var d=v.filter(function(t){return t.done;}).length; h+=barRow(CF[c]+" "+CN[c], d, v.length, AR(d)+"/"+AR(v.length), true); });
+
+  var conf=bks.filter(function(b){return b.status==="confirmed";}).length;
+  var pend=bks.filter(function(b){return b.status==="pending";}).length;
+  h+='<div class="rp-sec">🎫 الحجوزات</div>';
+  h+='<div class="rp-mets"><div class="rp-met"><div class="rp-met-l">الإجمالي</div><div class="rp-met-v">'+AR(bks.length)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">مؤكدة</div><div class="rp-met-v">'+AR(conf)+'</div></div>'
+    +'<div class="rp-met"><div class="rp-met-l">معلّقة</div><div class="rp-met-v">'+AR(pend)+'</div></div></div>';
+
+  var tDone=tasks.filter(function(t){return t.done;}).length;
+  h+='<div class="rp-sec">✅ المهام</div>';
+  h+='<div class="rp-line"><span>المُنجز من المهام</span><span>'+AR(tDone)+' / '+AR(tasks.length)+'</span></div>';
+
+  h+='<div class="rp-foot">أُنشئ التقرير في '+new Date().toLocaleDateString("ar-u-nu-latn",{year:"numeric",month:"long",day:"numeric"})+'</div>';
+  return h;
+}
+function openReport(){
+  document.getElementById("report-content").innerHTML=buildReport();
+  document.getElementById("report-bg").classList.remove("hidden");
+  document.body.classList.add("rep-open");
+  document.getElementById("report-bg").scrollTop=0;
+}
+function closeReport(){
+  document.getElementById("report-bg").classList.add("hidden");
+  document.body.classList.remove("rep-open");
+}
+document.getElementById("btn-report").addEventListener("click", openReport);
+document.getElementById("btn-report-close").addEventListener("click", closeReport);
+document.getElementById("btn-report-print").addEventListener("click", function(){ window.print(); });
+
+// ===== STAGE 2: EDIT EXPENSE =====
+var editPay=["omar","majed","waseem"], editSplitMode="equal";
+function updateEditPayUI(){
+  document.getElementById("edit-pay-split-wrap").style.display = editPay.length>1 ? "block":"none";
+  document.getElementById("edit-pay-custom-fields").style.display = (editPay.length>1 && editSplitMode==="custom") ? "block":"none";
+  ["omar","majed","waseem"].forEach(function(p){ document.getElementById("edit-cf-"+p).style.display = editPay.indexOf(p)>=0 ? "block":"none"; });
+}
+function editE(i){
+  var e=exps[i]; if(!e) return;
+  document.getElementById("edit-e-idx").value=i;
+  document.getElementById("edit-en").value=e.nm;
+  document.getElementById("edit-ea").value=e.am;
+  document.getElementById("edit-eco").value=e.co;
+  document.getElementById("edit-ect").value=e.ct;
+  var payers = Array.isArray(e.pay)?e.pay.slice():(e.pay==="split"?["omar","majed","waseem"]:[e.pay]);
+  editPay=payers.slice();
+  document.querySelectorAll("#edit-pay-seg .sg").forEach(function(b){ b.classList.toggle("on", editPay.indexOf(b.getAttribute("data-pay"))>=0); });
+  editSplitMode="equal";
+  if(editPay.length>1 && e.payAmts){
+    var each=e.am/editPay.length, custom=false;
+    editPay.forEach(function(p){ if(Math.abs((e.payAmts[p]||0)-each)>0.5) custom=true; });
+    editSplitMode=custom?"custom":"equal";
+  }
+  document.querySelectorAll("#edit-split-mode-seg .sg").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-mode")===editSplitMode); });
+  ["omar","majed","waseem"].forEach(function(p){ document.getElementById("edit-pa-"+p).value=(e.payAmts&&e.payAmts[p])?e.payAmts[p]:""; });
+  document.getElementById("edit-pay-sum-hint").textContent="";
+  updateEditPayUI();
+  document.getElementById("edit-e-modal-bg").classList.remove("hidden");
+}
+window.editE=editE;
+document.getElementById("edit-pay-seg").addEventListener("click",function(e){
+  var btn=e.target.closest(".sg"); if(!btn) return;
+  var p=btn.getAttribute("data-pay"); btn.classList.toggle("on");
+  editPay=[]; document.querySelectorAll("#edit-pay-seg .sg.on").forEach(function(x){ editPay.push(x.getAttribute("data-pay")); });
+  if(!editPay.length){ btn.classList.add("on"); editPay=[p]; }
+  updateEditPayUI();
+});
+document.getElementById("edit-split-mode-seg").addEventListener("click",function(e){
+  var btn=e.target.closest(".sg"); if(!btn) return;
+  editSplitMode=btn.getAttribute("data-mode");
+  document.querySelectorAll("#edit-split-mode-seg .sg").forEach(function(x){ x.classList.remove("on"); });
+  btn.classList.add("on");
+  updateEditPayUI();
+});
+["edit-pa-omar","edit-pa-majed","edit-pa-waseem"].forEach(function(id){
+  document.getElementById(id).addEventListener("input",function(){
+    var total=parseFloat(document.getElementById("edit-ea").value)||0, sum=0;
+    editPay.forEach(function(p){ sum+=parseFloat(document.getElementById("edit-pa-"+p).value)||0; });
+    var hint=document.getElementById("edit-pay-sum-hint");
+    if(sum>0 && Math.abs(sum-total)>0.5){ hint.textContent="⚠️ المجموع: "+FM(sum)+" ر.س (المطلوب: "+FM(total)+" ر.س)"; hint.style.color="var(--rd)"; }
+    else hint.textContent="";
+  });
+});
+document.getElementById("btn-save-edit-e").addEventListener("click",function(){
+  var i=parseInt(document.getElementById("edit-e-idx").value);
+  if(isNaN(i)||!exps[i]) return;
+  var nm=document.getElementById("edit-en").value.trim();
+  var am=parseFloat(document.getElementById("edit-ea").value);
+  var ct=document.getElementById("edit-ect").value, co=document.getElementById("edit-eco").value;
+  if(!nm||!am||am<=0){ toast("⚠️ أدخل البيان والمبلغ"); return; }
+  var payInfo={};
+  if(editPay.length===1){ payInfo[editPay[0]]=am; }
+  else if(editSplitMode==="equal"){ var each=am/editPay.length; editPay.forEach(function(p){ payInfo[p]=each; }); }
+  else { var sum=0; editPay.forEach(function(p){ var v=parseFloat(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
+  exps[i]={nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo};
+  document.getElementById("edit-e-modal-bg").classList.add("hidden");
+  calc(); renE(); sched();
+  toast("✓ تم تعديل المصروف");
+});
+document.getElementById("btn-cancel-edit-e").addEventListener("click",function(){ document.getElementById("edit-e-modal-bg").classList.add("hidden"); });
+
+// ===== STAGE 2: EDIT TASK =====
+function editTk(i){
+  var t=tasks[i]; if(!t) return;
+  document.getElementById("edit-tk-idx").value=i;
+  document.getElementById("edit-tk-name").value=t.name;
+  document.getElementById("edit-tk-date").value=t.dt||"";
+  document.getElementById("edit-tk-pri").value=t.pri||"high";
+  document.getElementById("edit-tk-notes").value=t.notes||"";
+  var assign=(t.assign&&t.assign.length)?t.assign:["omar","majed","waseem"];
+  document.querySelectorAll("#edit-tk-assign .sg").forEach(function(b){ b.classList.toggle("on", assign.indexOf(b.getAttribute("data-ta"))>=0); });
+  document.getElementById("edit-tk-modal-bg").classList.remove("hidden");
+}
+window.editTk=editTk;
+document.getElementById("edit-tk-assign").addEventListener("click",function(e){
+  var b=e.target.closest(".sg"); if(!b) return;
+  b.classList.toggle("on");
+  if(!document.querySelectorAll("#edit-tk-assign .sg.on").length) b.classList.add("on");
+});
+document.getElementById("btn-save-edit-tk").addEventListener("click",function(){
+  var i=parseInt(document.getElementById("edit-tk-idx").value);
+  if(isNaN(i)||!tasks[i]) return;
+  var name=document.getElementById("edit-tk-name").value.trim();
+  if(!name){ toast("⚠️ أدخل اسم المهمة"); return; }
+  var assign=[]; document.querySelectorAll("#edit-tk-assign .sg.on").forEach(function(x){ assign.push(x.getAttribute("data-ta")); });
+  var wasDone=tasks[i].done;
+  tasks[i]={ name:name, dt:document.getElementById("edit-tk-date").value, pri:document.getElementById("edit-tk-pri").value, assign:assign, notes:document.getElementById("edit-tk-notes").value.trim(), done:wasDone };
+  tasks.sort(function(a,b){ if(a.done!==b.done) return a.done?1:-1; return (a.dt||"z")>(b.dt||"z")?1:-1; });
+  document.getElementById("edit-tk-modal-bg").classList.add("hidden");
+  renTk(); sched();
+  toast("✓ تم تعديل المهمة");
+});
+document.getElementById("btn-cancel-edit-tk").addEventListener("click",function(){ document.getElementById("edit-tk-modal-bg").classList.add("hidden"); });
+
+// ===== STAGE 1: THEME / COUNTDOWN / EDIT-MODE =====
+var EDIT_PASS = "1407";          // ← غيّر رمز التحرير من هنا
+var TRIP_START = "2026-07-03";   // تاريخ أول رحلة (للعدّاد)
+
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  var b = document.getElementById("btn-theme");
+  if (b) b.textContent = t === "dark" ? "☀️" : "\u{1F319}";
+}
+applyTheme(localStorage.getItem("t_theme") || "light");
+document.getElementById("btn-theme").addEventListener("click", function(){
+  var cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  localStorage.setItem("t_theme", cur);
+  applyTheme(cur);
+});
+
+function renderCountdown(){
+  var el = document.getElementById("countdown");
+  if (!el) return;
+  var start = safeDate(TRIP_START);
+  if (!start){ el.style.display = "none"; return; }
+  var today = new Date(); today.setHours(0,0,0,0);
+  var s2 = new Date(start); s2.setHours(0,0,0,0);
+  var days = Math.round((s2 - today) / 86400000);
+  if (days > 0){
+    el.innerHTML = '<span class="cd-num">' + AR(days) + '</span><span class="cd-txt">يوماً على انطلاق الرحلة · ' + s2.toLocaleDateString("ar-u-nu-latn",{day:"numeric",month:"long"}) + '</span>';
+  } else if (days === 0){
+    el.innerHTML = '<span class="cd-num cd-done">✨</span><span class="cd-txt cd-done">اليوم تنطلق الرحلة!</span>';
+  } else {
+    el.innerHTML = '<span class="cd-txt cd-done">\u{1F30D} الرحلة جارية · اليوم ' + AR(-days + 1) + '</span>';
+  }
+}
+
+function setEditMode(on){
+  document.documentElement.classList.toggle("view-mode", !on);
+  var b = document.getElementById("btn-lock");
+  if (b){
+    b.textContent = on ? "\u{1F513}" : "\u{1F512}";
+    b.className = "icon-btn " + (on ? "unlocked" : "locked");
+    b.title = on ? "وضع التحرير مفعّل - اضغط للقفل" : "وضع التحرير";
+  }
+}
+function isEdit(){ return localStorage.getItem("t_edit") === "1"; }
+
+var pcBuf = "";
+function renderPcDots(){
+  var html = "";
+  for (var i = 0; i < EDIT_PASS.length; i++){ html += '<div class="pc-dot' + (i < pcBuf.length ? " fill" : "") + '"></div>'; }
+  document.getElementById("pc-dots").innerHTML = html;
+}
+function openPc(){ pcBuf = ""; renderPcDots(); document.getElementById("pc-modal-bg").classList.remove("hidden"); }
+function closePc(){ document.getElementById("pc-modal-bg").classList.add("hidden"); }
+function pcPress(k){
+  if (k === "del"){ pcBuf = pcBuf.slice(0, -1); renderPcDots(); return; }
+  if (pcBuf.length >= EDIT_PASS.length) return;
+  pcBuf += k; renderPcDots();
+  if (pcBuf.length === EDIT_PASS.length){
+    setTimeout(function(){
+      if (pcBuf === EDIT_PASS){
+        localStorage.setItem("t_edit", "1");
+        setEditMode(true); closePc();
+        toast("✓ تم تفعيل وضع التحرير");
+      } else {
+        var m = document.getElementById("pc-modal");
+        m.classList.add("pc-shake");
+        setTimeout(function(){ m.classList.remove("pc-shake"); }, 400);
+        pcBuf = ""; renderPcDots();
+        toast("⚠️ رمز خاطئ");
+      }
+    }, 130);
+  }
+}
+(function buildPcKeys(){
+  var el = document.getElementById("pc-keys");
+  if (!el) return;
+  var keys = ["1","2","3","4","5","6","7","8","9","del","0","sp"];
+  el.innerHTML = keys.map(function(k){
+    if (k === "del") return '<div class="pc-key wide" data-k="del">⌫</div>';
+    if (k === "sp") return '<div class="pc-key" data-k="" style="visibility:hidden"></div>';
+    return '<div class="pc-key" data-k="' + k + '">' + k + '</div>';
+  }).join("");
+  el.addEventListener("click", function(e){
+    var key = e.target.closest(".pc-key");
+    if (!key) return;
+    var k = key.getAttribute("data-k");
+    if (k) pcPress(k);
+  });
+})();
+document.getElementById("btn-pc-close").addEventListener("click", closePc);
+document.getElementById("btn-lock").addEventListener("click", function(){
+  if (isEdit()){
+    localStorage.removeItem("t_edit");
+    setEditMode(false);
+    toast("\u{1F512} تم القفل - وضع المشاهدة");
+  } else { openPc(); }
+});
+
+setEditMode(isEdit());
+renderCountdown();
+
+// ===== STAGE 2: DAILY ITINERARY VIEW =====
+var TRIP_LEGS = [
+  {co:"ma", start:"2026-07-03", arrive:"جدة ← الدار البيضاء"},
+  {co:"dz", start:"2026-07-10", arrive:"الدار البيضاء ← الجزائر (عبر تونس)"},
+  {co:"za", start:"2026-07-15", arrive:"الجزائر ← جوهانسبرغ"},
+  {co:"eg", start:"2026-07-20", arrive:"جوهانسبرغ ← القاهرة"}
+];
+var TRIP_RETURN = "2026-07-23"; // العودة: القاهرة ← جدة
+
+function ymd(d){ return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+// normalize any stored date ("2026-07-03" or Sheets ISO "2026-07-03T04:00:00.000Z") to YYYY-MM-DD
+function dateKey(d){ if(!d) return ""; var m=String(d).match(/^(\d{4}-\d{2}-\d{2})/); if(m) return m[1]; var dt=safeDate(d); return dt?ymd(dt):""; }
+function tripDays(){
+  var days=[], cur=safeDate(TRIP_LEGS[0].start), end=safeDate(TRIP_RETURN);
+  while(cur<=end){ days.push(ymd(cur)); cur.setDate(cur.getDate()+1); }
+  return days;
+}
+function legFor(s){ var c=TRIP_LEGS[0]; for(var k=0;k<TRIP_LEGS.length;k++){ if(TRIP_LEGS[k].start<=s) c=TRIP_LEGS[k]; } return c; }
+function countryDays(co,days){ days=days||tripDays(); return days.filter(function(d){ return legFor(d).co===co; }); }
+function fmtDay(s){ var d=safeDate(s); return {wday:d.toLocaleDateString("ar-u-nu-latn",{weekday:"long"}), day:AR(d.getDate()), mon:d.toLocaleDateString("ar-u-nu-latn",{month:"short"})}; }
+function fmtLatin(s){ var d=safeDate(s); return d? d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : ""; }
+function mapUrl(t){ var q=[t.hd,t.cy,CN[t.co]].filter(Boolean).join(" "); return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q); }
+
+function renTDay(){
+  var el=document.getElementById("tl2day");
+  if(!el) return;
+  if(!tls.length){ el.innerHTML='<div class="emp"><div class="ei">\u{1F5D3}️</div>أضف زيارات لجدولتها على الأيام</div>'; return; }
+  var days=tripDays();
+  var byDate={}, unsched={};
+  tls.forEach(function(t,i){
+    var vd=dateKey(t.dt);
+    if(vd && days.indexOf(vd)>=0){ (byDate[vd]=byDate[vd]||[]).push({t:t,i:i}); }
+    else { var co=t.co||"ma"; (unsched[co]=unsched[co]||[]).push({t:t,i:i}); }
+  });
+
+  // legs strip
+  var html='<div class="legs">';
+  TRIP_LEGS.forEach(function(L){
+    var co=L.co, cd=countryDays(co,days);
+    var total=tls.filter(function(t){return t.co===co;}).length;
+    var sch=tls.filter(function(t){return t.co===co && days.indexOf(dateKey(t.dt))>=0;}).length;
+    html+='<div class="leg"><span class="leg-flag">'+CF[co]+'</span> <span class="leg-name">'+CN[co]+'</span>'
+      +'<div class="leg-dates">'+fmtLatin(cd[0])+' – '+fmtLatin(cd[cd.length-1])+'</div>'
+      +'<div class="leg-cnt">'+AR(sch)+'/'+AR(total)+' · '+AR(cd.length)+' أيام</div></div>';
+  });
+  html+='</div>';
+
+  // day cards
+  html+='<div class="daywrap">';
+  days.forEach(function(dstr){
+    var L=legFor(dstr), co=L.co, f=fmtDay(dstr), cd=countryDays(co,days);
+    var dayNum=cd.indexOf(dstr)+1, isArr=(dstr===L.start), isRet=(dstr===TRIP_RETURN);
+    var visits=byDate[dstr]||[], travel=isArr||isRet;
+    var badge='';
+    if(isRet) badge='<span class="daytrip">✈️ العودة · القاهرة ← جدة</span>';
+    else if(isArr) badge='<span class="daytrip">✈️ '+(co===TRIP_LEGS[0].co?"وصول":"انتقال")+' · '+L.arrive+'</span>';
+    html+='<div class="day'+(travel?" travel":"")+(visits.length?"":" empty")+'">'
+      +'<div class="day-head"><div class="day-num"><span class="d">'+f.day+'</span><span class="m">'+f.mon+'</span></div>'
+      +'<div class="day-info"><div class="day-wday">'+f.wday+'</div><div class="day-sub">'+CF[co]+' '+CN[co]+' · اليوم '+AR(dayNum)
+      +(badge?' '+badge:'')+(visits.length?' <span class="dcount">'+AR(visits.length)+' زيارة</span>':'')+'</div></div></div>'
+      +'<div class="day-body">';
+    if(visits.length){
+      visits.forEach(function(v){
+        var t=v.t,i=v.i,pr=t.pri||"high";
+        html+='<div class="vrow"><span class="vdot2'+(pr==="med"?" med":pr==="low"?" low":"")+'"></span>'
+          +'<div class="vname">'+t.hd+(t.cy?' <span class="vcity">'+t.cy+'</span>':'')+'</div>'
+          +'<a class="vmap" href="'+mapUrl(t)+'" target="_blank">\u{1F4CD} خريطة</a>'
+          +(t.att?'<a class="vmap" style="color:#854F0B" href="'+t.att+'" target="_blank" title="المرفق">\u{1F4CE}</a>':'')
+          +'<button class="vunassign" onclick="unassignDay('+i+')" title="إلغاء الإسناد">✕</button></div>';
+      });
+    } else {
+      html+='<div class="day-empty">'+(travel?"يوم سفر":"لا زيارات مسندة")+'</div>';
+    }
+    html+='</div></div>';
+  });
+  html+='</div>';
+
+  // unscheduled per country with guided picker
+  var unTot=0; Object.keys(unsched).forEach(function(co){ unTot+=unsched[co].length; });
+  if(unTot){
+    html+='<div class="unsched-wrap">';
+    CO.forEach(function(co){
+      if(!unsched[co]) return;
+      var cd=countryDays(co,days);
+      html+='<div class="unsched"><div class="unsched-t"><span>\u{1F4CC} غير مجدولة — '+CN[co]+'</span><span class="dcount">'+AR(unsched[co].length)+'</span></div>'
+        +'<div class="unsched-s">أسند كل زيارة ليوم ضمن فترة '+CN[co]+' ('+fmtLatin(cd[0])+'–'+fmtLatin(cd[cd.length-1])+'). تظهر الأيام المتاحة فقط.</div>';
+      unsched[co].forEach(function(v){
+        var t=v.t,i=v.i;
+        html+='<div class="uchip"><div class="un">'+t.hd+(t.cy?' <span class="uc">· '+t.cy+'</span>':'')+'</div>'
+          +'<button class="assignbtn" onclick="togPicker(this)">إسناد ليوم ←</button></div>'
+          +'<div class="picker"><div class="picker-hint">\u{1F4A1} اختر يوماً ضمن فترة '+CN[co]+':</div><div class="picker-days">';
+        cd.forEach(function(dd){ var ff=fmtDay(dd); html+='<button class="pday" onclick="assignDay('+i+',\''+dd+'\')">'+ff.wday+' '+ff.day+'</button>'; });
+        html+='</div></div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+
+function togPicker(btn){
+  var pk=btn.closest(".uchip").nextElementSibling;
+  var open=pk.classList.contains("open");
+  document.querySelectorAll("#tl2day .picker").forEach(function(p){ p.classList.remove("open"); });
+  document.querySelectorAll("#tl2day .assignbtn").forEach(function(a){ a.classList.remove("active"); });
+  if(!open){ pk.classList.add("open"); btn.classList.add("active"); }
+}
+window.togPicker=togPicker;
+function assignDay(i,dstr){
+  if(!tls[i]) return;
+  tls[i].dt=dstr;
+  tls.sort(function(a,b){ return a.dt>b.dt?1:-1; });
+  renT(); renTDay(); sched();
+  toast("✓ تم إسناد الزيارة");
+}
+window.assignDay=assignDay;
+function unassignDay(i){
+  if(!tls[i]) return;
+  tls[i].dt="";
+  renT(); renTDay(); sched();
+  toast("تم إلغاء الإسناد");
+}
+window.unassignDay=unassignDay;
+
+// ----- BY-CITY VIEW (cities grouped under their country, country order) -----
+function renTCity(){
+  var el=document.getElementById("tl2city");
+  if(!el) return;
+  if(!tls.length){ el.innerHTML='<div class="emp"><div class="ei">\u{1F3D9}️</div>أضف زيارات لعرضها حسب المدينة</div>'; return; }
+  // preserve open/close of city groups + visit cards
+  document.querySelectorAll("#tl2city [id^='ccy-'],#tl2city [id^='vc-']").forEach(function(e){ openState[e.id]=e.classList.contains("op"); });
+  var tree={};
+  tls.forEach(function(t,i){ var co=t.co||"sa"; var cy=(t.cy&&t.cy.trim()!=="")?t.cy:"غير معروف"; tree[co]=tree[co]||{}; (tree[co][cy]=tree[co][cy]||[]).push({t:t,i:i}); });
+  var totalDone=tls.filter(function(t){return t.done;}).length;
+  var totalPct=tls.length?Math.round(totalDone/tls.length*100):0;
+  var cityCount=0; Object.keys(tree).forEach(function(co){ cityCount+=Object.keys(tree[co]).length; });
+  var html='<div class="trip-stats">'
+    +'<div class="trip-stat"><div class="trip-stat-l">الدول</div><div class="trip-stat-v">'+AR(Object.keys(tree).length)+'</div></div>'
+    +'<div class="trip-stat"><div class="trip-stat-l">المدن</div><div class="trip-stat-v">'+AR(cityCount)+'</div></div>'
+    +'<div class="trip-stat"><div class="trip-stat-l">الزيارات</div><div class="trip-stat-v">'+AR(tls.length)+'</div></div>'
+    +'</div>'
+    +'<div class="prog-wrap"><div class="prog-hdr"><span class="prog-lbl">نسبة إنجاز الرحلة</span><span class="prog-num">'+AR(totalDone)+'/'+AR(tls.length)+' · '+AR(totalPct)+'٪</span></div>'
+    +'<div class="prog-bar"><div class="prog-fill" style="width:'+totalPct+'%"></div></div></div>';
+  CO.forEach(function(co){
+    if(!tree[co]) return;
+    var cities=Object.keys(tree[co]).sort(function(a,b){ if(a==="غير معروف")return 1; if(b==="غير معروف")return -1; return a.localeCompare(b,"ar"); });
+    var coTotal=cities.reduce(function(s,cy){return s+tree[co][cy].length;},0);
+    var coDone=cities.reduce(function(s,cy){return s+tree[co][cy].filter(function(v){return v.t.done;}).length;},0);
+    html+='<div class="city-co-hdr"><span class="city-co-name">'+CF[co]+' '+CN[co]+'</span><span class="city-co-cnt">'+AR(coDone)+'/'+AR(coTotal)+' · '+AR(cities.length)+' مدينة</span></div>';
+    cities.forEach(function(cy){
+      var visits=tree[co][cy];
+      var cyId="ccy-"+co+"-"+cy.replace(/[^a-zA-Z0-9؀-ۿ]/g,"_");
+      var done=visits.filter(function(v){return v.t.done;}).length;
+      var dates=visits.map(function(v){return v.t.dt;}).filter(Boolean).sort();
+      var dr="";
+      if(dates.length){ var fmt=function(d){var dt=safeDate(d);return dt?dt.toLocaleDateString("ar-u-nu-latn",{month:"short",day:"numeric"}):"";}; dr=dates.length===1?fmt(dates[0]):fmt(dates[0])+" – "+fmt(dates[dates.length-1]); }
+      var op=openState[cyId]!==false;
+      html+='<div class="grp-cy"><div class="grp-cy-hdr">'
+        +'<span class="grp-cy-icon">\u{1F4CD}</span>'
+        +'<span class="grp-cyname">'+cy+'</span>'
+        +(dr?'<span class="grp-cy-dates">'+dr+'</span>':'')
+        +'<span class="grp-cnt">'+AR(done)+'/'+AR(visits.length)+'</span>'
+        +'<span class="grp-chev'+(op?" op":"")+'" id="ch-'+cyId+'" onclick="togEl(\''+cyId+'\')">▼</span>'
+        +'</div><div class="grp-cy-body'+(op?" op":"")+'" id="'+cyId+'">';
+      visits.forEach(function(v){ html+=buildVisitCard(v.t,v.i); });
+      html+='</div></div>';
+    });
+  });
+  el.innerHTML=html;
+}
+
+// ----- dispatcher: render the active timeline view, clear the others -----
+var tlView=localStorage.getItem("t_tlview")||"country";
+(function(){
+  var _country=renT;
+  function clr(id){ var e=document.getElementById(id); if(e) e.innerHTML=""; }
+  renT=function(){
+    if(tlView==="day"){ renTDay(); clr("tl2"); clr("tl2city"); }
+    else if(tlView==="city"){ renTCity(); clr("tl2"); clr("tl2day"); }
+    else { _country(); clr("tl2day"); clr("tl2city"); }
+  };
+})();
+function applyTlView(){
+  var c=document.getElementById("tl2"), d=document.getElementById("tl2day"), y=document.getElementById("tl2city");
+  if(c) c.style.display=tlView==="country"?"":"none";
+  if(d) d.style.display=tlView==="day"?"":"none";
+  if(y) y.style.display=tlView==="city"?"":"none";
+  document.querySelectorAll("#tl-view-seg .sg").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-v")===tlView); });
+  renT();
+}
+document.getElementById("tl-view-seg").addEventListener("click",function(e){
+  var b=e.target.closest(".sg"); if(!b) return;
+  tlView=b.getAttribute("data-v"); localStorage.setItem("t_tlview",tlView); applyTlView();
+});
+applyTlView();
 
 // INIT
 var saved = localStorage.getItem("t_api");
