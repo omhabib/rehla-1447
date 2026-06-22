@@ -379,6 +379,10 @@ html[data-theme="dark"] .vrow{border-bottom-color:var(--surface3)}
 .vmap{font-size:11px;color:var(--bl);text-decoration:none;flex-shrink:0;font-weight:700}
 .vunassign{background:none;border:none;color:#ccc;font-size:15px;cursor:pointer;flex-shrink:0;padding:0 3px;line-height:1}
 .vunassign:active{color:var(--rd)}
+.dv-chev{font-size:9px;color:var(--t3);flex-shrink:0;cursor:pointer;transition:transform .2s;padding:3px}
+.dv-chev.op{transform:rotate(180deg)}
+.dv-body{display:none;padding:2px 26px 11px 8px}
+.dv-body.op{display:block;animation:fadeIn .2s ease}
 .day-empty{text-align:center;color:var(--t3);font-size:11.5px;padding:9px 8px;border:1.5px dashed var(--bd);border-radius:10px;margin:3px}
 .unsched{background:var(--gl);border:1px solid #C9A84C44;border-radius:15px;padding:13px;margin-top:16px}
 .unsched-t{font-family:'Amiri',serif;font-size:14px;color:var(--br);margin-bottom:3px;display:flex;justify-content:space-between;align-items:center}
@@ -1584,15 +1588,12 @@ function buildVisitCard(t, i){
   var vcId = "vc-" + i;
   var ds = t.dt ? (function(){ var dt = safeDate(t.dt); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"long", day:"numeric"}) : ""; })() : "";
   var pr = t.pri || "high";
-  var summary = t.nb || t.ml || "";
-  if (summary.length > 60) summary = summary.substring(0, 60) + "...";
   var isDone = t.done;
   return '<div class="vc vc-pri-' + pr + (isDone ? ' vc-done' : '') + '">'
     + '<div class="vc-hdr">'
     + '<button class="vc-done-btn' + (isDone ? ' on' : '') + '" onclick="event.stopPropagation();togDone(' + i + ')">' + (isDone ? '✓' : '') + '</button>'
     + '<div class="vc-info" onclick="togEl(\'' + vcId + '\')" style="cursor:pointer">'
     + '<div class="vc-title">' + t.hd + '</div>'
-    + (summary ? '<div class="vc-summary">' + summary + '</div>' : '')
     + '</div>'
     + '<span class="pri-badge ' + PRIC[pr] + '">' + PRI[pr] + '</span>'
     + (ds ? '<div class="vc-date">' + ds + '</div>' : "")
@@ -1698,7 +1699,8 @@ function renT(){
       var dateRange = "";
       if (dates.length > 0) {
         var fmt = function(d){ var dt = safeDate(d); return dt ? dt.toLocaleDateString("ar-u-nu-latn", {month:"short", day:"numeric"}) : ""; };
-        dateRange = dates.length === 1 ? fmt(dates[0]) : fmt(dates[0]) + " \u2013 " + fmt(dates[dates.length - 1]);
+        var d0 = fmt(dates[0]), d1 = fmt(dates[dates.length - 1]);
+        dateRange = (d0 === d1) ? d0 : d0 + " \u2013 " + d1;
       }
 
       var cyIcon = cy === "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" ? "\u{1F4CD}" : "\u{1F4CD}";
@@ -2567,12 +2569,20 @@ function renTDay(){
       +'<div class="day-body">';
     if(visits.length){
       visits.forEach(function(v){
-        var t=v.t,i=v.i,pr=t.pri||"high";
+        var t=v.t,i=v.i,pr=t.pri||"high",dvId="dvb-"+i;
         html+='<div class="vrow"><span class="vdot2'+(pr==="med"?" med":pr==="low"?" low":"")+'"></span>'
-          +'<div class="vname">'+t.hd+(t.cy?' <span class="vcity">'+t.cy+'</span>':'')+'</div>'
-          +'<a class="vmap" href="'+mapUrl(t)+'" target="_blank">\u{1F4CD} خريطة</a>'
+          +'<div class="vname" onclick="togEl(\''+dvId+'\')" style="cursor:pointer">'+t.hd+'</div>'
+          +'<span class="dv-chev'+(openState[dvId]?" op":"")+'" id="ch-'+dvId+'" onclick="togEl(\''+dvId+'\')">▼</span>'
+          +'<a class="vmap" href="'+mapUrl(t)+'" target="_blank" title="افتح في الخريطة">\u{1F4CD}</a>'
           +(t.att?'<a class="vmap" style="color:#854F0B" href="'+t.att+'" target="_blank" title="المرفق">\u{1F4CE}</a>':'')
-          +'<button class="vunassign" onclick="unassignDay('+i+')" title="إلغاء الإسناد">✕</button></div>';
+          +'<button class="vunassign" onclick="unassignDay('+i+')" title="إلغاء الإسناد">✕</button></div>'
+          +'<div class="dv-body'+(openState[dvId]?" op":"")+'" id="'+dvId+'">'
+          +(t.cy?'<div class="tf"><div class="tfl">المدينة</div><div class="tfv">'+t.cy+'</div></div>':'')
+          +(t.nb?'<div class="tf"><div class="tfl">نبذة</div><div class="tfv">'+t.nb+'</div></div>':'')
+          +(t.ml?'<div class="tf"><div class="tfl">المطلوب</div><div class="tfv">'+t.ml+'</div></div>':'')
+          +(t.nt?'<div class="tf"><div class="tfl">ملاحظات</div><div class="tfv">'+t.nt+'</div></div>':'')
+          +(!t.cy&&!t.nb&&!t.ml&&!t.nt?'<div class="tf"><div class="tfv mu">لا توجد تفاصيل بعد</div></div>':'')
+          +'</div>';
       });
     } else {
       html+='<div class="day-empty">'+(travel?"يوم سفر":"لا زيارات مسندة")+'</div>';
@@ -2660,7 +2670,7 @@ function renTCity(){
       var done=visits.filter(function(v){return v.t.done;}).length;
       var dates=visits.map(function(v){return v.t.dt;}).filter(Boolean).sort();
       var dr="";
-      if(dates.length){ var fmt=function(d){var dt=safeDate(d);return dt?dt.toLocaleDateString("ar-u-nu-latn",{month:"short",day:"numeric"}):"";}; dr=dates.length===1?fmt(dates[0]):fmt(dates[0])+" – "+fmt(dates[dates.length-1]); }
+      if(dates.length){ var fmt=function(d){var dt=safeDate(d);return dt?dt.toLocaleDateString("ar-u-nu-latn",{month:"short",day:"numeric"}):"";}; var d0=fmt(dates[0]),d1=fmt(dates[dates.length-1]); dr=(d0===d1)?d0:d0+" – "+d1; }
       var op=openState[cyId]!==false;
       html+='<div class="grp-cy"><div class="grp-cy-hdr">'
         +'<span class="grp-cy-icon">\u{1F4CD}</span>'
