@@ -1173,8 +1173,10 @@ function saveApi(){
   pull();
 }
 
+function anyEditModalOpen(){ return !!document.querySelector(".modal-bg:not(.hidden)"); }
 function pull(){
   if (dirty) return;
+  if (anyEditModalOpen()) return; // \u0644\u0627 \u062A\u064F\u062D\u062F\u0651\u062B \u0623\u062B\u0646\u0627\u0621 \u0641\u062A\u062D \u0646\u0627\u0641\u0630\u0629 \u062A\u0639\u062F\u064A\u0644 (\u064A\u0645\u0646\u0639 \u0625\u0632\u0627\u062D\u0629 \u0627\u0644\u062A\u0631\u0642\u064A\u0645 \u0648\u062A\u0644\u0641 \u0627\u0644\u062D\u0641\u0638)
   dot("sy", "\u062C\u0627\u0631\u064A...");
   fetch(API + "?t=" + Date.now())
     .then(function(r){ return r.json(); })
@@ -1189,7 +1191,7 @@ function pull(){
 function parse(rows){
   // Snapshot local done states BEFORE overwriting (read-only, no push)
   var prevTlDone = {};
-  tls.forEach(function(t){ if (t.done) prevTlDone[t.co+"|"+t.cy+"|"+t.dt+"|"+t.hd] = true; });
+  tls.forEach(function(t){ if (t.done) prevTlDone[t.co+"|"+t.cy+"|"+dateKey(t.dt)+"|"+t.hd] = true; });
   exps = []; tls = []; var b = "";
   var seenE = {}, seenT = {};
   rows.forEach(function(r){
@@ -1216,10 +1218,10 @@ function parse(rows){
       exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
     }
     else if (r[0] === "T") {
-      var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+(r[3]||"")+"|"+(r[4]||"");
+      var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||"");
       if (seenT[kT]) return;
       seenT[kT] = true;
-      var isDone = r[9]==="1" || !!prevTlDone[r[1]+"|"+r[2]+"|"+r[3]+"|"+r[4]];
+      var isDone = r[9]==="1" || !!prevTlDone[r[1]+"|"+r[2]+"|"+dateKey(r[3])+"|"+r[4]];
       tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone, att:r[10]||""});
     }
   });
@@ -1241,7 +1243,7 @@ function buildRows(){
 }
 
 var dirty = false;
-function sched(){ saveLoc(); dirty = true; clearTimeout(sv); sv = setTimeout(push, 1400); }
+function sched(){ saveLoc(); dirty = true; try{localStorage.setItem("t_dirty","1");}catch(e){} clearTimeout(sv); sv = setTimeout(push, 1400); }
 
 var pushRetry = 0;
 function push(){
@@ -1250,7 +1252,7 @@ function push(){
   busy = true;
   dot("sy", "\u064A\u062D\u0641\u0638...");
   fetch(API, {method: "POST", body: JSON.stringify({action: "save", rows: buildRows()}), redirect: "follow"})
-    .then(function(){ dot("ok", "\u062A\u0645"); toast("\u2713 \u062A\u0645 \u0627\u0644\u062D\u0641\u0638 \u0648\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"); busy = false; dirty = false; pushRetry = 0; })
+    .then(function(){ dot("ok", "\u062A\u0645"); toast("\u2713 \u062A\u0645 \u0627\u0644\u062D\u0641\u0638 \u0648\u0627\u0644\u0645\u0632\u0627\u0645\u0646\u0629"); busy = false; dirty = false; pushRetry = 0; try{localStorage.removeItem("t_dirty");}catch(e){} })
     .catch(function(){
       busy = false;
       pushRetry++;
@@ -1274,6 +1276,8 @@ window.addEventListener("beforeunload", function(){
     if (API) navigator.sendBeacon(API, JSON.stringify({action: "save", rows: buildRows()}));
   }
 });
+// Auto-sync pending changes when the connection comes back
+window.addEventListener("online", function(){ if (dirty && !busy) { pushRetry = 0; push(); } });
 
 function saveLoc(){
   try {
@@ -1733,7 +1737,7 @@ function editT(i){
   document.getElementById("edit-idx").value = i;
   document.getElementById("edit-co").value = t.co;
   document.getElementById("edit-cy").value = t.cy || "";
-  document.getElementById("edit-dt").value = t.dt || "";
+  document.getElementById("edit-dt").value = dateKey(t.dt);
   document.getElementById("edit-hd").value = t.hd;
   document.getElementById("edit-nb").value = t.nb || "";
   document.getElementById("edit-ml").value = t.ml || "";
@@ -2016,8 +2020,8 @@ function editBk(i){
   document.getElementById("edit-bk-type").value = b.type;
   document.getElementById("edit-bk-co").value = b.co;
   document.getElementById("edit-bk-title").value = b.title;
-  document.getElementById("edit-bk-date").value = b.dt || "";
-  document.getElementById("edit-bk-time").value = b.tm || "";
+  document.getElementById("edit-bk-date").value = dateKey(b.dt);
+  document.getElementById("edit-bk-time").value = fmtBkTime(b.tm);
   document.getElementById("edit-bk-status").value = b.status;
   document.getElementById("edit-bk-ref").value = b.ref || "";
   document.getElementById("edit-bk-cost").value = b.cost || "";
@@ -2162,13 +2166,13 @@ function dedupAll(){
   exps.forEach(function(e){ var k = (e.nm||"")+"|"+(e.ct||"")+"|"+(e.co||"")+"|"+(+e.am||0); if (!sE[k]){ sE[k]=true; nE.push(e); } });
   exps = nE;
   var sT = {}, nT = [];
-  tls.forEach(function(t){ var k = (t.co||"")+"|"+(t.cy||"")+"|"+(t.dt||"")+"|"+(t.hd||""); if (!sT[k]){ sT[k]=true; nT.push(t); } });
+  tls.forEach(function(t){ var k = (t.co||"")+"|"+(t.cy||"")+"|"+dateKey(t.dt)+"|"+(t.hd||""); if (!sT[k]){ sT[k]=true; nT.push(t); } });
   tls = nT;
   var sK = {}, nK = [];
-  bks.forEach(function(b){ var k = (b.type||"")+"|"+(b.title||"")+"|"+(b.dt||""); if (!sK[k]){ sK[k]=true; nK.push(b); } });
+  bks.forEach(function(b){ var k = (b.type||"")+"|"+(b.title||"")+"|"+dateKey(b.dt); if (!sK[k]){ sK[k]=true; nK.push(b); } });
   bks = nK;
   var sM = {}, nM = [];
-  tasks.forEach(function(t){ var k = (t.name||"")+"|"+(t.dt||""); if (!sM[k]){ sM[k]=true; nM.push(t); } });
+  tasks.forEach(function(t){ var k = (t.name||"")+"|"+dateKey(t.dt); if (!sM[k]){ sM[k]=true; nM.push(t); } });
   tasks = nM;
 }
 
@@ -2189,22 +2193,22 @@ var _parse = parse;
 parse = function(rows){
   // Snapshot local task done states (read-only, no push)
   var prevTkDone = {};
-  tasks.forEach(function(t){ if (t.done) prevTkDone[t.name+"|"+(t.dt||"")] = true; });
+  tasks.forEach(function(t){ if (t.done) prevTkDone[t.name+"|"+dateKey(t.dt)] = true; });
   _parse(rows);
   bks = []; tasks = [];
   var seenK = {}, seenM = {};
   rows.forEach(function(r){
     if (r[0] === "K") {
-      var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+(r[4]||"");
+      var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+dateKey(r[4]);
       if (seenK[kK]) return;
       seenK[kK] = true;
       bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||"", att:r[11]||""});
     }
     if (r[0] === "M") {
-      var kM = (r[1]||"")+"|"+(r[2]||"");
+      var kM = (r[1]||"")+"|"+dateKey(r[2]);
       if (seenM[kM]) return;
       seenM[kM] = true;
-      var isDone = r[6]==="1" || !!prevTkDone[r[1]+"|"+r[2]];
+      var isDone = r[6]==="1" || !!prevTkDone[r[1]+"|"+dateKey(r[2])];
       tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:isDone});
     }
   });
@@ -2378,7 +2382,7 @@ function editTk(i){
   var t=tasks[i]; if(!t) return;
   document.getElementById("edit-tk-idx").value=i;
   document.getElementById("edit-tk-name").value=t.name;
-  document.getElementById("edit-tk-date").value=t.dt||"";
+  document.getElementById("edit-tk-date").value=dateKey(t.dt);
   document.getElementById("edit-tk-pri").value=t.pri||"high";
   document.getElementById("edit-tk-notes").value=t.notes||"";
   var assign=(t.assign&&t.assign.length)?t.assign:["omar","majed","waseem"];
@@ -2716,13 +2720,15 @@ var saved = localStorage.getItem("t_api");
 if (saved){ API = saved; document.getElementById("cfg-banner").style.display = "none"; }
 // Reset cache: open page with ?reset to force reload from Sheets
 if (location.search.indexOf("reset") >= 0) {
-  ["t_e","t_t","t_b","t_k","t_m"].forEach(function(k){ localStorage.removeItem(k); });
+  ["t_e","t_t","t_b","t_k","t_m","t_dirty"].forEach(function(k){ localStorage.removeItem(k); });
   exps = []; tls = []; tasks = []; bks = [];
   toast("\u062A\u0645 \u0645\u0633\u062D \u0627\u0644\u0643\u0627\u0634 - \u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644 \u0645\u0646 Sheets...");
   history.replaceState(null, "", location.pathname);
 } else {
   loadLoc();
 }
+// \u0625\u0646 \u0648\u064F\u062C\u062F\u062A \u062A\u063A\u064A\u064A\u0631\u0627\u062A \u0645\u062D\u0644\u064A\u0629 \u0644\u0645 \u062A\u064F\u0631\u0641\u0639 (\u0625\u063A\u0644\u0627\u0642 \u0623\u062B\u0646\u0627\u0621 \u0627\u0646\u0642\u0637\u0627\u0639 \u0627\u0644\u0625\u0646\u062A\u0631\u0646\u062A): \u0627\u062D\u0645\u0650\u0647\u0627 \u0648\u0627\u0631\u0641\u0639\u0647\u0627\u060C \u0648\u0644\u0627 \u062A\u064E\u062F\u064E\u0639 pull \u064A\u0643\u062A\u0628 \u0641\u0648\u0642\u0647\u0627
+if (localStorage.getItem("t_dirty") === "1") { dirty = true; push(); }
 pull();
 
 })();
