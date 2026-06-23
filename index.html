@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>الرحلة الصيفية الثانية ١٤٤٧هـ</title>
+<title>الرحلة الصيفية الثانية ١٤٤٨هـ</title>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -490,7 +490,7 @@ html[data-theme="dark"] .report-btn{color:var(--gold)}
 <div class="hdr">
   <div class="hdr-pat"></div>
   <div class="hdr-in">
-    <div class="hdr-title">الرحلة الصيفية الثانية ١٤٤٧هـ</div>
+    <div class="hdr-title">الرحلة الصيفية الثانية ١٤٤٨هـ</div>
     <div class="hdr-ctrls">
       <button class="icon-btn" id="btn-theme" title="الوضع الليلي">&#x1F319;</button>
       <button class="icon-btn locked" id="btn-lock" title="وضع التحرير">&#x1F512;</button>
@@ -1936,11 +1936,13 @@ function flightPrayer(title){
   return FLIGHT_PRAYERS[codes[0] + "-" + codes[1]] || "";
 }
 // Robust HH:MM extraction (handles clean "07:00" and dirty "1899-12-30T07:00:00.000Z")
+// Google Sheets يخزّن الوقت بإزاحة منطقتها الزمنية (UTC-6) فيعود الوقت +6 ساعات؛ نعكسها هنا للعرض
+var SHEET_TM_OFFSET = 6;
 function fmtBkTime(tm){
   if (!tm) return "";
   if (/^\d{1,2}:\d{2}/.test(tm)) { var p = tm.match(/^(\d{1,2}):(\d{2})/); return ("0"+p[1]).slice(-2)+":"+p[2]; }
   var d = new Date(tm);
-  if (!isNaN(d.getTime())) return ("0"+d.getUTCHours()).slice(-2)+":"+("0"+d.getUTCMinutes()).slice(-2);
+  if (!isNaN(d.getTime())) { var h = (d.getUTCHours() - SHEET_TM_OFFSET + 24) % 24; return ("0"+h).slice(-2)+":"+("0"+d.getUTCMinutes()).slice(-2); }
   var m = String(tm).match(/(\d{1,2}):(\d{2})/);
   return m ? (("0"+m[1]).slice(-2)+":"+m[2]) : "";
 }
@@ -2247,7 +2249,7 @@ function buildReport(){
   var setl=[],di=0,ci=0;
   while(di<debt.length&&ci<cred.length){ var tr=Math.min(debt[di].a,cred[ci].a); if(tr>0.5) setl.push(debt[di].n+" يدفع لـ"+cred[ci].n+": "+FM(tr)+" ر.س"); debt[di].a-=tr; cred[ci].a-=tr; if(debt[di].a<0.5)di++; if(cred[ci].a<0.5)ci++; }
 
-  var h='<div class="rp-title">الرحلة الصيفية الثانية ١٤٤٧هـ</div>';
+  var h='<div class="rp-title">الرحلة الصيفية الثانية ١٤٤٨هـ</div>';
   h+='<div class="rp-sub">٣ – ٢٣ يوليو ٢٠٢٦ · عمر · ماجد · وسيم</div>';
 
   h+='<div class="rp-sec">💰 الميزانية</div>';
