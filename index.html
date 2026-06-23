@@ -452,6 +452,16 @@ html[data-theme="dark"] .report-btn{color:var(--gold)}
   body.rep-open .rp-actions{display:none!important}
 }
 
+/* ===== CONTRIBUTIONS TRACKER ===== */
+.contrib-row{margin-bottom:11px}
+.contrib-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.contrib-name{font-size:13px;font-weight:700;color:var(--br)}
+.contrib-vals{font-size:11px;color:var(--t3);font-weight:700;direction:rtl}
+.contrib-bar{height:8px;background:#e8dcc8;border-radius:8px;overflow:hidden}
+html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
+.contrib-fill{height:100%;background:linear-gradient(90deg,#378ADD,#185FA5);border-radius:8px;transition:width .5s}
+.contrib-fill.done{background:linear-gradient(90deg,var(--gn),#4caf50)}
+
 /* ===== RESPONSIVE: DESKTOP (Stage 2) ===== */
 .bgrid>*{min-width:0}
 @media(min-width:760px){
@@ -569,6 +579,22 @@ html[data-theme="dark"] .report-btn{color:var(--gold)}
   <div class="co-tabs" id="budget-co-tabs"></div>
 
   <div id="sa"></div>
+
+  <div class="card" id="contrib-card">
+    <div class="stitle">&#x1F4B8; المساهمات</div>
+    <div id="contrib-summary"></div>
+    <div class="edit-only" style="margin-top:8px">
+      <div class="g3">
+        <div><label class="lbl">مَن حوّل؟</label>
+          <select class="fi" id="c-who"><option value="omar">عمر</option><option value="majed">ماجد</option><option value="waseem">وسيم</option></select>
+        </div>
+        <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="c-amount" placeholder="&#x0660;"></div>
+        <div><label class="lbl">ملاحظة</label><input class="fi" type="text" id="c-note" placeholder="تحويل أول"></div>
+      </div>
+      <button class="btn" id="btn-add-c" style="margin-top:2px">إضافة تحويل</button>
+    </div>
+    <div id="contrib-list"></div>
+  </div>
   </div><!-- /bcol-a -->
 
   <div class="bcol-b">
@@ -632,6 +658,14 @@ html[data-theme="dark"] .report-btn{color:var(--gold)}
           <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-waseem" placeholder="٠"></div>
         </div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="pay-sum-hint"></div>
+      </div>
+    </div>
+    <div class="mb">
+      <label class="lbl">مَن يشاركون التكلفة؟ (للتسوية)</label>
+      <div class="seg" id="share-seg">
+        <button class="sg on" data-sh="omar">عمر</button>
+        <button class="sg on" data-sh="majed">ماجد</button>
+        <button class="sg on" data-sh="waseem">وسيم</button>
       </div>
     </div>
     <button class="btn" id="btn-add-exp">تسجيل المصروف</button>
@@ -985,6 +1019,14 @@ html[data-theme="dark"] .report-btn{color:var(--gold)}
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="edit-pay-sum-hint"></div>
       </div>
     </div>
+    <div class="mb">
+      <label class="lbl">مَن يشاركون التكلفة؟ (للتسوية)</label>
+      <div class="seg" id="edit-share-seg">
+        <button class="sg on" data-sh="omar">عمر</button>
+        <button class="sg on" data-sh="majed">ماجد</button>
+        <button class="sg on" data-sh="waseem">وسيم</button>
+      </div>
+    </div>
     <button class="btn" id="btn-save-edit-e" style="margin-bottom:10px">حفظ التعديل</button>
     <button id="btn-cancel-edit-e" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
   </div>
@@ -1152,7 +1194,7 @@ document.getElementById("filter-row").addEventListener("click", function(e){
 });
 
 // Budget input
-document.getElementById("tb").addEventListener("input", function(){ calc(); sched(); });
+document.getElementById("tb").addEventListener("input", function(){ calc(); renC(); sched(); });
 
 // Modal
 document.getElementById("cfg-btn-link").addEventListener("click", openModal);
@@ -1215,7 +1257,7 @@ function parse(rows){
         payArr = [payVal];
         payAmts = {}; payAmts[payVal] = +r[2];
       }
-      exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts});
+      exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts, share:(r[7]||"").split("+").filter(Boolean)});
     }
     else if (r[0] === "T") {
       var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||"");
@@ -1236,7 +1278,7 @@ function buildRows(){
   exps.forEach(function(e){
     var payStr = Array.isArray(e.pay) ? e.pay.join("+") : e.pay;
     var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
-    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr]);
+    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr, (e.share && e.share.length && e.share.length < 3) ? e.share.join("+") : ""]);
   });
   tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0", t.att||""]); });
   return rows;
@@ -1329,16 +1371,70 @@ function addE(){
     }
   }
 
-  exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo});
+  exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
   document.getElementById("en2").value = "";
   document.getElementById("ea2").value = "";
   ["pa-omar","pa-majed","pa-waseem"].forEach(function(id){ document.getElementById(id).value = ""; });
   document.getElementById("pay-sum-hint").textContent = "";
+  share = ["omar","majed","waseem"];
+  document.querySelectorAll("#share-seg .sg").forEach(function(x){ x.classList.add("on"); });
   calc(); renE(); sched();
 }
+// who shares the cost (for settlement) — add form
+var share = ["omar","majed","waseem"];
+document.getElementById("share-seg").addEventListener("click", function(e){
+  var btn = e.target.closest(".sg"); if(!btn) return;
+  btn.classList.toggle("on");
+  share = [];
+  document.querySelectorAll("#share-seg .sg.on").forEach(function(x){ share.push(x.getAttribute("data-sh")); });
+  if(share.length === 0){ btn.classList.add("on"); share = [btn.getAttribute("data-sh")]; }
+});
 
 function delE(i){ exps.splice(i, 1); calc(); renE(); sched(); }
 window.delE = delE;
+
+// ===== CONTRIBUTIONS TRACKER =====
+var CPN = {omar:"عمر", majed:"ماجد", waseem:"وسيم"};
+function renC(){
+  var sumEl = document.getElementById("contrib-summary");
+  if (!sumEl) return;
+  var listEl = document.getElementById("contrib-list");
+  var target = (parseFloat(document.getElementById("tb").value)||0) / 3;
+  var totals = {omar:0, majed:0, waseem:0};
+  contribs.forEach(function(c){ if (totals[c.who] !== undefined) totals[c.who] += (c.amount||0); });
+  var html = "";
+  ["omar","majed","waseem"].forEach(function(p){
+    var paid = totals[p], rem = Math.max(0, target - paid);
+    var pct = target>0 ? Math.min(100, Math.round(paid/target*100)) : 0;
+    html += '<div class="contrib-row"><div class="contrib-head"><span class="contrib-name">'+CPN[p]+'</span>'
+      + '<span class="contrib-vals">'+FM(paid)+' / '+FM(target)+(rem>0?' · باقٍ '+FM(rem):' &#x2713;')+'</span></div>'
+      + '<div class="contrib-bar"><div class="contrib-fill'+(rem<=0&&target>0?' done':'')+'" style="width:'+pct+'%"></div></div></div>';
+  });
+  sumEl.innerHTML = html;
+  if (!contribs.length){ listEl.innerHTML = ""; return; }
+  var lh = '<div style="font-size:11px;color:var(--t3);font-weight:700;margin:12px 0 4px">سجل التحويلات</div>';
+  contribs.forEach(function(c, i){
+    lh += '<div class="er">'
+      + '<button class="dl" onclick="delC('+i+')">&#x2715;</button>'
+      + '<span class="pt pt'+(c.who==="omar"?"o":c.who==="majed"?"m":"w")+'">'+CPN[c.who]+'</span>'
+      + '<span class="en2">'+(c.note||"تحويل")+'</span>'
+      + '<span class="ea">'+FM(c.amount)+'</span></div>';
+  });
+  listEl.innerHTML = lh;
+}
+document.getElementById("btn-add-c").addEventListener("click", function(){
+  var who = document.getElementById("c-who").value;
+  var amount = parseFloat(document.getElementById("c-amount").value);
+  var note = document.getElementById("c-note").value.trim();
+  if (!amount || amount <= 0){ toast("⚠️ أدخل مبلغ التحويل"); return; }
+  contribs.push({who:who, amount:amount, note:note});
+  document.getElementById("c-amount").value = "";
+  document.getElementById("c-note").value = "";
+  renC(); sched();
+  toast("✓ تم تسجيل التحويل");
+});
+function delC(i){ contribs.splice(i, 1); renC(); sched(); }
+window.delC = delC;
 
 function calc(){
   var tot = parseFloat(document.getElementById("tb").value) || 0;
@@ -1388,15 +1484,17 @@ function calc(){
   document.getElementById("ms2").textContent = FM(mSh) + " \u0631.\u0633";
   document.getElementById("ws2").textContent = FM(wSh) + " \u0631.\u0633";
 
-  // Calculate net settlement between three people
-  // Each person's fair share = total_spent / 3
-  // What each person should have paid = sp / 3
-  // If person paid MORE than their share, they are owed money
-  // If person paid LESS, they owe money
-  var fairShare = sp / 3;
-  var oNet = oP - fairShare; // positive = overpaid (is owed), negative = underpaid (owes)
-  var mNet = mP - fairShare;
-  var wNet = wP - fairShare;
+  // Calculate net settlement: each person's owed share = sum of (expense / participants) for expenses they share
+  // (most expenses shared by all 3; some — like personal visas — only by 2)
+  var owe = {omar:0, majed:0, waseem:0};
+  exps.forEach(function(e){
+    var parts = (e.share && e.share.length) ? e.share : ["omar","majed","waseem"];
+    var per = e.am / parts.length;
+    parts.forEach(function(p){ if (owe[p] !== undefined) owe[p] += per; });
+  });
+  var oNet = oP - owe.omar; // positive = overpaid (is owed), negative = underpaid (owes)
+  var mNet = mP - owe.majed;
+  var wNet = wP - owe.waseem;
 
   var ob = document.getElementById("ob"), mb = document.getElementById("mb2"), wb = document.getElementById("wb2");
 
@@ -1951,6 +2049,7 @@ var BT = {flight:"\u2708\uFE0F",hotel:"\u{1F3E8}",car:"\u{1F697}",visa:"\u{1F4C4
 var BTN = {flight:"\u0637\u064A\u0631\u0627\u0646",hotel:"\u0641\u0646\u062F\u0642",car:"\u0633\u064A\u0627\u0631\u0629",visa:"\u062A\u0623\u0634\u064A\u0631\u0629",activity:"\u0646\u0634\u0627\u0637",other:"\u0623\u062E\u0631\u0649"};
 var BSN = {confirmed:"\u0645\u0624\u0643\u062F",pending:"\u0645\u0639\u0644\u0651\u0642",cancelled:"\u0645\u0644\u063A\u064A"};
 var bks = [], bkFil = "all", bkTravelers = ["omar","majed","waseem"];
+var contribs = []; // المساهمات/التحويلات: {who, amount, note}
 
 // Default booking data from PDF
 var defaultBks = [];
@@ -2143,6 +2242,7 @@ saveLoc = function(){
   try {
     localStorage.setItem("t_k", JSON.stringify(bks));
     localStorage.setItem("t_m", JSON.stringify(tasks));
+    localStorage.setItem("t_c", JSON.stringify(contribs));
   } catch(e){}
 };
 
@@ -2158,8 +2258,9 @@ loadLoc = function(){
     var m = localStorage.getItem("t_m");
     if (m) { tasks = JSON.parse(m); tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; }); }
   } catch(e){}
+  try { var cc = localStorage.getItem("t_c"); if (cc) contribs = JSON.parse(cc); } catch(e){}
   dedupAll();
-  renBk(); renTk();
+  renBk(); renTk(); renC();
 };
 
 // Dedup in-memory arrays by unique keys (safe: only removes exact duplicates)
@@ -2188,6 +2289,9 @@ buildRows = function(){
   tasks.forEach(function(t){
     rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
   });
+  contribs.forEach(function(c){
+    rows.push(["C", c.who, c.amount||0, c.note||""]);
+  });
   return rows;
 };
 
@@ -2197,9 +2301,10 @@ parse = function(rows){
   var prevTkDone = {};
   tasks.forEach(function(t){ if (t.done) prevTkDone[t.name+"|"+dateKey(t.dt)] = true; });
   _parse(rows);
-  bks = []; tasks = [];
+  bks = []; tasks = []; contribs = [];
   var seenK = {}, seenM = {};
   rows.forEach(function(r){
+    if (r[0] === "C") { contribs.push({who:r[1], amount:+r[2]||0, note:r[3]||""}); }
     if (r[0] === "K") {
       var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+dateKey(r[4]);
       if (seenK[kK]) return;
@@ -2216,7 +2321,7 @@ parse = function(rows){
   });
   bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
-  saveLoc(); renBk(); renTk();
+  saveLoc(); renBk(); renTk(); renC();
 };
 
 // Auto refresh every 30s
@@ -2334,10 +2439,20 @@ function editE(i){
   document.querySelectorAll("#edit-split-mode-seg .sg").forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-mode")===editSplitMode); });
   ["omar","majed","waseem"].forEach(function(p){ document.getElementById("edit-pa-"+p).value=(e.payAmts&&e.payAmts[p])?e.payAmts[p]:""; });
   document.getElementById("edit-pay-sum-hint").textContent="";
+  var shr = (e.share && e.share.length) ? e.share : ["omar","majed","waseem"];
+  editShare = shr.slice();
+  document.querySelectorAll("#edit-share-seg .sg").forEach(function(b){ b.classList.toggle("on", editShare.indexOf(b.getAttribute("data-sh"))>=0); });
   updateEditPayUI();
   document.getElementById("edit-e-modal-bg").classList.remove("hidden");
 }
 window.editE=editE;
+var editShare = ["omar","majed","waseem"];
+document.getElementById("edit-share-seg").addEventListener("click",function(e){
+  var btn=e.target.closest(".sg"); if(!btn) return;
+  btn.classList.toggle("on");
+  editShare=[]; document.querySelectorAll("#edit-share-seg .sg.on").forEach(function(x){ editShare.push(x.getAttribute("data-sh")); });
+  if(!editShare.length){ btn.classList.add("on"); editShare=[btn.getAttribute("data-sh")]; }
+});
 document.getElementById("edit-pay-seg").addEventListener("click",function(e){
   var btn=e.target.closest(".sg"); if(!btn) return;
   var p=btn.getAttribute("data-pay"); btn.classList.toggle("on");
@@ -2372,7 +2487,7 @@ document.getElementById("btn-save-edit-e").addEventListener("click",function(){
   if(editPay.length===1){ payInfo[editPay[0]]=am; }
   else if(editSplitMode==="equal"){ var each=am/editPay.length; editPay.forEach(function(p){ payInfo[p]=each; }); }
   else { var sum=0; editPay.forEach(function(p){ var v=parseFloat(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
-  exps[i]={nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo};
+  exps[i]={nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
   document.getElementById("edit-e-modal-bg").classList.add("hidden");
   calc(); renE(); sched();
   toast("✓ تم تعديل المصروف");
@@ -2722,8 +2837,8 @@ var saved = localStorage.getItem("t_api");
 if (saved){ API = saved; document.getElementById("cfg-banner").style.display = "none"; }
 // Reset cache: open page with ?reset to force reload from Sheets
 if (location.search.indexOf("reset") >= 0) {
-  ["t_e","t_t","t_b","t_k","t_m","t_dirty"].forEach(function(k){ localStorage.removeItem(k); });
-  exps = []; tls = []; tasks = []; bks = [];
+  ["t_e","t_t","t_b","t_k","t_m","t_c","t_dirty"].forEach(function(k){ localStorage.removeItem(k); });
+  exps = []; tls = []; tasks = []; bks = []; contribs = [];
   toast("\u062A\u0645 \u0645\u0633\u062D \u0627\u0644\u0643\u0627\u0634 - \u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u0645\u064A\u0644 \u0645\u0646 Sheets...");
   history.replaceState(null, "", location.pathname);
 } else {
