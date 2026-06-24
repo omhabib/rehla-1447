@@ -1407,7 +1407,7 @@ function renC(){
     var paid = totals[p], rem = Math.max(0, target - paid);
     var pct = target>0 ? Math.min(100, Math.round(paid/target*100)) : 0;
     html += '<div class="contrib-row"><div class="contrib-head"><span class="contrib-name">'+CPN[p]+'</span>'
-      + '<span class="contrib-vals">'+FM(paid)+' / '+FM(target)+(rem>0?' · باقٍ '+FM(rem):' &#x2713;')+'</span></div>'
+      + '<span class="contrib-vals">'+FM(paid)+' / '+FM(target)+(rem>0?' · الباقي '+FM(rem):' &#x2713;')+'</span></div>'
       + '<div class="contrib-bar"><div class="contrib-fill'+(rem<=0&&target>0?' done':'')+'" style="width:'+pct+'%"></div></div></div>';
   });
   sumEl.innerHTML = html;
