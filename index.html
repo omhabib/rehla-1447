@@ -341,7 +341,7 @@ html[data-theme="dark"].view-mode .view-badge{color:var(--gold)}
 .pc-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bd);transition:all .2s}
 .pc-dot.fill{background:var(--gold);border-color:var(--gold)}
 .pc-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.pc-key{padding:15px 0;border:1px solid var(--bd);border-radius:13px;background:var(--surface);font-family:'Tajawal',sans-serif;font-size:21px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .12s}
+.pc-key{padding:15px 0;border:1px solid var(--bd);border-radius:13px;background:var(--surface);font-family:'Tajawal',sans-serif;font-size:21px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .12s;text-align:center}
 .pc-key:active{background:var(--gl);transform:scale(.95)}
 .pc-key.wide{font-size:15px}
 .pc-shake{animation:shake .4s}
@@ -1371,6 +1371,14 @@ function addE(){
     }
   }
 
+  // auto-number duplicate names so identical expenses aren't merged on sync
+  var origNm = nm;
+  if (exps.some(function(e){ return e.nm === nm; })) {
+    var arDig = function(x){ return String(x).replace(/[0-9]/g, function(dg){ return "٠١٢٣٤٥٦٧٨٩"[+dg]; }); };
+    var base = nm, n = 2;
+    while (exps.some(function(e){ return e.nm === base + " " + arDig(n); })) n++;
+    nm = base + " " + arDig(n);
+  }
   exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
   document.getElementById("en2").value = "";
   document.getElementById("ea2").value = "";
@@ -1379,6 +1387,7 @@ function addE(){
   share = ["omar","majed","waseem"];
   document.querySelectorAll("#share-seg .sg").forEach(function(x){ x.classList.add("on"); });
   calc(); renE(); sched();
+  if (nm !== origNm) toast("سُجّل باسم «" + nm + "» لتمييزه");
 }
 // who shares the cost (for settlement) — add form
 var share = ["omar","majed","waseem"];
