@@ -407,6 +407,17 @@ html.view-mode .assignbtn,html.view-mode .vunassign,html.view-mode .picker{displ
 .vc-att:active{background:var(--surface3)}
 html[data-theme="dark"] .vc-att{color:var(--gold)}
 .vc-img{max-height:160px;max-width:100%;border-radius:11px;border:1px solid var(--bd);cursor:zoom-in;margin-top:10px;display:block;object-fit:cover}
+/* multi-attachment editor rows */
+.att-row{display:flex;gap:6px;align-items:center;margin-bottom:7px}
+.att-row .att-u{flex:1.2;min-width:0}
+.att-row .att-d{flex:1;min-width:0;font-size:13px}
+.att-del{flex-shrink:0;width:34px;height:38px;border:1.5px solid var(--bd);border-radius:10px;background:var(--wh);color:var(--rd);font-size:18px;line-height:1;cursor:pointer;font-family:'Tajawal',sans-serif}
+.att-del:active{background:var(--gl)}
+.att-add{width:100%;padding:9px;border:1.5px dashed var(--gold);border-radius:10px;background:none;color:#854F0B;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:2px}
+.att-add:active{background:var(--gl)}
+html[data-theme="dark"] .att-add{color:var(--gold)}
+.att-view-img{margin-top:10px}
+.att-cap{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5}
 .imgbox{position:fixed;inset:0;background:#000e;z-index:600;display:flex;align-items:center;justify-content:center;padding:18px;cursor:zoom-out}
 .imgbox.hidden{display:none}
 .imgbox img{max-width:100%;max-height:100%;border-radius:10px;object-fit:contain;box-shadow:0 8px 40px #000}
@@ -805,7 +816,11 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
     </div>
     <div class="mb"><label class="lbl">ملاحظات (اختياري)</label><textarea class="fi" id="bk-notes" placeholder="رابط الحجز، تفاصيل إضافية..."></textarea></div>
-    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط تذكرة/PDF)</label><input class="fi" type="url" id="bk-att" placeholder="https://..." style="direction:ltr;font-size:13px"></div>
+    <div class="mb">
+      <label class="lbl">&#x1F4CE; المرفقات (روابط تذاكر/PDF/صور)</label>
+      <div id="bk-atts-list"></div>
+      <button type="button" class="att-add" id="bk-add-att">&#x2795; إضافة مرفق</button>
+    </div>
     <button class="btn" id="btn-add-bk">إضافة الحجز</button>
   </div>
 
@@ -924,7 +939,11 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
     </div>
     <div class="mb"><label class="lbl">ملاحظات</label><textarea class="fi" id="edit-bk-notes"></textarea></div>
-    <div class="mb"><label class="lbl">&#x1F4CE; مرفق (رابط تذكرة/PDF)</label><input class="fi" type="url" id="edit-bk-att" placeholder="https://..." style="direction:ltr;font-size:13px"></div>
+    <div class="mb">
+      <label class="lbl">&#x1F4CE; المرفقات (روابط تذاكر/PDF/صور)</label>
+      <div id="edit-bk-atts-list"></div>
+      <button type="button" class="att-add" id="edit-bk-add-att">&#x2795; إضافة مرفق</button>
+    </div>
     <button class="btn" id="btn-save-edit-bk" style="margin-bottom:10px">حفظ التعديل</button>
     <button id="btn-cancel-edit-bk" style="width:100%;padding:11px;border:1px solid var(--bd);border-radius:12px;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--t2);cursor:pointer">إلغاء</button>
   </div>
@@ -1690,6 +1709,63 @@ function attBlock(url){
   if(isImage(url)) return '<img class="vc-img" src="'+attEsc(url)+'" loading="lazy" onclick="openImg(this.src)" alt="مرفق">';
   return '<a class="vc-att" href="'+attEsc(url)+'" target="_blank">\u{1F4CE} المرفق</a>';
 }
+// Multi-attachment model: b.atts = [{u:url, d:desc}]; legacy b.att (plain url) is auto-migrated.
+function bkAtts(b){
+  if(b && Array.isArray(b.atts)) return b.atts.filter(function(a){ return a && a.u; });
+  if(b && b.att){
+    var s=String(b.att);
+    if(s.charAt(0)==="["){ try{ var a=JSON.parse(s); if(Array.isArray(a)) return a.filter(function(x){ return x && x.u; }); }catch(e){} }
+    return [{u:s, d:""}];
+  }
+  return [];
+}
+// Serialize atts into the single sheet column (keeps plain-url form for one simple attachment).
+function attsToStr(atts){
+  atts=(atts||[]).filter(function(a){ return a && a.u; });
+  if(!atts.length) return "";
+  if(atts.length===1 && !atts[0].d) return atts[0].u;
+  return JSON.stringify(atts.map(function(a){ return {u:a.u, d:a.d||""}; }));
+}
+function attCap(d){ return String(d||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+// Render attachments for a booking card: {imgs, links}
+function bkAttsHtml(b){
+  var imgs="", links="";
+  bkAtts(b).forEach(function(a){
+    if(isImage(a.u)){
+      imgs+='<div class="att-view-img"><img class="vc-img" src="'+attEsc(a.u)+'" loading="lazy" onclick="openImg(this.src)" alt="مرفق">'
+        +(a.d?'<div class="att-cap">'+attCap(a.d)+'</div>':'')+'</div>';
+    } else {
+      links+='<a class="vc-att" href="'+attEsc(a.u)+'" target="_blank">\u{1F4CE} '+(a.d?attCap(a.d):'المرفق')+'</a>';
+    }
+  });
+  return {imgs:imgs, links:links};
+}
+// Attachment editor row helpers (add/edit forms)
+function attRowHtml(u,d){
+  return '<div class="att-row">'
+    +'<input class="fi att-u" type="url" placeholder="https://..." style="direction:ltr" value="'+attEsc(u)+'">'
+    +'<input class="fi att-d" type="text" placeholder="الوصف (اختياري)" value="'+attCap(d).replace(/"/g,"&quot;")+'">'
+    +'<button type="button" class="att-del" onclick="this.closest(\'.att-row\').remove()">×</button>'
+    +'</div>';
+}
+function addAttRow(listId,u,d){ document.getElementById(listId).insertAdjacentHTML("beforeend", attRowHtml(u||"",d||"")); }
+function clearAttRows(listId){ document.getElementById(listId).innerHTML=""; }
+function fillAttRows(listId, atts){
+  clearAttRows(listId);
+  (atts||[]).forEach(function(a){ addAttRow(listId, a.u, a.d); });
+  if(!(atts&&atts.length)) addAttRow(listId,"","");
+}
+function readAttRows(listId){
+  var out=[];
+  document.querySelectorAll("#"+listId+" .att-row").forEach(function(row){
+    var u=row.querySelector(".att-u").value.trim();
+    var d=row.querySelector(".att-d").value.trim();
+    if(u) out.push({u:u, d:d});
+  });
+  return out;
+}
+window.addAttRow=addAttRow;
+
 function openImg(src){ var lb=document.getElementById("imgbox"); lb.querySelector("img").src=src; lb.classList.remove("hidden"); }
 function closeImg(){ var lb=document.getElementById("imgbox"); lb.classList.add("hidden"); lb.querySelector("img").src=""; }
 window.openImg=openImg; window.closeImg=closeImg;
@@ -2096,6 +2172,11 @@ document.getElementById("bk-filter-row").addEventListener("click", function(e){
   renBk();
 });
 
+// Attachment "add" buttons + seed one empty row in the add form
+document.getElementById("bk-add-att").addEventListener("click", function(){ addAttRow("bk-atts-list","",""); });
+document.getElementById("edit-bk-add-att").addEventListener("click", function(){ addAttRow("edit-bk-atts-list","",""); });
+fillAttRows("bk-atts-list", []);
+
 // Add booking
 document.getElementById("btn-add-bk").addEventListener("click", function(){
   var title = document.getElementById("bk-title").value.trim();
@@ -2111,10 +2192,11 @@ document.getElementById("btn-add-bk").addEventListener("click", function(){
     cost: parseFloat(document.getElementById("bk-cost").value) || 0,
     travelers: bkTravelers.slice(),
     notes: document.getElementById("bk-notes").value.trim(),
-    att: document.getElementById("bk-att").value.trim()
+    atts: readAttRows("bk-atts-list")
   });
   bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
-  ["bk-title","bk-date","bk-time","bk-ref","bk-cost","bk-notes","bk-att"].forEach(function(id){ document.getElementById(id).value = ""; });
+  ["bk-title","bk-date","bk-time","bk-ref","bk-cost","bk-notes"].forEach(function(id){ document.getElementById(id).value = ""; });
+  fillAttRows("bk-atts-list", []);
   document.getElementById("bk-status").value = "confirmed";
   renBk(); sched();
   toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u062D\u062C\u0632");
@@ -2136,7 +2218,7 @@ function editBk(i){
   document.getElementById("edit-bk-ref").value = b.ref || "";
   document.getElementById("edit-bk-cost").value = b.cost || "";
   document.getElementById("edit-bk-notes").value = b.notes || "";
-  document.getElementById("edit-bk-att").value = b.att || "";
+  fillAttRows("edit-bk-atts-list", bkAtts(b));
   document.querySelectorAll("#edit-bk-travelers .sg").forEach(function(btn){
     var tr = btn.getAttribute("data-tr");
     btn.classList.toggle("on", b.travelers && b.travelers.indexOf(tr) >= 0);
@@ -2163,7 +2245,7 @@ document.getElementById("btn-save-edit-bk").addEventListener("click", function()
     cost: parseFloat(document.getElementById("edit-bk-cost").value) || 0,
     travelers: trav,
     notes: document.getElementById("edit-bk-notes").value.trim(),
-    att: document.getElementById("edit-bk-att").value.trim()
+    atts: readAttRows("edit-bk-atts-list")
   };
   bks.sort(function(a, b){ return (a.dt || "") > (b.dt || "") ? 1 : -1; });
   document.getElementById("edit-bk-modal-bg").classList.add("hidden");
@@ -2232,11 +2314,10 @@ function renBk(){
       + '<div class="bk-detail"><span class="bk-dl">\u0627\u0644\u0645\u0633\u0627\u0641\u0631\u0648\u0646</span><span class="bk-dv"><div class="bk-travelers">' + travHtml + '</div></span></div>'
       + (b.notes ? '<div class="bk-detail"><span class="bk-dl">\u0645\u0644\u0627\u062D\u0638\u0627\u062A</span><span class="bk-dv">' + b.notes.replace(/\n/g, "<br>") + '</span></div>' : '')
       + (prayerNote ? '<div class="bk-prayer"><span class="pi">\u{1F54C}</span><span class="pt2">' + prayerNote + '</span></div>' : '')
-      + ((["hotel","car","activity"].indexOf(b.type) >= 0 || (b.att && !isImage(b.att))) ? '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">'
-          + (["hotel","car","activity"].indexOf(b.type) >= 0 ? '<a class="vc-map" style="margin-top:0" href="' + bkMapUrl(b) + '" target="_blank">\u{1F4CD} \u062E\u0631\u0627\u0626\u0637 Google</a>' : '')
-          + (b.att && !isImage(b.att) ? attBlock(b.att) : '')
-          + '</div>' : '')
-      + (b.att && isImage(b.att) ? attBlock(b.att) : '')
+      + (function(){ var ah = bkAttsHtml(b); var hasMap = ["hotel","car","activity"].indexOf(b.type) >= 0;
+          return ((hasMap || ah.links) ? '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">'
+              + (hasMap ? '<a class="vc-map" style="margin-top:0" href="' + bkMapUrl(b) + '" target="_blank">\u{1F4CD} \u062E\u0631\u0627\u0626\u0637 Google</a>' : '')
+              + ah.links + '</div>' : '') + ah.imgs; })()
       + '<div class="ta"><button class="db" onclick="delBk(' + i + ')">\u062D\u0630\u0641</button><button class="eb" onclick="editBk(' + i + ')">\u062A\u0639\u062F\u064A\u0644</button></div>'
       + '</div>'
       + '</div>';
@@ -2293,7 +2374,7 @@ var _buildRows = buildRows;
 buildRows = function(){
   var rows = _buildRows();
   bks.forEach(function(b){
-    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||"", b.att||""]);
+    rows.push(["K", b.type, b.co, b.title, b.dt||"", b.tm||"", b.status, b.ref||"", b.cost||0, (b.travelers||[]).join("+"), b.notes||"", attsToStr(bkAtts(b))]);
   });
   tasks.forEach(function(t){
     rows.push(["M", t.name, t.dt||"", t.pri||"high", (t.assign||[]).join("+"), t.notes||"", t.done?"1":"0"]);
@@ -2318,7 +2399,7 @@ parse = function(rows){
       var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+dateKey(r[4]);
       if (seenK[kK]) return;
       seenK[kK] = true;
-      bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||"", att:r[11]||""});
+      bks.push({type:r[1], co:r[2], title:r[3], dt:r[4], tm:r[5], status:r[6], ref:r[7], cost:+r[8]||0, travelers:(r[9]||"").split("+").filter(Boolean), notes:r[10]||"", atts:bkAtts({att:r[11]||""})});
     }
     if (r[0] === "M") {
       var kM = (r[1]||"")+"|"+dateKey(r[2]);
