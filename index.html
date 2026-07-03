@@ -599,7 +599,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
         <div><label class="lbl">مَن حوّل؟</label>
           <select class="fi" id="c-who"><option value="omar">عمر</option><option value="majed">ماجد</option><option value="waseem">وسيم</option></select>
         </div>
-        <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="c-amount" placeholder="&#x0660;"></div>
+        <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="c-amount" placeholder="&#x0660;"></div>
         <div><label class="lbl">ملاحظة</label><input class="fi" type="text" id="c-note" placeholder="تحويل أول"></div>
       </div>
       <button class="btn" id="btn-add-c" style="margin-top:2px">إضافة تحويل</button>
@@ -612,7 +612,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
   <div class="card edit-only">
     <div class="stitle">&#x2699;&#xFE0F; الميزانية الإجمالية</div>
     <label class="lbl">الميزانية الكاملة للرحلة (ر.س)</label>
-    <input class="fi" type="number" inputmode="numeric" id="tb" placeholder="مثال: 15000">
+    <input class="fi" type="number" inputmode="decimal" step="0.01" id="tb" placeholder="مثال: 15000">
   </div>
 
   <div class="card edit-only">
@@ -622,7 +622,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       <input class="fi" type="text" id="en2" placeholder="مثال: تذاكر الطيران">
     </div>
     <div class="g3">
-      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="ea2" placeholder="&#x0660;"></div>
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="ea2" placeholder="&#x0660;"></div>
       <div><label class="lbl">البلد</label>
         <select class="fi" id="eco">
           <option value="sa">&#x1F1F8;&#x1F1E6; السعودية</option>
@@ -664,9 +664,9 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
       <div id="pay-custom-fields" style="display:none;margin-top:8px">
         <div class="g3">
-          <div id="cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-omar" placeholder="٠"></div>
-          <div id="cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-majed" placeholder="٠"></div>
-          <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="pa-waseem" placeholder="٠"></div>
+          <div id="cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-omar" placeholder="٠"></div>
+          <div id="cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-majed" placeholder="٠"></div>
+          <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-waseem" placeholder="٠"></div>
         </div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="pay-sum-hint"></div>
       </div>
@@ -806,7 +806,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     </div>
     <div class="g2">
       <div><label class="lbl">رقم التأكيد (اختياري)</label><input class="fi" type="text" id="bk-ref" placeholder="ABC123" style="direction:ltr"></div>
-      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="bk-cost" placeholder="٠"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="bk-cost" placeholder="٠"></div>
     </div>
     <div class="mb">
       <label class="lbl">المسافرون</label>
@@ -930,7 +930,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     </div>
     <div class="g2">
       <div><label class="lbl">رقم التأكيد</label><input class="fi" type="text" id="edit-bk-ref" style="direction:ltr"></div>
-      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-bk-cost"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-bk-cost"></div>
     </div>
     <div class="mb">
       <label class="lbl">المسافرون</label>
@@ -1010,7 +1010,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     <input type="hidden" id="edit-e-idx">
     <div class="mb"><label class="lbl">البيان</label><input class="fi" type="text" id="edit-en"></div>
     <div class="g3">
-      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-ea"></div>
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-ea"></div>
       <div><label class="lbl">البلد</label>
         <select class="fi" id="edit-eco">
           <option value="sa">🇸🇦 السعودية</option><option value="ma">🇲🇦 المغرب</option><option value="dz">🇩🇿 الجزائر</option><option value="eg">🇪🇬 مصر</option><option value="za">🇿🇦 جنوب أفريقيا</option>
@@ -1035,9 +1035,9 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
       <div id="edit-pay-custom-fields" style="display:none;margin-top:8px">
         <div class="g3">
-          <div id="edit-cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-omar"></div>
-          <div id="edit-cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-majed"></div>
-          <div id="edit-cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="numeric" id="edit-pa-waseem"></div>
+          <div id="edit-cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-omar"></div>
+          <div id="edit-cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-majed"></div>
+          <div id="edit-cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-waseem"></div>
         </div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="edit-pay-sum-hint"></div>
       </div>
@@ -1132,7 +1132,7 @@ var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
 
 function AR(n){ return String(n); }
-function FM(n){ return AR(Math.round(n).toLocaleString("en")); }
+function FM(n){ var r=Math.round(n*100)/100; return AR(r.toLocaleString("en",{minimumFractionDigits:(r%1?2:0),maximumFractionDigits:2})); }
 
 function dot(s, lbl){
   var d = document.getElementById("sd");
