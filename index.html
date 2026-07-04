@@ -599,7 +599,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
         <div><label class="lbl">مَن حوّل؟</label>
           <select class="fi" id="c-who"><option value="omar">عمر</option><option value="majed">ماجد</option><option value="waseem">وسيم</option></select>
         </div>
-        <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="c-amount" placeholder="&#x0660;"></div>
+        <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="c-amount" placeholder="&#x0660;"></div>
         <div><label class="lbl">ملاحظة</label><input class="fi" type="text" id="c-note" placeholder="تحويل أول"></div>
       </div>
       <button class="btn" id="btn-add-c" style="margin-top:2px">إضافة تحويل</button>
@@ -612,7 +612,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
   <div class="card edit-only">
     <div class="stitle">&#x2699;&#xFE0F; الميزانية الإجمالية</div>
     <label class="lbl">الميزانية الكاملة للرحلة (ر.س)</label>
-    <input class="fi" type="number" inputmode="decimal" step="0.01" id="tb" placeholder="مثال: 15000">
+    <input class="fi" type="text" inputmode="decimal" id="tb" placeholder="مثال: 15000">
   </div>
 
   <div class="card edit-only">
@@ -622,7 +622,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       <input class="fi" type="text" id="en2" placeholder="مثال: تذاكر الطيران">
     </div>
     <div class="g3">
-      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="ea2" placeholder="&#x0660;"></div>
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="ea2" placeholder="&#x0660;"></div>
       <div><label class="lbl">البلد</label>
         <select class="fi" id="eco">
           <option value="sa">&#x1F1F8;&#x1F1E6; السعودية</option>
@@ -664,9 +664,9 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
       <div id="pay-custom-fields" style="display:none;margin-top:8px">
         <div class="g3">
-          <div id="cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-omar" placeholder="٠"></div>
-          <div id="cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-majed" placeholder="٠"></div>
-          <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="pa-waseem" placeholder="٠"></div>
+          <div id="cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="pa-omar" placeholder="٠"></div>
+          <div id="cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="pa-majed" placeholder="٠"></div>
+          <div id="cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="pa-waseem" placeholder="٠"></div>
         </div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="pay-sum-hint"></div>
       </div>
@@ -806,7 +806,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     </div>
     <div class="g2">
       <div><label class="lbl">رقم التأكيد (اختياري)</label><input class="fi" type="text" id="bk-ref" placeholder="ABC123" style="direction:ltr"></div>
-      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="bk-cost" placeholder="٠"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="bk-cost" placeholder="٠"></div>
     </div>
     <div class="mb">
       <label class="lbl">المسافرون</label>
@@ -930,7 +930,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     </div>
     <div class="g2">
       <div><label class="lbl">رقم التأكيد</label><input class="fi" type="text" id="edit-bk-ref" style="direction:ltr"></div>
-      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-bk-cost"></div>
+      <div><label class="lbl">التكلفة (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-bk-cost"></div>
     </div>
     <div class="mb">
       <label class="lbl">المسافرون</label>
@@ -1010,7 +1010,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     <input type="hidden" id="edit-e-idx">
     <div class="mb"><label class="lbl">البيان</label><input class="fi" type="text" id="edit-en"></div>
     <div class="g3">
-      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-ea"></div>
+      <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-ea"></div>
       <div><label class="lbl">البلد</label>
         <select class="fi" id="edit-eco">
           <option value="sa">🇸🇦 السعودية</option><option value="ma">🇲🇦 المغرب</option><option value="dz">🇩🇿 الجزائر</option><option value="eg">🇪🇬 مصر</option><option value="za">🇿🇦 جنوب أفريقيا</option>
@@ -1035,9 +1035,9 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       </div>
       <div id="edit-pay-custom-fields" style="display:none;margin-top:8px">
         <div class="g3">
-          <div id="edit-cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-omar"></div>
-          <div id="edit-cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-majed"></div>
-          <div id="edit-cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="number" inputmode="decimal" step="0.01" id="edit-pa-waseem"></div>
+          <div id="edit-cf-omar" style="display:none"><label class="lbl">عمر (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-pa-omar"></div>
+          <div id="edit-cf-majed" style="display:none"><label class="lbl">ماجد (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-pa-majed"></div>
+          <div id="edit-cf-waseem" style="display:none"><label class="lbl">وسيم (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-pa-waseem"></div>
         </div>
         <div style="font-size:11px;color:var(--t3);margin-top:4px" id="edit-pay-sum-hint"></div>
       </div>
@@ -1132,6 +1132,16 @@ var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
 
 function AR(n){ return String(n); }
+// تطبيع مدخلات المبالغ: يحوّل الأرقام العربية والفاصلة العربية (٫) إلى صيغة قياسية قبل parseFloat
+function toNum(s){
+  if(s==null) return NaN;
+  s=String(s)
+    .replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-0x0660;})   // ٠-٩ إلى 0-9
+    .replace(/[۰-۹]/g,function(d){return d.charCodeAt(0)-0x06F0;})   // ۰-۹ إلى 0-9
+    .replace(/٫/g,'.')          // الفاصلة العشرية العربية إلى نقطة
+    .replace(/[٬،,\s]/g,'');    // حذف فاصل الآلاف العربي والفاصلة والمسافات
+  return parseFloat(s);
+}
 function FM(n){ var r=Math.round(n*100)/100; return AR(r.toLocaleString("en",{minimumFractionDigits:(r%1?2:0),maximumFractionDigits:2})); }
 
 function dot(s, lbl){
@@ -1184,9 +1194,9 @@ function updatePayUI(){
 
 ["pa-omar","pa-majed","pa-waseem"].forEach(function(id){
   document.getElementById(id).addEventListener("input", function(){
-    var total = parseFloat(document.getElementById("ea2").value) || 0;
+    var total = toNum(document.getElementById("ea2").value) || 0;
     var sum = 0;
-    pay.forEach(function(p){ sum += parseFloat(document.getElementById("pa-" + p).value) || 0; });
+    pay.forEach(function(p){ sum += toNum(document.getElementById("pa-" + p).value) || 0; });
     var hint = document.getElementById("pay-sum-hint");
     if (sum > 0 && Math.abs(sum - total) > 0.5) {
       hint.textContent = "\u26A0\uFE0F \u0627\u0644\u0645\u062C\u0645\u0648\u0639: " + FM(sum) + " \u0631.\u0633 (\u0627\u0644\u0645\u0637\u0644\u0648\u0628: " + FM(total) + " \u0631.\u0633)";
@@ -1366,7 +1376,7 @@ function loadLoc(){
 document.getElementById("btn-add-exp").addEventListener("click", addE);
 function addE(){
   var nm = document.getElementById("en2").value.trim();
-  var am = parseFloat(document.getElementById("ea2").value);
+  var am = toNum(document.getElementById("ea2").value);
   var ct = document.getElementById("ect").value;
   var co = document.getElementById("eco").value;
   if (!nm || !am || am <= 0){ toast("\u26A0\uFE0F \u0623\u062F\u062E\u0644 \u0627\u0644\u0628\u064A\u0627\u0646 \u0648\u0627\u0644\u0645\u0628\u0644\u063A"); return; }
@@ -1384,7 +1394,7 @@ function addE(){
     // Custom amounts
     var sum = 0;
     pay.forEach(function(p){
-      var v = parseFloat(document.getElementById("pa-" + p).value) || 0;
+      var v = toNum(document.getElementById("pa-" + p).value) || 0;
       payInfo[p] = v;
       sum += v;
     });
@@ -1422,7 +1432,7 @@ document.getElementById("share-seg").addEventListener("click", function(e){
   if(share.length === 0){ btn.classList.add("on"); share = [btn.getAttribute("data-sh")]; }
 });
 
-function delE(i){ exps.splice(i, 1); calc(); renE(); sched(); }
+function delE(i){ if(!confirm("حذف المصروف «"+((exps[i]&&exps[i].nm)||"")+"»؟\nسيُحذف للجميع فوراً.")) return; exps.splice(i, 1); calc(); renE(); sched(); }
 window.delE = delE;
 
 // ===== CONTRIBUTIONS TRACKER =====
@@ -1431,7 +1441,7 @@ function renC(){
   var sumEl = document.getElementById("contrib-summary");
   if (!sumEl) return;
   var listEl = document.getElementById("contrib-list");
-  var target = (parseFloat(document.getElementById("tb").value)||0) / 3;
+  var target = (toNum(document.getElementById("tb").value)||0) / 3;
   var totals = {omar:0, majed:0, waseem:0};
   contribs.forEach(function(c){ if (totals[c.who] !== undefined) totals[c.who] += (c.amount||0); });
   var html = "";
@@ -1456,7 +1466,7 @@ function renC(){
 }
 document.getElementById("btn-add-c").addEventListener("click", function(){
   var who = document.getElementById("c-who").value;
-  var amount = parseFloat(document.getElementById("c-amount").value);
+  var amount = toNum(document.getElementById("c-amount").value);
   var note = document.getElementById("c-note").value.trim();
   if (!amount || amount <= 0){ toast("⚠️ أدخل مبلغ التحويل"); return; }
   contribs.push({who:who, amount:amount, note:note});
@@ -1465,11 +1475,11 @@ document.getElementById("btn-add-c").addEventListener("click", function(){
   renC(); sched();
   toast("✓ تم تسجيل التحويل");
 });
-function delC(i){ contribs.splice(i, 1); renC(); sched(); }
+function delC(i){ if(!confirm("حذف تحويل "+((contribs[i]&&CPN[contribs[i].who])||"")+" ("+FM((contribs[i]&&contribs[i].amount)||0)+" ر.س)؟\nسيُحذف للجميع فوراً.")) return; contribs.splice(i, 1); renC(); sched(); }
 window.delC = delC;
 
 function calc(){
-  var tot = parseFloat(document.getElementById("tb").value) || 0;
+  var tot = toNum(document.getElementById("tb").value) || 0;
   var oP = 0, mP = 0, wP = 0, sh = 0;
   exps.forEach(function(e){
     if (e.payAmts) {
@@ -1645,7 +1655,7 @@ function addT(){
   renT(); sched();
 }
 
-function delT(i){ tls.splice(i, 1); renT(); sched(); }
+function delT(i){ if(!confirm("حذف الزيارة «"+((tls[i]&&tls[i].hd)||"")+"»؟\nستُحذف للجميع فوراً.")) return; tls.splice(i, 1); renT(); sched(); }
 window.delT = delT;
 
 function togDone(i){
@@ -2039,7 +2049,7 @@ function togTk(i){
 }
 window.togTk = togTk;
 
-function delTk(i){ tasks.splice(i, 1); renTk(); sched(); }
+function delTk(i){ if(!confirm("حذف المهمة «"+((tasks[i]&&tasks[i].name)||"")+"»؟\nستُحذف للجميع فوراً.")) return; tasks.splice(i, 1); renTk(); sched(); }
 window.delTk = delTk;
 
 function renTk(){
@@ -2196,7 +2206,7 @@ document.getElementById("btn-add-bk").addEventListener("click", function(){
     tm: document.getElementById("bk-time").value,
     status: document.getElementById("bk-status").value,
     ref: document.getElementById("bk-ref").value.trim(),
-    cost: parseFloat(document.getElementById("bk-cost").value) || 0,
+    cost: toNum(document.getElementById("bk-cost").value) || 0,
     travelers: bkTravelers.slice(),
     notes: document.getElementById("bk-notes").value.trim(),
     atts: readAttRows("bk-atts-list"),
@@ -2210,7 +2220,7 @@ document.getElementById("btn-add-bk").addEventListener("click", function(){
   toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u062D\u062C\u0632");
 });
 
-function delBk(i){ bks.splice(i, 1); renBk(); sched(); }
+function delBk(i){ if(!confirm("حذف الحجز «"+((bks[i]&&bks[i].title)||"")+"»؟\nسيُحذف للجميع فوراً.")) return; bks.splice(i, 1); renBk(); sched(); }
 window.delBk = delBk;
 
 function editBk(i){
@@ -2251,7 +2261,7 @@ document.getElementById("btn-save-edit-bk").addEventListener("click", function()
     tm: document.getElementById("edit-bk-time").value,
     status: document.getElementById("edit-bk-status").value,
     ref: document.getElementById("edit-bk-ref").value.trim(),
-    cost: parseFloat(document.getElementById("edit-bk-cost").value) || 0,
+    cost: toNum(document.getElementById("edit-bk-cost").value) || 0,
     travelers: trav,
     notes: document.getElementById("edit-bk-notes").value.trim(),
     atts: readAttRows("edit-bk-atts-list"),
@@ -2436,7 +2446,7 @@ function barRow(label, val, max, valText, green){
     +'<span class="rp-bar-val">'+(valText||FM(val))+'</span></div>';
 }
 function buildReport(){
-  var tot=parseFloat(document.getElementById("tb").value)||0;
+  var tot=toNum(document.getElementById("tb").value)||0;
   var sp=exps.reduce(function(s,e){return s+e.am;},0);
   var rm=tot-sp;
   var pc=tot>0?Math.min(100,Math.round(sp/tot*100)):0;
@@ -2569,8 +2579,8 @@ document.getElementById("edit-split-mode-seg").addEventListener("click",function
 });
 ["edit-pa-omar","edit-pa-majed","edit-pa-waseem"].forEach(function(id){
   document.getElementById(id).addEventListener("input",function(){
-    var total=parseFloat(document.getElementById("edit-ea").value)||0, sum=0;
-    editPay.forEach(function(p){ sum+=parseFloat(document.getElementById("edit-pa-"+p).value)||0; });
+    var total=toNum(document.getElementById("edit-ea").value)||0, sum=0;
+    editPay.forEach(function(p){ sum+=toNum(document.getElementById("edit-pa-"+p).value)||0; });
     var hint=document.getElementById("edit-pay-sum-hint");
     if(sum>0 && Math.abs(sum-total)>0.5){ hint.textContent="⚠️ المجموع: "+FM(sum)+" ر.س (المطلوب: "+FM(total)+" ر.س)"; hint.style.color="var(--rd)"; }
     else hint.textContent="";
@@ -2580,13 +2590,13 @@ document.getElementById("btn-save-edit-e").addEventListener("click",function(){
   var i=parseInt(document.getElementById("edit-e-idx").value);
   if(isNaN(i)||!exps[i]) return;
   var nm=document.getElementById("edit-en").value.trim();
-  var am=parseFloat(document.getElementById("edit-ea").value);
+  var am=toNum(document.getElementById("edit-ea").value);
   var ct=document.getElementById("edit-ect").value, co=document.getElementById("edit-eco").value;
   if(!nm||!am||am<=0){ toast("⚠️ أدخل البيان والمبلغ"); return; }
   var payInfo={};
   if(editPay.length===1){ payInfo[editPay[0]]=am; }
   else if(editSplitMode==="equal"){ var each=am/editPay.length; editPay.forEach(function(p){ payInfo[p]=each; }); }
-  else { var sum=0; editPay.forEach(function(p){ var v=parseFloat(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
+  else { var sum=0; editPay.forEach(function(p){ var v=toNum(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
   exps[i]={nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
   document.getElementById("edit-e-modal-bg").classList.add("hidden");
   calc(); renE(); sched();
