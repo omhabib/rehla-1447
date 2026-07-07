@@ -228,6 +228,17 @@ textarea.fi{resize:none;min-height:66px;line-height:1.6}
 .prog-num{font-size:12px;font-weight:700;color:var(--br)}
 .prog-bar{height:7px;background:#e8dcc8;border-radius:8px;overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--gn),#4caf50);border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+#prog-summary{background:var(--gl);border:1px solid #C9A84C44;border-radius:14px;padding:12px 14px;margin-bottom:14px}
+#prog-summary:empty{display:none;padding:0;border:0;margin:0}
+.psum-t{font-family:'Amiri',serif;font-size:15px;color:var(--br);margin-bottom:11px}
+.psum-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.psum-row:last-child{margin-bottom:0}
+.psum-flag{font-size:15px;flex-shrink:0;width:20px;text-align:center}
+.psum-name{font-size:12px;color:var(--t2);width:92px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psum-bar{flex:1}
+.psum-cnt{font-size:11px;color:var(--t3);min-width:64px;text-align:left;flex-shrink:0;font-weight:700}
+.psum-total{border-top:1px solid #C9A84C44;margin-top:11px;padding-top:11px}
+.psum-total .psum-name{font-weight:700;color:var(--br)}
 .co-prog{margin:0 13px 8px;padding-top:6px}
 
 .cfg{background:linear-gradient(135deg,#fff8e8,#fdedc6);border:1.5px solid #C9A84C55;border-radius:13px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
@@ -746,6 +757,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
   </div>
 
   <div class="stitle" style="padding:0 2px 10px;font-family:'Amiri',serif;font-size:16px;color:var(--br)">&#x1F9ED; مسار الرحلة</div>
+  <div id="prog-summary"></div>
   <div id="tl2"><div class="emp"><div class="ei">&#x1F5FA;&#xFE0F;</div>أضف زيارات رحلتك للبدء</div></div>
   <div id="tl2day" style="display:none"></div>
   <div id="tl2city" style="display:none"></div>
@@ -1691,6 +1703,7 @@ function togDone(i){
   // Update country tab counter
   var coTab = document.querySelector('#tl2 .co-tab[data-co="' + co + '"] .co-tab-cnt');
   if (coTab) coTab.textContent = AR(coDone) + '/' + AR(coVisits.length);
+  renProgSummary();
   sched();
 }
 window.togDone = togDone;
@@ -2926,8 +2939,37 @@ var tlView=localStorage.getItem("t_tlview")||"country";
     if(tlView==="day"){ renTDay(); clr("tl2"); clr("tl2city"); }
     else if(tlView==="city"){ renTCity(); clr("tl2"); clr("tl2day"); }
     else { _country(); clr("tl2day"); clr("tl2city"); }
+    renProgSummary();
   };
 })();
+// ملخّص الإنجاز: منجز كل دولة ثم إجمالي الرحلة — يظهر فوق العروض الثلاثة
+function renProgSummary(){
+  var el=document.getElementById("prog-summary");
+  if(!el) return;
+  if(!tls.length){ el.innerHTML=""; return; }
+  var totalDone=tls.filter(function(t){return t.done;}).length;
+  var totalPct=tls.length?Math.round(totalDone/tls.length*100):0;
+  var rows="";
+  CO.forEach(function(co){
+    var v=tls.filter(function(t){return t.co===co;});
+    if(!v.length) return;
+    var d=v.filter(function(t){return t.done;}).length;
+    var pct=v.length?Math.round(d/v.length*100):0;
+    rows+='<div class="psum-row">'
+      +'<span class="psum-flag">'+CF[co]+'</span>'
+      +'<span class="psum-name">'+CN[co]+'</span>'
+      +'<div class="prog-bar psum-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>'
+      +'<span class="psum-cnt">'+AR(d)+'/'+AR(v.length)+' · '+AR(pct)+'٪</span>'
+      +'</div>';
+  });
+  rows+='<div class="psum-row psum-total">'
+    +'<span class="psum-flag">\u{1F3C1}</span>'
+    +'<span class="psum-name">الرحلة كاملة</span>'
+    +'<div class="prog-bar psum-bar"><div class="prog-fill" style="width:'+totalPct+'%"></div></div>'
+    +'<span class="psum-cnt">'+AR(totalDone)+'/'+AR(tls.length)+' · '+AR(totalPct)+'٪</span>'
+    +'</div>';
+  el.innerHTML='<div class="psum-t">\u{1F3C1} ملخّص الإنجاز</div>'+rows;
+}
 function applyTlView(){
   var c=document.getElementById("tl2"), d=document.getElementById("tl2day"), y=document.getElementById("tl2city");
   if(c) c.style.display=tlView==="country"?"":"none";
