@@ -1308,7 +1308,7 @@ function parse(rows){
       var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||"");
       if (seenT[kT]) return;
       seenT[kT] = true;
-      var isDone = r[9]==="1" || !!prevTlDone[r[1]+"|"+r[2]+"|"+dateKey(r[3])+"|"+r[4]];
+      var isDone = +r[9]===1 || !!prevTlDone[r[1]+"|"+r[2]+"|"+dateKey(r[3])+"|"+r[4]];
       tls.push({co:r[1], cy:r[2], dt:r[3], hd:r[4], nb:r[5], ml:r[6], nt:r[7], pri:r[8] || "high", done:isDone, att:r[10]||"", map:r[11]||""});
     }
   });
@@ -1351,6 +1351,28 @@ function push(){
         pushRetry = 0;
       }
     });
+}
+
+// \u062D\u0641\u0638 \u0639\u0645\u0644\u064A\u0629 \u0645\u0633\u062A\u0647\u062F\u0641\u0629 (\u062D\u0630\u0641/\u0625\u0646\u062C\u0627\u0632) \u062F\u0648\u0646 \u0637\u0645\u0633 \u062A\u0639\u062F\u064A\u0644\u0627\u062A \u0627\u0644\u0622\u062E\u0631\u064A\u0646:
+// \u064A\u062C\u0644\u0628 \u0623\u062D\u062F\u062B \u0646\u0633\u062E\u0629 \u0645\u0646 \u0627\u0644\u062E\u0627\u062F\u0645\u060C \u064A\u0637\u0628\u0651\u0642 \u062A\u063A\u064A\u064A\u0631\u0627\u064B \u0648\u0627\u062D\u062F\u0627\u064B \u0639\u0628\u0631 mutate(rows)->rows\u060C \u062B\u0645 \u064A\u0643\u062A\u0628. \u0645\u064F\u062A\u0633\u0644\u0633\u0644 \u0639\u0628\u0631 \u0637\u0627\u0628\u0648\u0631 \u0644\u0645\u0646\u0639 \u062A\u0635\u0627\u062F\u0645 \u0627\u0644\u0639\u0645\u0644\u064A\u0627\u062A \u0627\u0644\u0645\u062A\u062A\u0627\u0628\u0639\u0629.
+var opQueue = Promise.resolve();
+function commitOp(mutate){
+  var run = function(){
+    if (!API) return Promise.reject(new Error("no-api"));
+    busy = true;
+    return fetch(API + "?t=" + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j.status !== "ok" || !j.data) throw new Error("pull-failed");
+        var rows = mutate(j.data.slice());
+        return fetch(API, {method:"POST", body:JSON.stringify({action:"save", rows:rows}), redirect:"follow"})
+          .then(function(){ return rows; });
+      })
+      .then(function(rows){ busy = false; dirty = false; pushRetry = 0; try{localStorage.removeItem("t_dirty");}catch(e){} return rows; })
+      .catch(function(e){ busy = false; throw e; });
+  };
+  opQueue = opQueue.then(run, run);
+  return opQueue;
 }
 
 // Save immediately when page is closed/hidden
@@ -1444,7 +1466,16 @@ document.getElementById("share-seg").addEventListener("click", function(e){
   if(share.length === 0){ btn.classList.add("on"); share = [btn.getAttribute("data-sh")]; }
 });
 
-function delE(i){ if(!confirm("حذف المصروف «"+((exps[i]&&exps[i].nm)||"")+"»؟\nسيُحذف للجميع فوراً.")) return; exps.splice(i, 1); calc(); renE(); sched(); }
+function delE(i){
+  var e = exps[i]; if(!e) return;
+  if(!confirm("حذف المصروف «"+(e.nm||"")+"»؟\nسيُحذف للجميع فوراً.")) return;
+  var k = (e.nm||"")+"|"+(e.ct||"")+"|"+(e.co||"")+"|"+(+e.am||0);
+  dot("sy","يحذف...");
+  commitOp(function(rows){
+    return rows.filter(function(r){ return !(r[0]==="E" && ((r[1]||"")+"|"+(r[3]||"")+"|"+(r[4]||"")+"|"+(+r[2]||0))===k); });
+  }).then(function(rows){ parse(rows); toast("✓ حُذف المصروف"); })
+    .catch(function(){ dot("er","تعذّر"); toast("⚠️ تعذّر الحذف — تحقق من الاتصال وأعد المحاولة"); });
+}
 window.delE = delE;
 
 // ===== CONTRIBUTIONS TRACKER =====
@@ -1487,7 +1518,19 @@ document.getElementById("btn-add-c").addEventListener("click", function(){
   renC(); sched();
   toast("✓ تم تسجيل التحويل");
 });
-function delC(i){ if(!confirm("حذف تحويل "+((contribs[i]&&CPN[contribs[i].who])||"")+" ("+FM((contribs[i]&&contribs[i].amount)||0)+" ر.س)؟\nسيُحذف للجميع فوراً.")) return; contribs.splice(i, 1); renC(); sched(); }
+function delC(i){
+  var c = contribs[i]; if(!c) return;
+  if(!confirm("حذف تحويل "+(CPN[c.who]||"")+" ("+FM(c.amount||0)+" ر.س)؟\nسيُحذف للجميع فوراً.")) return;
+  var removed = false;
+  dot("sy","يحذف...");
+  commitOp(function(rows){
+    return rows.filter(function(r){
+      if(!removed && r[0]==="C" && r[1]===c.who && (+r[2]||0)===(+c.amount||0) && (r[3]||"")===(c.note||"")){ removed = true; return false; }
+      return true;
+    });
+  }).then(function(rows){ parse(rows); toast("✓ حُذف التحويل"); })
+    .catch(function(){ dot("er","تعذّر"); toast("⚠️ تعذّر الحذف — تحقق من الاتصال وأعد المحاولة"); });
+}
 window.delC = delC;
 
 function calc(){
@@ -1667,7 +1710,16 @@ function addT(){
   renT(); sched();
 }
 
-function delT(i){ if(!confirm("حذف الزيارة «"+((tls[i]&&tls[i].hd)||"")+"»؟\nستُحذف للجميع فوراً.")) return; tls.splice(i, 1); renT(); sched(); }
+function delT(i){
+  var t = tls[i]; if(!t) return;
+  if(!confirm("حذف الزيارة «"+(t.hd||"")+"»؟\nستُحذف للجميع فوراً.")) return;
+  var k = (t.co||"")+"|"+(t.cy||"")+"|"+dateKey(t.dt)+"|"+(t.hd||"");
+  dot("sy","يحذف...");
+  commitOp(function(rows){
+    return rows.filter(function(r){ return !(r[0]==="T" && ((r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||""))===k); });
+  }).then(function(rows){ parse(rows); toast("✓ حُذفت الزيارة"); })
+    .catch(function(){ dot("er","تعذّر"); toast("⚠️ تعذّر الحذف — تحقق من الاتصال وأعد المحاولة"); });
+}
 window.delT = delT;
 
 function togDone(i){
@@ -1704,7 +1756,14 @@ function togDone(i){
   var coTab = document.querySelector('#tl2 .co-tab[data-co="' + co + '"] .co-tab-cnt');
   if (coTab) coTab.textContent = AR(coDone) + '/' + AR(coVisits.length);
   renProgSummary();
-  sched();
+  // حفظ الإنجاز على أحدث نسخة من الخادم (لا يطمس تعديلات الآخرين)
+  var t = tls[i], nd = t.done, key = (t.co||"")+"|"+(t.cy||"")+"|"+dateKey(t.dt)+"|"+(t.hd||"");
+  dot("sy","يحفظ...");
+  commitOp(function(rows){
+    rows.forEach(function(r){ if(r[0]==="T" && ((r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||""))===key) r[9] = nd?1:0; });
+    return rows;
+  }).then(function(){ dot("ok","تم"); })
+    .catch(function(){ if(tls[i]) tls[i].done = !nd; renT(); renProgSummary(); dot("er","تعذّر"); toast("⚠️ تعذّر حفظ الإنجاز — تحقق من الاتصال"); });
 }
 window.togDone = togDone;
 
@@ -2058,11 +2117,28 @@ document.getElementById("btn-add-tk").addEventListener("click", function(){
 function togTk(i){
   if (!tasks[i]) return;
   tasks[i].done = !tasks[i].done;
-  renTk(); sched();
+  renTk();
+  // حفظ الإنجاز على أحدث نسخة من الخادم (لا يطمس تعديلات الآخرين)
+  var t = tasks[i], nd = t.done, key = (t.name||"")+"|"+dateKey(t.dt);
+  dot("sy","يحفظ...");
+  commitOp(function(rows){
+    rows.forEach(function(r){ if(r[0]==="M" && ((r[1]||"")+"|"+dateKey(r[2]))===key) r[6] = nd?"1":"0"; });
+    return rows;
+  }).then(function(){ dot("ok","تم"); })
+    .catch(function(){ if(tasks[i]) tasks[i].done = !nd; renTk(); dot("er","تعذّر"); toast("⚠️ تعذّر حفظ الإنجاز — تحقق من الاتصال"); });
 }
 window.togTk = togTk;
 
-function delTk(i){ if(!confirm("حذف المهمة «"+((tasks[i]&&tasks[i].name)||"")+"»؟\nستُحذف للجميع فوراً.")) return; tasks.splice(i, 1); renTk(); sched(); }
+function delTk(i){
+  var t = tasks[i]; if(!t) return;
+  if(!confirm("حذف المهمة «"+(t.name||"")+"»؟\nستُحذف للجميع فوراً.")) return;
+  var k = (t.name||"")+"|"+dateKey(t.dt);
+  dot("sy","يحذف...");
+  commitOp(function(rows){
+    return rows.filter(function(r){ return !(r[0]==="M" && ((r[1]||"")+"|"+dateKey(r[2]))===k); });
+  }).then(function(rows){ parse(rows); toast("✓ حُذفت المهمة"); })
+    .catch(function(){ dot("er","تعذّر"); toast("⚠️ تعذّر الحذف — تحقق من الاتصال وأعد المحاولة"); });
+}
 window.delTk = delTk;
 
 function renTk(){
@@ -2233,7 +2309,16 @@ document.getElementById("btn-add-bk").addEventListener("click", function(){
   toast("\u2713 \u062A\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u062D\u062C\u0632");
 });
 
-function delBk(i){ if(!confirm("حذف الحجز «"+((bks[i]&&bks[i].title)||"")+"»؟\nسيُحذف للجميع فوراً.")) return; bks.splice(i, 1); renBk(); sched(); }
+function delBk(i){
+  var b = bks[i]; if(!b) return;
+  if(!confirm("حذف الحجز «"+(b.title||"")+"»؟\nسيُحذف للجميع فوراً.")) return;
+  var k = (b.type||"")+"|"+(b.title||"")+"|"+dateKey(b.dt);
+  dot("sy","يحذف...");
+  commitOp(function(rows){
+    return rows.filter(function(r){ return !(r[0]==="K" && ((r[1]||"")+"|"+(r[3]||"")+"|"+dateKey(r[4]))===k); });
+  }).then(function(rows){ parse(rows); toast("✓ حُذف الحجز"); })
+    .catch(function(){ dot("er","تعذّر"); toast("⚠️ تعذّر الحذف — تحقق من الاتصال وأعد المحاولة"); });
+}
 window.delBk = delBk;
 
 function editBk(i){
@@ -2438,7 +2523,7 @@ parse = function(rows){
       var kM = (r[1]||"")+"|"+dateKey(r[2]);
       if (seenM[kM]) return;
       seenM[kM] = true;
-      var isDone = r[6]==="1" || !!prevTkDone[r[1]+"|"+dateKey(r[2])];
+      var isDone = +r[6]===1 || !!prevTkDone[r[1]+"|"+dateKey(r[2])];
       tasks.push({name:r[1], dt:r[2], pri:r[3]||"high", assign:(r[4]||"").split("+").filter(Boolean), notes:r[5]||"", done:isDone});
     }
   });
