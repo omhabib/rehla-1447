@@ -1700,8 +1700,8 @@ function renE(){
     return;
   }
   var html = "";
-  // عرض زمني بترتيب الإدخال (الأقدم أولاً) — بلا عكس
-  list.forEach(function(e){
+  var rev = [].concat(list).reverse();
+  rev.forEach(function(e){
     var i = exps.indexOf(e);
     var ptc, ptx;
     if (Array.isArray(e.pay)) {
