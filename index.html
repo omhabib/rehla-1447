@@ -1700,7 +1700,16 @@ function renE(){
     return;
   }
   var html = "";
+  // ترتيب حسب وقت الإنشاء (المعرّف يبدأ بـDate.now): آخر ما أُدخل أولاً.
+  // القديمة بلا معرّف تبقى بترتيب الشيت معكوساً (أحدث صف أولاً) وتحت الجديدة.
   var rev = [].concat(list).reverse();
+  rev.sort(function(a, b){
+    var ai = a.id || "", bi = b.id || "";
+    if (ai && bi) return ai < bi ? 1 : (ai > bi ? -1 : 0);
+    if (ai && !bi) return -1;
+    if (!ai && bi) return 1;
+    return 0;
+  });
   rev.forEach(function(e){
     var i = exps.indexOf(e);
     var ptc, ptx;
