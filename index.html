@@ -665,6 +665,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
         <button class="sg on" data-pay="omar">عمر</button>
         <button class="sg on" data-pay="majed">ماجد</button>
         <button class="sg on" data-pay="waseem">وسيم</button>
+        <button class="sg" data-pay="fund">&#x1F3E6; الصندوق</button>
       </div>
     </div>
     <div class="mb" id="pay-split-wrap" style="display:none">
@@ -1037,7 +1038,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     <div class="mb">
       <label class="lbl">مَن دفع؟</label>
       <div class="seg" id="edit-pay-seg">
-        <button class="sg on" data-pay="omar">عمر</button><button class="sg on" data-pay="majed">ماجد</button><button class="sg on" data-pay="waseem">وسيم</button>
+        <button class="sg on" data-pay="omar">عمر</button><button class="sg on" data-pay="majed">ماجد</button><button class="sg on" data-pay="waseem">وسيم</button><button class="sg" data-pay="fund">&#x1F3E6; الصندوق</button>
       </div>
     </div>
     <div class="mb" id="edit-pay-split-wrap" style="display:none">
@@ -1141,9 +1142,11 @@ var CO = ["sa","ma","dz","eg","za"];
 var pay = ["omar","majed","waseem"], fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
 var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\u0637\u0629", low:"\u0639\u0646\u062F \u0632\u064A\u0627\u062F\u0629 \u0627\u0644\u0648\u0642\u062A"};
 var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
-var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643"};
+var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643", fund:"\u{1F3E6} \u0627\u0644\u0635\u0646\u062F\u0648\u0642"};
 
 function AR(n){ return String(n); }
+// معرّف فريد لكل مصروف — يمنع حذف مصروفين حقيقيين متطابقين المحتوى عند إزالة التكرار
+function uid(){ return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
 // تطبيع مدخلات المبالغ: يحوّل الأرقام العربية والفاصلة العربية (٫) إلى صيغة قياسية قبل parseFloat
 function toNum(s){
   if(s==null) return NaN;
@@ -1180,6 +1183,11 @@ document.getElementById("pay-seg").addEventListener("click", function(e){
   if (!btn) return;
   var p = btn.getAttribute("data-pay");
   btn.classList.toggle("on");
+  // «الصندوق» خيار حصري لا يجتمع مع الأشخاص
+  if (btn.classList.contains("on")) {
+    if (p === "fund") { document.querySelectorAll('#pay-seg .sg:not([data-pay="fund"])').forEach(function(x){ x.classList.remove("on"); }); }
+    else { var f = document.querySelector('#pay-seg .sg[data-pay="fund"]'); if (f) f.classList.remove("on"); }
+  }
   pay = [];
   document.querySelectorAll("#pay-seg .sg.on").forEach(function(x){ pay.push(x.getAttribute("data-pay")); });
   if (pay.length === 0){ btn.classList.add("on"); pay = [p]; }
@@ -1285,7 +1293,8 @@ function parse(rows){
     if (!r[0]) return;
     if (r[0] === "B") b = r[1];
     else if (r[0] === "E") {
-      var kE = (r[1]||"")+"|"+(r[3]||"")+"|"+(r[4]||"")+"|"+(+r[2]||0);
+      // إزالة التكرار بالـid إن وُجد (المصاريف الجديدة)، وإلا بالمحتوى (القديمة) للتوافق
+      var kE = r[8] ? ("id:"+r[8]) : ((r[1]||"")+"|"+(r[3]||"")+"|"+(r[4]||"")+"|"+(+r[2]||0));
       if (seenE[kE]) return;
       seenE[kE] = true;
       var payVal = r[5] || "split";
@@ -1302,7 +1311,7 @@ function parse(rows){
         payArr = [payVal];
         payAmts = {}; payAmts[payVal] = +r[2];
       }
-      exps.push({nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts, share:(r[7]||"").split("+").filter(Boolean)});
+      exps.push({id:r[8]||"", nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts, share:(r[7]||"").split("+").filter(Boolean)});
     }
     else if (r[0] === "T") {
       var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||"");
@@ -1323,7 +1332,7 @@ function buildRows(){
   exps.forEach(function(e){
     var payStr = Array.isArray(e.pay) ? e.pay.join("+") : e.pay;
     var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
-    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr, (e.share && e.share.length && e.share.length < 3) ? e.share.join("+") : ""]);
+    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr, (e.share && e.share.length && e.share.length < 3) ? e.share.join("+") : "", e.id || ""]);
   });
   tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0", t.att||"", t.map||""]); });
   return rows;
@@ -1446,7 +1455,7 @@ function addE(){
     while (exps.some(function(e){ return e.nm === base + " " + arDig(n); })) n++;
     nm = base + " " + arDig(n);
   }
-  exps.push({nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
+  exps.push({id:uid(), nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
   document.getElementById("en2").value = "";
   document.getElementById("ea2").value = "";
   ["pa-omar","pa-majed","pa-waseem"].forEach(function(id){ document.getElementById(id).value = ""; });
@@ -1487,6 +1496,8 @@ function renC(){
   var target = (toNum(document.getElementById("tb").value)||0) / 3;
   var totals = {omar:0, majed:0, waseem:0};
   contribs.forEach(function(c){ if (totals[c.who] !== undefined) totals[c.who] += (c.amount||0); });
+  // من موّل حصته بالدفع المباشر من جيبه (payAmts) لا بالتحويل يُحتسب له أيضاً
+  exps.forEach(function(e){ if (e.payAmts){ ["omar","majed","waseem"].forEach(function(p){ if (totals[p] !== undefined) totals[p] += (e.payAmts[p]||0); }); } });
   var html = "";
   ["omar","majed","waseem"].forEach(function(p){
     var paid = totals[p], rem = Math.max(0, target - paid);
@@ -1589,9 +1600,13 @@ function calc(){
     var per = e.am / parts.length;
     parts.forEach(function(p){ if (owe[p] !== undefined) owe[p] += per; });
   });
-  var oNet = oP - owe.omar; // positive = overpaid (is owed), negative = underpaid (owes)
-  var mNet = mP - owe.majed;
-  var wNet = wP - owe.waseem;
+  // نموذج الصندوق: الرصيد = ما دفعه شخصياً + مساهمته (تحويلاته) − نصيبه.
+  // مدفوعات «الصندوق» (payAmts.fund) لا تُنسب لأحد، فتظل خارج oP/mP/wP.
+  var cBy = {omar:0, majed:0, waseem:0};
+  contribs.forEach(function(c){ if (cBy[c.who] !== undefined) cBy[c.who] += (c.amount || 0); });
+  var oNet = oP + cBy.omar - owe.omar; // positive = دائن (له)، negative = مدين
+  var mNet = mP + cBy.majed - owe.majed;
+  var wNet = wP + cBy.waseem - owe.waseem;
 
   var ob = document.getElementById("ob"), mb = document.getElementById("mb2"), wb = document.getElementById("wb2");
 
@@ -1612,6 +1627,20 @@ function calc(){
   var sa = document.getElementById("sa");
   if (!exps.length){ sa.innerHTML = ""; return; }
 
+  // تسويات الأفراد بين بعضهم: بنود الفئة (share<3) التي دفعها فرد لا الصندوق
+  var ii = {};
+  exps.forEach(function(e){
+    var parts = (e.share && e.share.length) ? e.share : ["omar","majed","waseem"];
+    if (parts.length >= 3 || !e.payAmts) return;
+    var payers = ["omar","majed","waseem"].filter(function(p){ return (e.payAmts[p]||0) > 0; });
+    if (!payers.length) return;
+    var per = e.am / parts.length, cr = payers[0];
+    parts.forEach(function(s){ if (s !== cr && payers.indexOf(s) < 0){ var k = s+"|"+cr; ii[k] = (ii[k]||0) + per; } });
+  });
+  var iiHtml = "", iiNet = {omar:0, majed:0, waseem:0};
+  Object.keys(ii).forEach(function(k){ if (ii[k] > 0.5){ var pr = k.split("|"); iiHtml += PN[pr[0]] + ' يدفع لـ' + PN[pr[1]] + ' ' + FM(ii[k]) + ' ر.س<br>'; iiNet[pr[0]] -= ii[k]; iiNet[pr[1]] += ii[k]; } });
+  var fO = oNet - iiNet.omar, fM = mNet - iiNet.majed, fW = wNet - iiNet.waseem;
+
   // Build settlement instructions
   var debts = [];
   var people = [{name:"\u0639\u0645\u0631", net:oNet}, {name:"\u0645\u0627\u062C\u062F", net:mNet}, {name:"\u0648\u0633\u064A\u0645", net:wNet}];
@@ -1620,7 +1649,15 @@ function calc(){
   var creditors = people.filter(function(p){ return p.net > 0.5; }).map(function(p){ return {name:p.name, amt:p.net}; });
 
   if (debtors.length === 0) {
-    sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div><div class="set-b" style="color:#1a4731">\u0627\u0644\u062C\u0645\u064A\u0639 \u0645\u062A\u0633\u0627\u0648\u0648\u0646 \u062A\u0645\u0627\u0645\u0627\u064B</div></div>';
+    var reserve = oNet + mNet + wNet; // = \u0645\u0627 \u062F\u062E\u0644 \u2212 \u0645\u0627 \u0635\u064F\u0631\u0641 = \u0631\u0635\u064A\u062F \u0627\u0644\u0635\u0646\u062F\u0648\u0642 \u0627\u0644\u0645\u0634\u062A\u0631\u0643
+    if (reserve < 1 && !iiHtml) {
+      sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div><div class="set-b" style="color:#1a4731">\u0627\u0644\u062C\u0645\u064A\u0639 \u0645\u062A\u0633\u0627\u0648\u0648\u0646 \u062A\u0645\u0627\u0645\u0627\u064B</div></div>';
+    } else {
+      var h = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629</div><div class="set-b" style="color:#1a4731">';
+      if (iiHtml) h += '<b>\u0628\u064A\u0646 \u0627\u0644\u0623\u0641\u0631\u0627\u062F:</b><br>' + iiHtml;
+      h += '<b>\u{1F3E6} \u0627\u0644\u0635\u0646\u062F\u0648\u0642 (\u0633\u064A\u0648\u0644\u0629 \u0645\u0634\u062A\u0631\u0643\u0629) \u2014 \u0627\u0644\u0645\u062A\u0628\u0642\u064A ' + FM(reserve) + ' \u0631.\u0633</b><br>\u064A\u0631\u062F\u0651 \u0644\u0640: \u0639\u0645\u0631 ' + FM(fO) + ' \u00B7 \u0645\u0627\u062C\u062F ' + FM(fM) + ' \u00B7 \u0648\u0633\u064A\u0645 ' + FM(fW) + '</div></div>';
+      sa.innerHTML = h;
+    }
   } else {
     // Simple settlement: each debtor pays each creditor
     var settHtml = '<div class="sett"><div class="set-t">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629</div><div class="set-b">';
@@ -1663,13 +1700,13 @@ function renE(){
     return;
   }
   var html = "";
-  var rev = [].concat(list).reverse();
-  rev.forEach(function(e){
+  // عرض زمني بترتيب الإدخال (الأقدم أولاً) — بلا عكس
+  list.forEach(function(e){
     var i = exps.indexOf(e);
     var ptc, ptx;
     if (Array.isArray(e.pay)) {
       if (e.pay.length === 3) { ptc = "pts"; ptx = "\u0645\u0634\u062A\u0631\u0643"; }
-      else if (e.pay.length === 1) { ptc = e.pay[0] === "omar" ? "pto" : e.pay[0] === "majed" ? "ptm" : "ptw"; ptx = PN[e.pay[0]]; }
+      else if (e.pay.length === 1) { var pp = e.pay[0]; ptc = pp === "omar" ? "pto" : pp === "majed" ? "ptm" : pp === "waseem" ? "ptw" : "pts"; ptx = PN[pp] || pp; }
       else { ptc = "pts"; ptx = e.pay.map(function(p){ return PN[p]; }).join(" + "); }
     } else {
       ptc = e.pay === "split" ? "pts" : e.pay === "omar" ? "pto" : e.pay === "majed" ? "ptm" : "ptw";
@@ -2474,7 +2511,7 @@ loadLoc = function(){
 // Dedup in-memory arrays by unique keys (safe: only removes exact duplicates)
 function dedupAll(){
   var sE = {}, nE = [];
-  exps.forEach(function(e){ var k = (e.nm||"")+"|"+(e.ct||"")+"|"+(e.co||"")+"|"+(+e.am||0); if (!sE[k]){ sE[k]=true; nE.push(e); } });
+  exps.forEach(function(e){ var k = e.id ? ("id:"+e.id) : ((e.nm||"")+"|"+(e.ct||"")+"|"+(e.co||"")+"|"+(+e.am||0)); if (!sE[k]){ sE[k]=true; nE.push(e); } });
   exps = nE;
   var sT = {}, nT = [];
   tls.forEach(function(t){ var k = (t.co||"")+"|"+(t.cy||"")+"|"+dateKey(t.dt)+"|"+(t.hd||""); if (!sT[k]){ sT[k]=true; nT.push(t); } });
@@ -2485,6 +2522,9 @@ function dedupAll(){
   var sM = {}, nM = [];
   tasks.forEach(function(t){ var k = (t.name||"")+"|"+dateKey(t.dt); if (!sM[k]){ sM[k]=true; nM.push(t); } });
   tasks = nM;
+  var sC = {}, nC = [];
+  contribs.forEach(function(c){ var k = (c.who||"")+"|"+(+c.amount||0)+"|"+(c.note||""); if (!sC[k]){ sC[k]=true; nC.push(c); } });
+  contribs = nC;
 }
 
 // Extend buildRows/parse for bookings + tasks sync
@@ -2510,9 +2550,14 @@ parse = function(rows){
   tasks.forEach(function(t){ if (t.done) prevTkDone[t.name+"|"+dateKey(t.dt)] = true; });
   _parse(rows);
   bks = []; tasks = []; contribs = [];
-  var seenK = {}, seenM = {};
+  var seenK = {}, seenM = {}, seenC = {};
   rows.forEach(function(r){
-    if (r[0] === "C") { contribs.push({who:r[1], amount:+r[2]||0, note:r[3]||""}); }
+    if (r[0] === "C") {
+      var kC = (r[1]||"")+"|"+(+r[2]||0)+"|"+(r[3]||"");
+      if (seenC[kC]) return;
+      seenC[kC] = true;
+      contribs.push({who:r[1], amount:+r[2]||0, note:r[3]||""});
+    }
     if (r[0] === "K") {
       var kK = (r[1]||"")+"|"+(r[3]||"")+"|"+dateKey(r[4]);
       if (seenK[kK]) return;
@@ -2555,12 +2600,18 @@ function buildReport(){
   });
   var coSpend={},catSpend={};
   exps.forEach(function(e){ coSpend[e.co]=(coSpend[e.co]||0)+e.am; catSpend[e.ct]=(catSpend[e.ct]||0)+e.am; });
-  var fair=sp/3;
-  var ppl=[{n:"عمر",net:oP-fair},{n:"ماجد",net:mP-fair},{n:"وسيم",net:wP-fair}];
+  // نموذج الصندوق: النصيب حسب المشاركين الفعليين + احتساب المساهمات (التحويلات)
+  var owe={omar:0,majed:0,waseem:0};
+  exps.forEach(function(e){ var parts=(e.share&&e.share.length)?e.share:["omar","majed","waseem"]; var per=e.am/parts.length; parts.forEach(function(p){ if(owe[p]!==undefined) owe[p]+=per; }); });
+  var cBy={omar:0,majed:0,waseem:0};
+  contribs.forEach(function(c){ if(cBy[c.who]!==undefined) cBy[c.who]+=(c.amount||0); });
+  var ppl=[{n:"عمر",net:oP+cBy.omar-owe.omar},{n:"ماجد",net:mP+cBy.majed-owe.majed},{n:"وسيم",net:wP+cBy.waseem-owe.waseem}];
   var debt=ppl.filter(function(p){return p.net<-0.5;}).map(function(p){return {n:p.n,a:-p.net};});
   var cred=ppl.filter(function(p){return p.net>0.5;}).map(function(p){return {n:p.n,a:p.net};});
   var setl=[],di=0,ci=0;
   while(di<debt.length&&ci<cred.length){ var tr=Math.min(debt[di].a,cred[ci].a); if(tr>0.5) setl.push(debt[di].n+" يدفع لـ"+cred[ci].n+": "+FM(tr)+" ر.س"); debt[di].a-=tr; cred[ci].a-=tr; if(debt[di].a<0.5)di++; if(cred[ci].a<0.5)ci++; }
+  var reserve=ppl.reduce(function(s,p){return s+p.net;},0);
+  if(!debt.length && reserve>1){ setl.push("🏦 الصندوق (سيولة مشتركة): "+FM(reserve)+" ر.س — عمر "+FM(ppl[0].net)+" · ماجد "+FM(ppl[1].net)+" · وسيم "+FM(ppl[2].net)); }
 
   var h='<div class="rp-title">الرحلة الصيفية الثانية ١٤٤٨هـ</div>';
   h+='<div class="rp-sub">٣ – ٢٣ يوليو ٢٠٢٦ · عمر · ماجد · وسيم</div>';
@@ -2664,6 +2715,10 @@ document.getElementById("edit-share-seg").addEventListener("click",function(e){
 document.getElementById("edit-pay-seg").addEventListener("click",function(e){
   var btn=e.target.closest(".sg"); if(!btn) return;
   var p=btn.getAttribute("data-pay"); btn.classList.toggle("on");
+  if(btn.classList.contains("on")){
+    if(p==="fund"){ document.querySelectorAll('#edit-pay-seg .sg:not([data-pay="fund"])').forEach(function(x){ x.classList.remove("on"); }); }
+    else { var f=document.querySelector('#edit-pay-seg .sg[data-pay="fund"]'); if(f) f.classList.remove("on"); }
+  }
   editPay=[]; document.querySelectorAll("#edit-pay-seg .sg.on").forEach(function(x){ editPay.push(x.getAttribute("data-pay")); });
   if(!editPay.length){ btn.classList.add("on"); editPay=[p]; }
   updateEditPayUI();
@@ -2695,7 +2750,7 @@ document.getElementById("btn-save-edit-e").addEventListener("click",function(){
   if(editPay.length===1){ payInfo[editPay[0]]=am; }
   else if(editSplitMode==="equal"){ var each=am/editPay.length; editPay.forEach(function(p){ payInfo[p]=each; }); }
   else { var sum=0; editPay.forEach(function(p){ var v=toNum(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
-  exps[i]={nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
+  exps[i]={id:exps[i].id||uid(), nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
   document.getElementById("edit-e-modal-bg").classList.add("hidden");
   calc(); renE(); sched();
   toast("✓ تم تعديل المصروف");
