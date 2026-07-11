@@ -663,10 +663,10 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     <div class="mb">
       <label class="lbl">مَن دفع؟</label>
       <div class="seg" id="pay-seg">
-        <button class="sg on" data-pay="omar">عمر</button>
-        <button class="sg on" data-pay="majed">ماجد</button>
-        <button class="sg on" data-pay="waseem">وسيم</button>
-        <button class="sg" data-pay="fund">&#x1F3E6; الصندوق</button>
+        <button class="sg" data-pay="omar">عمر</button>
+        <button class="sg" data-pay="majed">ماجد</button>
+        <button class="sg" data-pay="waseem">وسيم</button>
+        <button class="sg on" data-pay="fund">&#x1F3E6; الصندوق</button>
       </div>
     </div>
     <div class="mb" id="pay-split-wrap" style="display:none">
@@ -1141,7 +1141,7 @@ var CB = {flights:"btr",taxi:"btr",carrental:"btr",tolls:"btr",food:"bfo",accomm
 var CO = ["sa","ma","dz","eg","za"];
 
 
-var pay = ["omar","majed","waseem"], fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
+var pay = ["fund"], fil = "all", exps = [], tls = [], sv = null, busy = false, curPri = "high";
 var PRI = {high:"\u0639\u0627\u0644\u064A\u0629", med:"\u0645\u062A\u0648\u0633\u0637\u0629", low:"\u0639\u0646\u062F \u0632\u064A\u0627\u062F\u0629 \u0627\u0644\u0648\u0642\u062A"};
 var PRIC = {high:"pri-high", med:"pri-med", low:"pri-low"};
 var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\u0648\u0633\u064A\u0645", split:"\u0645\u0634\u062A\u0631\u0643", fund:"\u{1F3E6} \u0627\u0644\u0635\u0646\u062F\u0648\u0642"};
@@ -1468,6 +1468,10 @@ function addE(){
   document.getElementById("pay-sum-hint").textContent = "";
   share = ["omar","majed","waseem"];
   document.querySelectorAll("#share-seg .sg").forEach(function(x){ x.classList.add("on"); });
+  // إعادة الدافع الافتراضي إلى «الصندوق»
+  pay = ["fund"];
+  document.querySelectorAll("#pay-seg .sg").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-pay") === "fund"); });
+  updatePayUI();
   calc(); renE(); sched();
   if (nm !== origNm) toast("سُجّل باسم «" + nm + "» لتمييزه");
 }
@@ -1643,8 +1647,15 @@ function calc(){
     var per = e.am / parts.length, cr = payers[0];
     parts.forEach(function(s){ if (s !== cr && payers.indexOf(s) < 0){ var k = s+"|"+cr; ii[k] = (ii[k]||0) + per; } });
   });
-  var iiHtml = "", iiNet = {omar:0, majed:0, waseem:0};
-  Object.keys(ii).forEach(function(k){ if (ii[k] > 0.5){ var pr = k.split("|"); iiHtml += PN[pr[0]] + ' يدفع لـ' + PN[pr[1]] + ' ' + FM(ii[k]) + ' ر.س<br>'; iiNet[pr[0]] -= ii[k]; iiNet[pr[1]] += ii[k]; } });
+  var iiNet = {omar:0, majed:0, waseem:0};
+  Object.keys(ii).forEach(function(k){ var pr = k.split("|"); iiNet[pr[0]] -= ii[k]; iiNet[pr[1]] += ii[k]; });
+  // مقاصّة الديون بين كل زوج: يبقى اتجاه واحد صافٍ فقط
+  var iiHtml = "";
+  [["omar","majed"],["omar","waseem"],["majed","waseem"]].forEach(function(pr){
+    var net = (ii[pr[0]+"|"+pr[1]]||0) - (ii[pr[1]+"|"+pr[0]]||0);
+    if (net > 0.5) iiHtml += PN[pr[0]] + ' يدفع لـ' + PN[pr[1]] + ' ' + FM(net) + ' ر.س<br>';
+    else if (net < -0.5) iiHtml += PN[pr[1]] + ' يدفع لـ' + PN[pr[0]] + ' ' + FM(-net) + ' ر.س<br>';
+  });
   var fO = oNet - iiNet.omar, fM = mNet - iiNet.majed, fW = wNet - iiNet.waseem;
 
   // Build settlement instructions
@@ -2593,7 +2604,8 @@ parse = function(rows){
   });
   bks.sort(function(a, b){ return (a.dt||"") > (b.dt||"") ? 1 : -1; });
   tasks.sort(function(a, b){ if (a.done !== b.done) return a.done ? 1 : -1; return (a.dt||"z") > (b.dt||"z") ? 1 : -1; });
-  saveLoc(); renBk(); renTk(); renC();
+  // إعادة حساب التسوية بعد تعبئة contribs (فـ_parse استدعى calc قبل تعبئتها)
+  saveLoc(); calc(); renE(); renBk(); renTk(); renC();
 };
 
 // Auto refresh every 30s
