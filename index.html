@@ -632,6 +632,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
       <label class="lbl">البيان</label>
       <input class="fi" type="text" id="en2" placeholder="مثال: تذاكر الطيران">
     </div>
+    <div class="mb"><label class="lbl">التاريخ</label><input class="fi" type="date" id="e-date"></div>
     <div class="g3">
       <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="ea2" placeholder="&#x0660;"></div>
       <div><label class="lbl">البلد</label>
@@ -1022,6 +1023,7 @@ html[data-theme="dark"] .contrib-bar{background:#3a2f1e}
     <div class="modal-t">تعديل المصروف</div>
     <input type="hidden" id="edit-e-idx">
     <div class="mb"><label class="lbl">البيان</label><input class="fi" type="text" id="edit-en"></div>
+    <div class="mb"><label class="lbl">التاريخ</label><input class="fi" type="date" id="edit-e-date"></div>
     <div class="g3">
       <div><label class="lbl">المبلغ (ر.س)</label><input class="fi" type="text" inputmode="decimal" id="edit-ea"></div>
       <div><label class="lbl">البلد</label>
@@ -1147,6 +1149,8 @@ var PN = {omar:"\u0639\u0645\u0631", majed:"\u0645\u0627\u062C\u062F", waseem:"\
 function AR(n){ return String(n); }
 // معرّف فريد لكل مصروف — يمنع حذف مصروفين حقيقيين متطابقين المحتوى عند إزالة التكرار
 function uid(){ return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
+// تاريخ اليوم بصيغة YYYY-MM-DD (محلي)
+function todayStr(){ var d = new Date(); return d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2); }
 // تطبيع مدخلات المبالغ: يحوّل الأرقام العربية والفاصلة العربية (٫) إلى صيغة قياسية قبل parseFloat
 function toNum(s){
   if(s==null) return NaN;
@@ -1311,7 +1315,7 @@ function parse(rows){
         payArr = [payVal];
         payAmts = {}; payAmts[payVal] = +r[2];
       }
-      exps.push({id:r[8]||"", nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts, share:(r[7]||"").split("+").filter(Boolean)});
+      exps.push({id:r[8]||"", dt:r[9]||"", nm:r[1], am:+r[2], ct:r[3], co:r[4], pay:payArr, payAmts:payAmts, share:(r[7]||"").split("+").filter(Boolean)});
     }
     else if (r[0] === "T") {
       var kT = (r[1]||"")+"|"+(r[2]||"")+"|"+dateKey(r[3])+"|"+(r[4]||"");
@@ -1332,7 +1336,7 @@ function buildRows(){
   exps.forEach(function(e){
     var payStr = Array.isArray(e.pay) ? e.pay.join("+") : e.pay;
     var amtsStr = e.payAmts ? JSON.stringify(e.payAmts) : "";
-    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr, (e.share && e.share.length && e.share.length < 3) ? e.share.join("+") : "", e.id || ""]);
+    rows.push(["E", e.nm, e.am, e.ct, e.co, payStr, amtsStr, (e.share && e.share.length && e.share.length < 3) ? e.share.join("+") : "", e.id || "", e.dt || ""]);
   });
   tls.forEach(function(t){ rows.push(["T", t.co, t.cy, t.dt, t.hd, t.nb, t.ml, t.nt, t.pri || "high", t.done?"1":"0", t.att||"", t.map||""]); });
   return rows;
@@ -1455,9 +1459,11 @@ function addE(){
     while (exps.some(function(e){ return e.nm === base + " " + arDig(n); })) n++;
     nm = base + " " + arDig(n);
   }
-  exps.push({id:uid(), nm:nm, am:am, ct:ct, co:co, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
+  var edt = document.getElementById("e-date").value || todayStr();
+  exps.push({id:uid(), nm:nm, am:am, ct:ct, co:co, dt:edt, pay:pay.slice(), payAmts:payInfo, share:share.slice()});
   document.getElementById("en2").value = "";
   document.getElementById("ea2").value = "";
+  document.getElementById("e-date").value = todayStr();
   ["pa-omar","pa-majed","pa-waseem"].forEach(function(id){ document.getElementById(id).value = ""; });
   document.getElementById("pay-sum-hint").textContent = "";
   share = ["omar","majed","waseem"];
@@ -1700,12 +1706,16 @@ function renE(){
     return;
   }
   var html = "";
-  // ترتيب حسب وقت الإنشاء (المعرّف يبدأ بـDate.now): آخر ما أُدخل أولاً.
-  // القديمة بلا معرّف تبقى بترتيب الشيت معكوساً (أحدث صف أولاً) وتحت الجديدة.
+  // ترتيب: حسب التاريخ (الأحدث أولاً) ثم وقت الإنشاء (المعرّف) ثم ترتيب الشيت معكوساً.
+  // المؤرّخة تعلو غير المؤرّخة؛ القديمة بلا تاريخ/معرّف تبقى بترتيب الشيت معكوساً.
   var rev = [].concat(list).reverse();
   rev.sort(function(a, b){
+    var ad = dateKey(a.dt), bd = dateKey(b.dt);
+    if (ad && bd && ad !== bd) return ad < bd ? 1 : -1;
+    if (ad && !bd) return -1;
+    if (!ad && bd) return 1;
     var ai = a.id || "", bi = b.id || "";
-    if (ai && bi) return ai < bi ? 1 : (ai > bi ? -1 : 0);
+    if (ai && bi && ai !== bi) return ai < bi ? 1 : -1;
     if (ai && !bi) return -1;
     if (!ai && bi) return 1;
     return 0;
@@ -1726,7 +1736,7 @@ function renE(){
       + '<button class="dl" onclick="editE(' + i + ')" style="color:var(--gold)">\u270e</button>'
       + '<span class="bx ' + CB[e.ct] + '">' + CL[e.ct] + '</span>'
       + '<span class="cb">' + CF[e.co] + '</span>'
-      + '<span class="en2">' + e.nm + '</span>'
+      + '<span class="en2">' + e.nm + (e.dt ? ' <span style="font-size:9px;color:var(--t3);font-weight:400;white-space:nowrap">' + (function(){ var d = safeDate(e.dt); return d ? d.toLocaleDateString("ar-u-nu-latn", {month:"short", day:"numeric"}) : ""; })() + '</span>' : '') + '</span>'
       + '<span class="pt ' + ptc + '">' + ptx + '</span>'
       + '<span class="ea">' + FM(e.am) + '</span>'
       + '</div>';
@@ -2692,6 +2702,7 @@ function editE(i){
   var e=exps[i]; if(!e) return;
   document.getElementById("edit-e-idx").value=i;
   document.getElementById("edit-en").value=e.nm;
+  document.getElementById("edit-e-date").value=dateKey(e.dt);
   document.getElementById("edit-ea").value=e.am;
   document.getElementById("edit-eco").value=e.co;
   document.getElementById("edit-ect").value=e.ct;
@@ -2759,7 +2770,8 @@ document.getElementById("btn-save-edit-e").addEventListener("click",function(){
   if(editPay.length===1){ payInfo[editPay[0]]=am; }
   else if(editSplitMode==="equal"){ var each=am/editPay.length; editPay.forEach(function(p){ payInfo[p]=each; }); }
   else { var sum=0; editPay.forEach(function(p){ var v=toNum(document.getElementById("edit-pa-"+p).value)||0; payInfo[p]=v; sum+=v; }); if(Math.abs(sum-am)>0.5){ toast("⚠️ مجموع المبالغ لا يساوي الإجمالي"); return; } }
-  exps[i]={id:exps[i].id||uid(), nm:nm, am:am, ct:ct, co:co, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
+  var edt=document.getElementById("edit-e-date").value || exps[i].dt || todayStr();
+  exps[i]={id:exps[i].id||uid(), nm:nm, am:am, ct:ct, co:co, dt:edt, pay:editPay.slice(), payAmts:payInfo, share:editShare.slice()};
   document.getElementById("edit-e-modal-bg").classList.add("hidden");
   calc(); renE(); sched();
   toast("✓ تم تعديل المصروف");
@@ -2898,6 +2910,8 @@ document.getElementById("btn-lock").addEventListener("click", function(){
 
 setEditMode(isEdit());
 renderCountdown();
+// تعبئة تاريخ نموذج المصروف بتاريخ اليوم افتراضياً
+(function(){ var d = document.getElementById("e-date"); if (d && !d.value) d.value = todayStr(); })();
 
 // ===== STAGE 2: DAILY ITINERARY VIEW =====
 var TRIP_LEGS = [
