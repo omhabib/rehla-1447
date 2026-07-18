@@ -1618,6 +1618,22 @@ function calc(){
   var mNet = mP + cBy.majed - owe.majed;
   var wNet = wP + cBy.waseem - owe.waseem;
 
+  // مقدّمات على بنود مشتركة (فرد دفع من جيبه لبند للجميع) يردّها الصندوق؛ وتسويات الأفراد لبنود الفئة
+  var cFront = {omar:0, majed:0, waseem:0}, iiC = {};
+  exps.forEach(function(e){
+    var parts = (e.share && e.share.length) ? e.share : ["omar","majed","waseem"];
+    if (!e.payAmts) return;
+    if (parts.length >= 3) { ["omar","majed","waseem"].forEach(function(p){ cFront[p] += (e.payAmts[p]||0); }); return; }
+    var payers = ["omar","majed","waseem"].filter(function(p){ return (e.payAmts[p]||0) > 0; });
+    if (!payers.length) return;
+    var per = e.am / parts.length, cr = payers[0];
+    parts.forEach(function(s){ if (s !== cr && payers.indexOf(s) < 0){ var k = s+"|"+cr; iiC[k] = (iiC[k]||0) + per; } });
+  });
+  var iiNetC = {omar:0, majed:0, waseem:0};
+  Object.keys(iiC).forEach(function(k){ var pr = k.split("|"); iiNetC[pr[0]] -= iiC[k]; iiNetC[pr[1]] += iiC[k]; });
+  // «المستحقّ الآن» لكل فرد = مقدّمه (يردّه الصندوق) + صافي ما بينه وبين الأفراد — بلا توزيع الوافر
+  var owedNow = {omar: cFront.omar + iiNetC.omar, majed: cFront.majed + iiNetC.majed, waseem: cFront.waseem + iiNetC.waseem};
+
   var ob = document.getElementById("ob"), mb = document.getElementById("mb2"), wb = document.getElementById("wb2");
 
   function setChip(el, net, name) {
@@ -1629,43 +1645,35 @@ function calc(){
       el.innerHTML = '<span class="chip cr2">\u0645\u062F\u064A\u0646 \u0628\u0640 ' + FM(-net) + ' \u0631.\u0633</span>';
     }
   }
-  setChip(ob, oNet);
-  setChip(mb, mNet);
-  setChip(wb, wNet);
+  setChip(ob, owedNow.omar);
+  setChip(mb, owedNow.majed);
+  setChip(wb, owedNow.waseem);
 
   // Settlement area
   var sa = document.getElementById("sa");
   if (!exps.length){ sa.innerHTML = ""; return; }
 
-  // تسويات الأفراد بين بعضهم: بنود الفئة (share<3) التي دفعها فرد لا الصندوق
-  var ii = {};
-  exps.forEach(function(e){
-    var parts = (e.share && e.share.length) ? e.share : ["omar","majed","waseem"];
-    if (parts.length >= 3 || !e.payAmts) return;
-    var payers = ["omar","majed","waseem"].filter(function(p){ return (e.payAmts[p]||0) > 0; });
-    if (!payers.length) return;
-    var per = e.am / parts.length, cr = payers[0];
-    parts.forEach(function(s){ if (s !== cr && payers.indexOf(s) < 0){ var k = s+"|"+cr; ii[k] = (ii[k]||0) + per; } });
-  });
-  var iiNet = {omar:0, majed:0, waseem:0};
-  Object.keys(ii).forEach(function(k){ var pr = k.split("|"); iiNet[pr[0]] -= ii[k]; iiNet[pr[1]] += ii[k]; });
-  // مقاصّة الديون بين كل زوج: يبقى اتجاه واحد صافٍ فقط
+  // نموذج نهائي: مقدّمات يردّها الصندوق + بين الأفراد (مقاصّة) + سيولة مشتركة (بلا توزيع الوافر)
+  var frontHtml = "";
+  ["omar","majed","waseem"].forEach(function(p){ if (cFront[p] > 0.5) frontHtml += PN[p] + ' يُستحقّ له ' + FM(cFront[p]) + ' ر.س<br>'; });
   var iiHtml = "";
   [["omar","majed"],["omar","waseem"],["majed","waseem"]].forEach(function(pr){
-    var net = (ii[pr[0]+"|"+pr[1]]||0) - (ii[pr[1]+"|"+pr[0]]||0);
-    if (net > 0.5) iiHtml += PN[pr[0]] + ' يدفع لـ' + PN[pr[1]] + ' ' + FM(net) + ' ر.س<br>';
-    else if (net < -0.5) iiHtml += PN[pr[1]] + ' يدفع لـ' + PN[pr[0]] + ' ' + FM(-net) + ' ر.س<br>';
+    var dd = (iiC[pr[0]+"|"+pr[1]]||0) - (iiC[pr[1]+"|"+pr[0]]||0);
+    if (dd > 0.5) iiHtml += PN[pr[0]] + ' يدفع لـ' + PN[pr[1]] + ' ' + FM(dd) + ' ر.س<br>';
+    else if (dd < -0.5) iiHtml += PN[pr[1]] + ' يدفع لـ' + PN[pr[0]] + ' ' + FM(-dd) + ' ر.س<br>';
   });
-  var fO = oNet - iiNet.omar, fM = mNet - iiNet.majed, fW = wNet - iiNet.waseem;
+  var liq = (oNet + mNet + wNet) - (cFront.omar + cFront.majed + cFront.waseem);
 
-  // Build settlement instructions
-  var debts = [];
-  var people = [{name:"\u0639\u0645\u0631", net:oNet}, {name:"\u0645\u0627\u062C\u062F", net:mNet}, {name:"\u0648\u0633\u064A\u0645", net:wNet}];
-  // Sort: debtors first (negative net), then creditors (positive net)
-  var debtors = people.filter(function(p){ return p.net < -0.5; }).map(function(p){ return {name:p.name, amt:-p.net}; });
-  var creditors = people.filter(function(p){ return p.net > 0.5; }).map(function(p){ return {name:p.name, amt:p.net}; });
-
-  if (debtors.length === 0) {
+  if (!frontHtml && !iiHtml && liq < 1) {
+    sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div></div>';
+  } else {
+    var h = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629</div><div class="set-b" style="color:#1a4731">';
+    if (frontHtml) h += '<b>\u0645\u0633\u062A\u062D\u0642\u0651\u0627\u062A \u0645\u0642\u062F\u0651\u0645\u0629 (\u064A\u0631\u062F\u0651\u0647\u0627 \u0627\u0644\u0635\u0646\u062F\u0648\u0642):</b><br>' + frontHtml;
+    if (iiHtml) h += '<b>\u0628\u064A\u0646 \u0627\u0644\u0623\u0641\u0631\u0627\u062F:</b><br>' + iiHtml;
+    h += '<b>\u{1F3E6} \u0627\u0644\u0635\u0646\u062F\u0648\u0642 (\u0633\u064A\u0648\u0644\u0629 \u0645\u0634\u062A\u0631\u0643\u0629): ' + FM(liq) + ' \u0631.\u0633</b><br><span style="font-size:11px;opacity:.85">\u062A\u0628\u0642\u0649 \u0644\u0628\u0642\u064A\u0629 \u0627\u0644\u0631\u062D\u0644\u0629 \u2014 \u0644\u0627 \u062A\u064F\u0648\u0632\u064E\u0651\u0639 \u0627\u0644\u0622\u0646</span></div></div>';
+    sa.innerHTML = h;
+  }
+  if (false) {
     var reserve = oNet + mNet + wNet; // = \u0645\u0627 \u062F\u062E\u0644 \u2212 \u0645\u0627 \u0635\u064F\u0631\u0641 = \u0631\u0635\u064A\u062F \u0627\u0644\u0635\u0646\u062F\u0648\u0642 \u0627\u0644\u0645\u0634\u062A\u0631\u0643
     if (reserve < 1 && !iiHtml) {
       sa.innerHTML = '<div class="sett sev"><div class="set-t" style="color:#1a4731">\u2713 \u0627\u0644\u062D\u0633\u0627\u0628 \u0645\u062A\u0633\u0627\u0648\u064D</div><div class="set-b" style="color:#1a4731">\u0627\u0644\u062C\u0645\u064A\u0639 \u0645\u062A\u0633\u0627\u0648\u0648\u0646 \u062A\u0645\u0627\u0645\u0627\u064B</div></div>';
@@ -1675,9 +1683,10 @@ function calc(){
       h += '<b>\u{1F3E6} \u0627\u0644\u0635\u0646\u062F\u0648\u0642 (\u0633\u064A\u0648\u0644\u0629 \u0645\u0634\u062A\u0631\u0643\u0629) \u2014 \u0627\u0644\u0645\u062A\u0628\u0642\u064A ' + FM(reserve) + ' \u0631.\u0633</b><br>\u064A\u0631\u062F\u0651 \u0644\u0640: \u0639\u0645\u0631 ' + FM(fO) + ' \u00B7 \u0645\u0627\u062C\u062F ' + FM(fM) + ' \u00B7 \u0648\u0633\u064A\u0645 ' + FM(fW) + '</div></div>';
       sa.innerHTML = h;
     }
-  } else {
-    // Simple settlement: each debtor pays each creditor
-    var settHtml = '<div class="sett"><div class="set-t">\u2696\uFE0F \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629</div><div class="set-b">';
+  }
+  if (false) {
+    // (\u0643\u0648\u062F \u0642\u062F\u064A\u0645 \u0645\u064F\u0639\u0637\u064E\u0651\u0644) \u0627\u0644\u062A\u0633\u0648\u064A\u0629 \u0628\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u0645\u062F\u064A\u0646/\u0627\u0644\u062F\u0627\u0626\u0646
+    var settHtml = '', debtors = [], creditors = [];
     var di = 0, ci = 0;
     var dList = debtors.slice(), cList = creditors.slice();
     while (di < dList.length && ci < cList.length) {
