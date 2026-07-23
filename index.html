@@ -2934,6 +2934,41 @@ renderCountdown();
 // تعبئة تاريخ نموذج المصروف بتاريخ اليوم افتراضياً
 (function(){ var d = document.getElementById("e-date"); if (d && !d.value) d.value = todayStr(); })();
 
+// ===== تبويب الميزانية للمالك فقط =====
+var OWNER_PASS = "2022"; // ← رمز فتح تبويب الميزانية على جهاز المالك
+function isOwner(){ try { return localStorage.getItem("t_owner") === "1"; } catch(e){ return false; } }
+function applyOwnerVisibility(){
+  var tb = document.getElementById("tab-b"), pgb = document.getElementById("pg-b");
+  if (!tb || !pgb) return;
+  if (isOwner()){ tb.style.display = ""; return; }
+  tb.style.display = "none";
+  // إن كانت الميزانية معروضةً لغير المالك، انتقل للبرنامج
+  if (pgb.classList.contains("on")){
+    document.querySelectorAll(".pg").forEach(function(p){ p.classList.remove("on"); });
+    document.querySelectorAll(".tab").forEach(function(b){ b.classList.remove("on"); });
+    var pt = document.getElementById("pg-t"), tt = document.getElementById("tab-t");
+    if (pt) pt.classList.add("on"); if (tt) tt.classList.add("on");
+  }
+}
+// فتح/قفل بالضغط على العنوان ٥ مرّات ثم إدخال الرمز
+(function(){
+  var t = document.querySelector(".hdr-title"); if (!t) return;
+  t.style.cursor = "default"; var taps = 0, timer = null;
+  t.addEventListener("click", function(){
+    taps++; clearTimeout(timer); timer = setTimeout(function(){ taps = 0; }, 1200);
+    if (taps < 5) return;
+    taps = 0;
+    var code = prompt("أدخل رمز المالك:");
+    if (code === null) return;
+    if (code === OWNER_PASS){
+      if (isOwner()){ localStorage.removeItem("t_owner"); alert("أُقفل تبويب الميزانية على هذا الجهاز."); }
+      else { try{ localStorage.setItem("t_owner","1"); }catch(e){} alert("فُتح تبويب الميزانية على هذا الجهاز."); }
+      applyOwnerVisibility();
+    } else { alert("رمز غير صحيح."); }
+  });
+})();
+applyOwnerVisibility();
+
 // ===== STAGE 2: DAILY ITINERARY VIEW =====
 var TRIP_LEGS = [
   {co:"ma", start:"2026-07-03", arrive:"جدة ← الدار البيضاء"},
